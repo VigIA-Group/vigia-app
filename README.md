@@ -1,50 +1,101 @@
-# Welcome to your Expo app 👋
+# VigIA
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil de VigIA para monitoreo y análisis inteligente.
 
-## Get started
+## 🎨 Sistema de Diseño
 
-1. Install dependencies
+### Colores Primarios
 
-   ```bash
-   npm install
-   ```
+- **Primary (Cyan)**: `#06b6d4` - Color principal de marca
+- **Secondary (Blue)**: `#3b82f6` - Color secundario de marca
 
-2. Start the app
+### Colores de Acento
 
-   ```bash
-   npx expo start
-   ```
+- **Success (Emerald)**: `#34d399` - Confirmaciones y estados positivos
+- **Purple**: `#a78bfa` - Métricas secundarias
+- **Warning (Amber)**: `#fbbf24` - Destacados y advertencias
+- **Danger (Red)**: `#f87171` - Alertas críticas
+- **Alert (Orange)**: `#fb923c` - Caídas y urgencia media
 
-In the output, you'll find options to open the app in a
+### Colores por Módulo
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **OCR y Placas**: Cyan `#06b6d4`
+- **Análisis de Personas**: Blue `#3b82f6`
+- **Intrusión y Perímetros**: Amber `#fbbf24`
+- **Objetos Robados**: Red `#f87171`
+- **Caídas y Movimiento**: Orange `#fb923c`
+- **Clasificación y Tampering**: Purple `#a78bfa`
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Dark Mode
 
-## Get a fresh project
+- Fondo principal: `#020617` (slate-950)
+- Cards: `#0f172a` (slate-900)
+- Elementos secundarios: `#1e293b` (slate-800)
+- Bordes: `#334155` (slate-700)
+- Texto primario: `#ffffff` (blanco)
+- Texto secundario: `#cbd5e1` (slate-300)
+- Texto terciario: `#94a3b8` (slate-400)
+- Labels: `#64748b` (slate-500)
 
-When you're ready, run:
+### Light Mode
+
+- Fondo principal: `#f8fafc` (slate-50)
+- Cards: `#ffffff` (blanco)
+- Bordes: `#e2e8f0` (slate-200)
+- Texto primario: `#0f172a` (slate-900)
+- Texto secundario: `#475569` (slate-600)
+
+## 🚀 Scripts
 
 ```bash
-npm run reset-project
+# Iniciar el servidor de desarrollo
+npm start
+
+# Iniciar en Android
+npm run android
+
+# Iniciar en iOS
+npm run ios
+
+# Iniciar en web
+npm run web
+
+# Linting
+npm run lint
+
+# Formateo con Prettier
+npm run format
+npm run format:check
+
+# Verificación de tipos TypeScript
+npm run type-check
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🔧 Stack Tecnológico
 
-## Learn more
+- **Framework**: Expo 54
+- **UI Library**: Tamagui 2.0
+- **Navigation**: Expo Router 6
+- **Language**: TypeScript 5.9
+- **Animations**: Moti & Reanimated
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📦 CI/CD
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+El proyecto incluye GitHub Actions configurado para:
 
-## Join the community
+- ✅ ESLint
+- ✅ TypeScript type checking
+- ✅ Prettier formatting
+- ✅ Expo Doctor
 
-Join our community of developers creating universal apps.
+Los workflows se ejecutan en todos los push y pull requests a cualquier rama.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 📱 Desarrollo
+
+Este proyecto usa Expo Router para la navegación basada en archivos. La estructura de la app está en el directorio `app/`.
+
+La configuración de temas y colores está en `tamagui.config.ts`.
+
+## 📄 Licencia
+
+Privado - VigIA Group
