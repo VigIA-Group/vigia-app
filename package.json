@@ -55,6 +55,7 @@
     "victory-native": "^41.20.2"
   },
   "devDependencies": {
+    "@tamagui/babel-plugin": "^2.0.0-rc.34",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
