@@ -1,15 +1,19 @@
 import { createMedia } from "@tamagui/react-native-media-driver";
 import { shorthands } from "@tamagui/shorthands";
 import { tokens as defaultTokens } from "@tamagui/themes";
-import { createTamagui, createTokens } from "tamagui";
+import { createFont, createTamagui, createTokens } from "tamagui";
 
 // Tokens personalizados de VigIA
 const tokens = createTokens({
   ...defaultTokens,
   color: {
-    // Colores primarios de marca
-    primary: "#06b6d4", // cyan
-    secondary: "#3b82f6", // blue
+    // Colores primarios de marca — degradé del logotipo
+    brandNavy: "#1e3a8a", // azul oscuro (izquierda del isotipo)
+    brandBlue: "#2563eb", // azul medio
+    primary: "#3b82f6", // azul principal
+    secondary: "#1d4ed8", // blue-700
+    brandSky: "#60a5fa", // azul claro (parte derecha del isotipo)
+    brandIce: "#93c5fd", // celeste suave (gradiente final)
 
     // Colores de acento
     success: "#34d399", // emerald - confirmaciones y estados positivos
@@ -19,29 +23,29 @@ const tokens = createTokens({
     alert: "#fb923c", // orange - caídas y urgencia media
 
     // Colores por módulo
-    ocr: "#06b6d4", // cyan - OCR y placas
+    ocr: "#3b82f6", // cyan - OCR y placas
     people: "#3b82f6", // blue - análisis de personas
     intrusion: "#fbbf24", // amber - intrusión y perímetros
     stolen: "#f87171", // red - objetos robados
     fall: "#fb923c", // orange - caídas y movimiento
     tampering: "#a78bfa", // purple - clasificación y tampering
 
-    // Dark mode colors
+    // Dark mode colors - improved contrast
     darkBg: "#020617", // slate-950 - fondo más profundo
     darkCard: "#0f172a", // slate-900 - fondo de cards
     darkSecondary: "#1e293b", // slate-800 - elementos secundarios
     darkBorder: "#334155", // slate-700 - bordes
     darkTextPrimary: "#ffffff", // blanco puro
-    darkTextSecondary: "#cbd5e1", // slate-300
-    darkTextTertiary: "#94a3b8", // slate-400
-    darkTextLabel: "#64748b", // slate-500
+    darkTextSecondary: "#e2e8f0", // slate-200 - lighter for better contrast
+    darkTextTertiary: "#cbd5e1", // slate-300 - lighter
+    darkTextLabel: "#94a3b8", // slate-400 - lighter
 
-    // Light mode colors
+    // Light mode colors - using more blue
     lightBg: "#f8fafc", // slate-50 - fondo principal
     lightCard: "#ffffff", // blanco - cards
-    lightBorder: "#e2e8f0", // slate-200 - bordes
+    lightBorder: "#cbd5e1", // slate-300 - darker borders for better contrast
     lightTextPrimary: "#0f172a", // slate-900 - texto principal
-    lightTextSecondary: "#475569", // slate-600 - texto secundario
+    lightTextSecondary: "#334155", // slate-700 - darker secondary text
   },
 });
 
@@ -104,6 +108,93 @@ const media = createMedia({
   pointerCoarse: { pointer: "coarse" },
 });
 
+const bodyFont = createFont({
+  family: "Outfit",
+  size: {
+    1: 12,
+    2: 13,
+    3: 14,
+    4: 15,
+    5: 16,
+    6: 17,
+    7: 20,
+    8: 22,
+    9: 24,
+    10: 26,
+    11: 30,
+    12: 34,
+    true: 15,
+  },
+  lineHeight: {
+    1: 17,
+    2: 19,
+    3: 21,
+    4: 22,
+    5: 23,
+    6: 25,
+    7: 28,
+    8: 30,
+    9: 32,
+    10: 34,
+    11: 38,
+    12: 42,
+    true: 22,
+  },
+  weight: {
+    1: "400",
+    2: "400",
+    3: "400",
+    4: "400",
+    5: "400",
+    6: "500",
+    7: "600",
+    8: "700",
+    true: "400",
+  },
+  letterSpacing: { 4: 0 },
+  face: {
+    400: { normal: "Outfit_400Regular" },
+    500: { normal: "Outfit_500Medium" },
+    600: { normal: "Outfit_600SemiBold" },
+    700: { normal: "Outfit_700Bold" },
+  },
+});
+
+const monoFont = createFont({
+  family: "IBMPlexMono",
+  size: {
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 14,
+    5: 15,
+    6: 17,
+    7: 19,
+    8: 21,
+    true: 14,
+  },
+  lineHeight: {
+    1: 15,
+    2: 17,
+    3: 19,
+    4: 21,
+    5: 23,
+    6: 25,
+    7: 27,
+    8: 29,
+    true: 21,
+  },
+  weight: {
+    1: "400",
+    true: "400",
+  },
+  letterSpacing: { 4: 0 },
+  face: {
+    400: { normal: "IBMPlexMono_400Regular" },
+    700: { normal: "IBMPlexMono_700Bold" },
+  },
+});
+
 export const tamaguiConfig = createTamagui({
   tokens,
   themes: customThemes,
@@ -113,14 +204,9 @@ export const tamaguiConfig = createTamagui({
   shouldAddPrefersColorThemes: true,
   themeClassNameOnRoot: true,
   fonts: {
-    body: {
-      family: "System",
-      size: {},
-      lineHeight: {},
-      weight: {},
-      letterSpacing: {},
-      face: {},
-    },
+    body: bodyFont,
+    heading: bodyFont,
+    mono: monoFont,
   },
 });
 
