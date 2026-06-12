@@ -7,25 +7,25 @@ import { InsightCard } from "@/src/components/insight-card";
 import { PageContainer } from "@/src/components/page-container";
 // import { ReportChatSheet } from "@/src/components/report-chat-sheet"; // Deshabilitado hasta tener backend de IA
 import {
-  filterHourly,
-  HOUR_RANGES,
-  INSIGHTS,
-  type DailyPeoplePoint,
-  type HourRange,
+    filterHourly,
+    HOUR_RANGES,
+    INSIGHTS,
+    type DailyPeoplePoint,
+    type HourRange,
 } from "@/src/data/mock";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
-  BarChart2,
-  Bell,
-  Filter,
-  GitCompareArrows,
-  Map,
-  MessageCircle,
-  ShieldAlert,
-  Users,
+    BarChart2,
+    Bell,
+    Filter,
+    GitCompareArrows,
+    Map,
+    MessageCircle,
+    ShieldAlert,
+    Users,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, Switch } from "react-native";
@@ -355,6 +355,8 @@ export default function ReportsScreen() {
 
   const onBarPress = (label: string, value: number) => setSelectedBar({ label, value });
 
+  const heatmapCameras = CAMERAS.filter((c) => c.status !== "offline");
+
   // Load live heatmap data from Supabase
   useEffect(() => {
     if (!ready || activeTab !== "heatmaps") return;
@@ -401,8 +403,6 @@ export default function ReportsScreen() {
     ALERTS_BY_MODULE.length > 0
       ? ALERTS_BY_MODULE.reduce((b, a) => (a.count > b.count ? a : b))
       : { moduleId: "people", label: "Análisis de Personas", count: 0, color: "#3b82f6" };
-
-  const heatmapCameras = CAMERAS.filter((c) => c.status !== "offline");
 
   const formatDay = (date: Date | null) =>
     date
