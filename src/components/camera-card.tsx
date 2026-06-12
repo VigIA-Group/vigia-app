@@ -1,26 +1,10 @@
 import type { Camera } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { VideoView, useVideoPlayer } from "expo-video";
-import {
-  Camera as CameraIcon,
-  PackageX,
-  PersonStanding,
-  ScanLine,
-  ShieldAlert,
-  Users,
-} from "lucide-react-native";
+import { Camera as CameraIcon } from "lucide-react-native";
 import { MotiView } from "moti";
 import { Text, View, XStack, YStack } from "tamagui";
 import { ModuleChip } from "./module-chip";
-
-const MODULE_ICONS: Record<string, React.ElementType> = {
-  ocr: ScanLine,
-  people: Users,
-  intrusion: ShieldAlert,
-  stolen: PackageX,
-  fall: PersonStanding,
-  tampering: CameraIcon,
-};
 
 const VIDEO_SOURCES = [
   require("@/assets/video1.mp4"),

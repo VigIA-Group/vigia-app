@@ -37,7 +37,7 @@ export default function ProfileScreen() {
   const colors = useColors();
   const { theme: appTheme, setTheme: setAppTheme } = useAppTheme();
   const { signOut } = useAuth();
-  const { organization, membership } = useOrganization();
+  const { membership } = useOrganization();
   const { user } = useUser();
   const { supabase, ready } = useSupabaseAuth();
 
@@ -152,11 +152,6 @@ export default function ProfileScreen() {
   const expiryColor =
     LICENSE.daysRemaining < 30 ? "#f87171" : LICENSE.daysRemaining < 60 ? "#fbbf24" : "#34d399";
 
-  const licenseProgress = Math.min(
-    (new Date().getFullYear() - new Date(LICENSE.startedAt).getFullYear()) * 365 +
-      ((new Date().getMonth() - new Date(LICENSE.startedAt).getMonth()) * 30) / 365,
-    1
-  );
   const periodProgress = 1 - LICENSE.daysRemaining / 365;
 
   return (

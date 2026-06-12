@@ -10,16 +10,14 @@ import {
   BlurMask,
   Canvas,
   Circle,
-  Fill,
   Image,
   Paint,
-  Rect,
   RadialGradient,
+  Rect,
   useImage,
   vec,
 } from "@shopify/react-native-skia";
 import { useMemo } from "react";
-import { View } from "tamagui";
 
 export type HeatPoint = { x: number; y: number; weight: number };
 

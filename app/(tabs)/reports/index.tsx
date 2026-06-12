@@ -14,11 +14,9 @@ import {
   type HourRange,
 } from "@/src/data/mock";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
-import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useColors } from "@/src/hooks/use-colors";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   BarChart2,
   Bell,
@@ -27,7 +25,6 @@ import {
   Map,
   MessageCircle,
   ShieldAlert,
-  Sparkles,
   Users,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -158,7 +155,6 @@ function ModuleBar({
 export default function ReportsScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
-  const chatSheetRef = useRef<BottomSheet>(null);
   const filterSheetRef = useRef<BottomSheet>(null);
   const { isDesktop } = useBreakpoint();
   const { supabase, ready } = useSupabaseAuth();
@@ -348,11 +344,11 @@ export default function ReportsScreen() {
   const [compareRange, setCompareRange] = useState(false);
   const [compareStart, setCompareStart] = useState<Date | null>(null);
   const [compareEnd, setCompareEnd] = useState<Date | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [, setShowFilters] = useState(false);
   const [showDatePickerFor, setShowDatePickerFor] = useState<
     "single" | "start" | "end" | "compareStart" | "compareEnd" | "startTime" | "endTime" | null
   >(null);
-  const [datePickerMode, setDatePickerMode] = useState<"date" | "time">("date");
+  const [, setDatePickerMode] = useState<"date" | "time">("date");
   const [comparePeriod, setComparePeriod] = useState(false);
   const [selectedBar, setSelectedBar] = useState<{ label: string; value: number } | null>(null);
   const [selectedModuleBar, setSelectedModuleBar] = useState<string | null>(null);
@@ -394,7 +390,7 @@ export default function ReportsScreen() {
         // silently fall back to placeholder
       }
     });
-  }, [supabase, ready, activeTab, period]);
+  }, [supabase, ready, activeTab, period, heatmapCameras]);
 
   const totalAlerts7d = DAILY_ALERTS_7D.reduce(
     (s, d) => s + d.intrusion + d.stolen + d.fall + d.ocr + d.people + d.tampering,
@@ -417,8 +413,6 @@ export default function ReportsScreen() {
         })
       : "N/D";
 
-  const normalizeDateKey = (date: Date) => date.toISOString().split("T")[0];
-
   const withinDateRange = (value: string, start: Date | null, end: Date | null) => {
     if (!start || !end) return true;
     const t = new Date(value).getTime();
@@ -429,13 +423,8 @@ export default function ReportsScreen() {
     return t >= startDay.getTime() && t <= endDay.getTime();
   };
 
-  const isHourlySeries = (data: unknown[]): data is Array<{ hour: string; count: number }> =>
+  const isHourlySeries = (data: unknown[]): data is { hour: string; count: number }[] =>
     data.length > 0 && typeof (data[0] as any).hour === "string";
-
-  const selectedRangeLabel =
-    rangeStart && rangeEnd ? `${formatDay(rangeStart)} → ${formatDay(rangeEnd)}` : null;
-  const compareRangeLabel =
-    compareStart && compareEnd ? `${formatDay(compareStart)} → ${formatDay(compareEnd)}` : null;
 
   const baseTrafficData =
     selectedDay && !rangeStart && !rangeEnd
@@ -483,18 +472,6 @@ export default function ReportsScreen() {
   ) as DailyPeoplePoint;
 
   const hourTotal = isHourlySeries(trafficData) ? trafficData.reduce((s, d) => s + d.count, 0) : 0;
-
-  const chatContext = `${TABS.find((t) => t.id === activeTab)?.label} — ${
-    selectedRangeLabel
-      ? `Rango: ${selectedRangeLabel}`
-      : selectedDay
-        ? `Día: ${formatDay(selectedDay)}`
-        : period === "today"
-          ? "Hoy"
-          : period === "7d"
-            ? "últimos 7 días"
-            : "últimos 30 días"
-  }${selectedHourFrom !== null || selectedHourTo !== null ? ` • Horas ${selectedHourFrom ?? 0}-${selectedHourTo ?? 23}` : ""}`;
 
   return (
     <PageContainer>

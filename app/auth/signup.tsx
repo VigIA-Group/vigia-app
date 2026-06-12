@@ -1,7 +1,7 @@
 import type { LicensePlan } from "@/src/data/mock";
 import { LICENSE_PLANS } from "@/src/data/mock";
 import { supabase } from "@/src/lib/supabase";
-import { useAuth, useClerk } from "@clerk/expo";
+import { useClerk } from "@clerk/expo";
 import { useSignUp } from "@clerk/expo/legacy";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,7 +32,6 @@ function slugify(name: string): string {
 
 export default function SignupScreen() {
   const { signUp, isLoaded } = useSignUp();
-  const { getToken } = useAuth();
   const clerk = useClerk();
   const router = useRouter();
 

@@ -1,10 +1,8 @@
 import { ThemeContext, useThemeState } from "@/src/hooks/use-app-theme";
+import { usePushNotifications } from "@/src/hooks/use-push-notifications";
 import config from "@/tamagui.config";
-import {
-  IBMPlexMono_400Regular,
-  IBMPlexMono_700Bold,
-  useFonts as useIBMPlexMono,
-} from "@expo-google-fonts/ibm-plex-mono";
+import { ClerkProvider, useAuth } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
 import {
   DMSans_400Regular,
   DMSans_500Medium,
@@ -12,15 +10,16 @@ import {
   DMSans_700Bold,
   useFonts as useDMSans,
 } from "@expo-google-fonts/dm-sans";
-import { ClerkProvider, useAuth } from "@clerk/expo";
-import { usePushNotifications } from "@/src/hooks/use-push-notifications";
-import { tokenCache } from "@clerk/expo/token-cache";
+import {
+  IBMPlexMono_400Regular,
+  IBMPlexMono_700Bold,
+  useFonts as useIBMPlexMono,
+} from "@expo-google-fonts/ibm-plex-mono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -66,7 +65,7 @@ function AuthGate() {
     if (!isSignedIn && !inAuthGroup) {
       router.replace("/auth/login");
     }
-  }, [isSignedIn, isLoaded, segments]);
+  }, [isSignedIn, isLoaded, segments, router]);
 
   return null;
 }

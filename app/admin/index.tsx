@@ -6,18 +6,8 @@ import { useApiClient } from "@/src/hooks/use-api-client";
 import { useOrganization } from "@clerk/expo";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import {
-  ArrowLeft,
-  Ban,
-  CheckCircle,
-  ChevronDown,
-  Key,
-  MailPlus,
-  Shield,
-  UserMinus,
-  UserPlus,
-} from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Ban, CheckCircle, Key, MailPlus, Shield, UserPlus } from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Modal, ScrollView, StyleSheet, TextInput } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 
@@ -55,7 +45,7 @@ export default function AdminScreen() {
   const [inviteRole, setInviteRole] = useState<Role>("viewer");
   const [inviteLoading, setInviteLoading] = useState(false);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -66,11 +56,11 @@ export default function AdminScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [api]);
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [loadUsers]);
 
   const handleInvite = async () => {
     if (!inviteEmail) return;

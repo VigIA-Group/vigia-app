@@ -10,7 +10,7 @@ import {
   ShieldAlert,
   Users,
 } from "lucide-react-native";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import { Text, View, XStack, YStack } from "tamagui";
 import { OwlState } from "./owl-state";
 
@@ -32,11 +32,6 @@ export function ModuleInfoSheet({ module, onClose }: ModuleInfoSheetProps) {
   const snapPoints = ["60%", "90%"];
   const bottomSheetRef = useRef<BottomSheet>(null);
   const colors = useColors();
-
-  const handleClose = useCallback(() => {
-    bottomSheetRef.current?.close();
-    onClose();
-  }, [onClose]);
 
   if (!module) return null;
 

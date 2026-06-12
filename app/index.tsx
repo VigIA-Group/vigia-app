@@ -37,7 +37,7 @@ export default function SplashScreen() {
         router.replace("/auth/login");
       }
     });
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, decided]);
 
   return (
     <View flex={1}>

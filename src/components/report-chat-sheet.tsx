@@ -7,7 +7,7 @@ import { type AIChatMessage, getAIResponse } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { Bot, Send, Sparkles, X } from "lucide-react-native";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, TextInput } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 
@@ -44,7 +44,6 @@ export function ReportChatSheet({
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const scrollRef = useRef<BottomSheet>(null);
 
   const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
