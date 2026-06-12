@@ -1,26 +1,19 @@
-import {
-    CAMERAS,
-    MODULE_SCHEDULES,
-    ModuleSchedule,
-    getCameraById,
-    getModuleById,
-} from "@/src/data/mock";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useColors } from "@/src/hooks/use-colors";
 import { router } from "expo-router";
 import {
-    Camera,
-    ChevronDown,
-    ChevronRight,
-    Clock,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    Settings,
-    ShieldAlert,
-    Users,
-    X,
+  Camera,
+  ChevronDown,
+  ChevronRight,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  Settings,
+  ShieldAlert,
+  Users,
+  X,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -34,161 +27,82 @@ const MODULE_ICONS: Record<string, React.ElementType> = {
   Camera,
 };
 
-const DAY_LABELS = ["D", "L", "M", "X", "J", "V", "S"];
+const SERVICE_TO_ICON: Record<string, string> = {
+  people_analytics: "Users",
+  person_detection: "Users",
+  vehicle_plates: "ScanLine",
+  theft_detection: "PackageX",
+  heat_map: "Users",
+  intrusion_detection: "ShieldAlert",
+  fall_detection: "PersonStanding",
+  tampering_detection: "Camera",
+};
 
-function padHour(h: number): string {
-  return String(h).padStart(2, "0") + ":00";
-}
-
-function ScheduleRow({ schedule }: { schedule: ModuleSchedule }) {
-  const colors = useColors();
-  const [enabled, setEnabled] = useState(schedule.enabled);
-  const module = getModuleById(schedule.moduleId);
-  const IconComponent = MODULE_ICONS[module.icon] ?? ShieldAlert;
-
-  return (
-    <YStack paddingHorizontal={14} paddingVertical={12} gap={10} opacity={enabled ? 1 : 0.5}>
-      <XStack alignItems="center" justifyContent="space-between">
-        <XStack gap={10} alignItems="center" flex={1}>
-          <View
-            width={32}
-            height={32}
-            borderRadius={8}
-            backgroundColor={module.color + "22"}
-            alignItems="center"
-            justifyContent="center"
-          >
-            <IconComponent size={14} color={module.color} />
-          </View>
-          <YStack flex={1}>
-            <Text fontSize={13} fontWeight="600" color={colors.text} fontFamily="$body">
-              {module.name}
-            </Text>
-            <XStack gap={4} alignItems="center" marginTop={2}>
-              <Clock size={11} color={colors.textLabel} />
-              <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-                {padHour(schedule.startHour)} – {padHour(schedule.endHour)}
-              </Text>
-            </XStack>
-          </YStack>
-        </XStack>
-        <Switch
-          value={enabled}
-          onValueChange={setEnabled}
-          trackColor={{ false: colors.border, true: "rgba(59,130,246,0.5)" }}
-          thumbColor={enabled ? "#3b82f6" : colors.textLabel}
-        />
-      </XStack>
-
-      {/* Active days */}
-      <XStack gap={5}>
-        {DAY_LABELS.map((label, idx) => {
-          const active = schedule.activeDays.includes(idx);
-          return (
-            <View
-              key={idx}
-              width={26}
-              height={26}
-              borderRadius={6}
-              alignItems="center"
-              justifyContent="center"
-              backgroundColor={active ? module.color + "22" : colors.cardAlt}
-              borderWidth={1}
-              borderColor={active ? module.color + "55" : colors.border}
-            >
-              <Text
-                fontSize={10}
-                fontWeight="700"
-                color={active ? module.color : colors.textLabel}
-                fontFamily="$mono"
-              >
-                {label}
-              </Text>
-            </View>
-          );
-        })}
-      </XStack>
-    </YStack>
-  );
-}
-
-function CameraSection({ cameraId }: { cameraId: string }) {
-  const colors = useColors();
-  const [expanded, setExpanded] = useState(false);
-  const camera = getCameraById(cameraId);
-  if (!camera) return null;
-
-  const schedules = MODULE_SCHEDULES.filter((s) => s.cameraId === cameraId);
-  if (schedules.length === 0) return null;
-
-  return (
-    <View
-      backgroundColor={colors.card}
-      borderRadius={14}
-      borderWidth={1}
-      borderColor={colors.borderSoft}
-      marginBottom={12}
-      overflow="hidden"
-    >
-      {/* Header */}
-      <XStack
-        padding={14}
-        alignItems="center"
-        justifyContent="space-between"
-        pressStyle={{ opacity: 0.7 }}
-        onPress={() => setExpanded((v) => !v)}
-      >
-        <XStack gap={10} alignItems="center" flex={1}>
-          <View
-            width={36}
-            height={36}
-            borderRadius={10}
-            backgroundColor={colors.cardAlt}
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Camera size={16} color="#3b82f6" />
-          </View>
-          <YStack flex={1}>
-            <Text fontSize={14} fontWeight="700" color={colors.text} fontFamily="$body">
-              {camera.name}
-            </Text>
-            <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-              {camera.room} · {schedules.length} horario{schedules.length !== 1 ? "s" : ""}
-            </Text>
-          </YStack>
-        </XStack>
-        {expanded ? (
-          <ChevronDown size={16} color={colors.textLabel} />
-        ) : (
-          <ChevronRight size={16} color={colors.textLabel} />
-        )}
-      </XStack>
-
-      {/* Schedules */}
-      {expanded && (
-        <>
-          <View height={1} backgroundColor={colors.borderSoft} />
-          {schedules.map((sch, i) => (
-            <View key={sch.id}>
-              <ScheduleRow schedule={sch} />
-              {i < schedules.length - 1 && (
-                <View height={1} backgroundColor={colors.borderSoft} marginHorizontal={14} />
-              )}
-            </View>
-          ))}
-        </>
-      )}
-    </View>
-  );
-}
+const SERVICE_TO_COLOR: Record<string, string> = {
+  people_analytics: "#3b82f6",
+  person_detection: "#3b82f6",
+  vehicle_plates: "#3b82f6",
+  theft_detection: "#f87171",
+  heat_map: "#3b82f6",
+  intrusion_detection: "#fbbf24",
+  fall_detection: "#fb923c",
+  tampering_detection: "#a78bfa",
+};
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const { supabase, ready } = useSupabaseAuth();
+  const [cameras, setCameras] = useState<any[]>([]);
+  const [cameraServices, setCameraServices] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Only show cameras that have schedules
-  const camerasWithSchedules = [...new Set(MODULE_SCHEDULES.map((s) => s.cameraId))];
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const [{ data: cams }, { data: svcMap }, { data: svcCatalog }] = await Promise.all([
+          supabase
+            .from("cameras")
+            .select("id, name, status, is_active")
+            .eq("is_active", true)
+            .order("created_at"),
+          supabase
+            .from("camera_services")
+            .select("camera_id, service_id, is_enabled, service_catalog(key, name)")
+            .eq("is_enabled", true),
+          supabase.from("service_catalog").select("id, key, name"),
+        ]);
+        if (cancelled) return;
+        setCameras(cams ?? []);
+        setCameraServices(svcMap ?? []);
+        setServices(svcCatalog ?? []);
+      } catch (err: any) {
+        console.error("[settings] error:", err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready]);
+
+  // Map services by camera
+  const servicesByCamera = (cameraId: string) => {
+    const serviceIds = cameraServices
+      .filter((cs) => cs.camera_id === cameraId)
+      .map((cs) => cs.service_id);
+    return services.filter((s) => serviceIds.includes(s.id));
+  };
+
+  const camerasWithServices = cameras.filter((c) => servicesByCamera(c.id).length > 0);
+  const camerasWithoutServices = cameras.filter((c) => servicesByCamera(c.id).length === 0);
 
   return (
     <View flex={1} backgroundColor={colors.bg}>
@@ -229,7 +143,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
       >
-        {/* Section: Module Schedules */}
+        {/* Section: Active modules per camera */}
         <Text
           fontSize={11}
           fontWeight="700"
@@ -239,7 +153,7 @@ export default function SettingsScreen() {
           marginBottom={12}
           marginLeft={2}
         >
-          HORARIOS DE MÓDULOS POR CÁMARA
+          MÓDULOS ACTIVOS POR CÁMARA
         </Text>
         <Text
           fontSize={12}
@@ -249,57 +163,160 @@ export default function SettingsScreen() {
           marginLeft={2}
           lineHeight={18}
         >
-          Activa o desactiva módulos de IA para cada cámara según su horario de operación. Los
-          cambios se aplican en el próximo ciclo de análisis.
+          Módulos de IA habilitados para cada cámara. Los cambios se aplican en el próximo ciclo de
+          análisis.
         </Text>
 
-        {camerasWithSchedules.map((cameraId) => (
-          <CameraSection key={cameraId} cameraId={cameraId} />
-        ))}
-
-        {/* Cameras without schedules notice */}
-        <View
-          backgroundColor={colors.card}
-          borderRadius={14}
-          borderWidth={1}
-          borderColor={colors.borderSoft}
-          padding={16}
-          marginTop={4}
-        >
-          <Text
-            fontSize={11}
-            fontWeight="700"
-            color={colors.textLabel}
-            fontFamily="$body"
-            letterSpacing={1.2}
-            marginBottom={8}
-          >
-            OTRAS CÁMARAS
+        {loading ? (
+          <Text fontSize={14} color={colors.textLabel} textAlign="center" marginTop={40}>
+            Cargando…
           </Text>
-          <Text fontSize={12} color={colors.textTer} fontFamily="$body" lineHeight={18}>
-            Las cámaras sin horarios configurados ejecutan todos sus módulos activos de forma
-            continua durante las 24 horas.
-          </Text>
-          <YStack marginTop={12} gap={8}>
-            {CAMERAS.filter((c) => !camerasWithSchedules.includes(c.id)).map((cam) => (
-              <XStack key={cam.id} alignItems="center" gap={10}>
-                <View
-                  width={6}
-                  height={6}
-                  borderRadius={3}
-                  backgroundColor={cam.status === "offline" ? colors.textLabel : "#34d399"}
-                />
-                <Text fontSize={12} color={colors.textSec} fontFamily="$body">
-                  {cam.name}
-                </Text>
-                <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-                  — {cam.room}
-                </Text>
-              </XStack>
+        ) : (
+          <>
+            {camerasWithServices.map((cam) => (
+              <CameraSection key={cam.id} camera={cam} services={servicesByCamera(cam.id)} />
             ))}
-          </YStack>
-        </View>
+
+            {/* Cameras without services notice */}
+            {camerasWithoutServices.length > 0 && (
+              <View
+                backgroundColor={colors.card}
+                borderRadius={14}
+                borderWidth={1}
+                borderColor={colors.borderSoft}
+                padding={16}
+                marginTop={4}
+              >
+                <Text
+                  fontSize={11}
+                  fontWeight="700"
+                  color={colors.textLabel}
+                  fontFamily="$body"
+                  letterSpacing={1.2}
+                  marginBottom={8}
+                >
+                  CÁMARAS SIN MÓDULOS ACTIVOS
+                </Text>
+                <Text fontSize={12} color={colors.textTer} fontFamily="$body" lineHeight={18}>
+                  Estas cámaras no tienen módulos de análisis habilitados.
+                </Text>
+                <YStack marginTop={12} gap={8}>
+                  {camerasWithoutServices.map((cam) => (
+                    <XStack key={cam.id} alignItems="center" gap={10}>
+                      <View
+                        width={6}
+                        height={6}
+                        borderRadius={3}
+                        backgroundColor={cam.status === "offline" ? colors.textLabel : "#34d399"}
+                      />
+                      <Text fontSize={12} color={colors.textSec} fontFamily="$body">
+                        {cam.name}
+                      </Text>
+                    </XStack>
+                  ))}
+                </YStack>
+              </View>
+            )}
+          </>
+        )}
       </ScrollView>
+    </View>
+  );
+}
+
+function CameraSection({ camera, services }: { camera: any; services: any[] }) {
+  const colors = useColors();
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View
+      backgroundColor={colors.card}
+      borderRadius={14}
+      borderWidth={1}
+      borderColor={colors.borderSoft}
+      marginBottom={12}
+      overflow="hidden"
+    >
+      {/* Header */}
+      <XStack
+        padding={14}
+        alignItems="center"
+        justifyContent="space-between"
+        pressStyle={{ opacity: 0.7 }}
+        onPress={() => setExpanded((v) => !v)}
+      >
+        <XStack gap={10} alignItems="center" flex={1}>
+          <View
+            width={36}
+            height={36}
+            borderRadius={10}
+            backgroundColor={colors.cardAlt}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Camera size={16} color="#3b82f6" />
+          </View>
+          <YStack flex={1}>
+            <Text fontSize={14} fontWeight="700" color={colors.text} fontFamily="$body">
+              {camera.name}
+            </Text>
+            <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
+              {services.length} módulo{services.length !== 1 ? "s" : ""} activo
+              {services.length !== 1 ? "s" : ""}
+            </Text>
+          </YStack>
+        </XStack>
+        {expanded ? (
+          <ChevronDown size={16} color={colors.textLabel} />
+        ) : (
+          <ChevronRight size={16} color={colors.textLabel} />
+        )}
+      </XStack>
+
+      {/* Services */}
+      {expanded && (
+        <>
+          <View height={1} backgroundColor={colors.borderSoft} />
+          {services.map((svc, i) => {
+            const iconName = SERVICE_TO_ICON[svc.key] ?? "ShieldAlert";
+            const IconComponent = MODULE_ICONS[iconName] ?? ShieldAlert;
+            const color = SERVICE_TO_COLOR[svc.key] ?? "#3b82f6";
+            return (
+              <View key={svc.id}>
+                <XStack paddingHorizontal={14} paddingVertical={12} alignItems="center" gap={10}>
+                  <View
+                    width={32}
+                    height={32}
+                    borderRadius={8}
+                    backgroundColor={color + "22"}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <IconComponent size={14} color={color} />
+                  </View>
+                  <YStack flex={1}>
+                    <Text fontSize={13} fontWeight="600" color={colors.text} fontFamily="$body">
+                      {svc.name}
+                    </Text>
+                    <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
+                      Activo 24 horas
+                    </Text>
+                  </YStack>
+                  <Switch
+                    value={true}
+                    disabled
+                    trackColor={{ false: colors.border, true: "rgba(59,130,246,0.5)" }}
+                    thumbColor="#3b82f6"
+                  />
+                </XStack>
+                {i < services.length - 1 && (
+                  <View height={1} backgroundColor={colors.borderSoft} marginHorizontal={14} />
+                )}
+              </View>
+            );
+          })}
+        </>
+      )}
     </View>
   );
 }

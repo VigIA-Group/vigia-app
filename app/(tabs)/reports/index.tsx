@@ -2,25 +2,19 @@ import BottomSheet, { BottomSheetScrollView } from "@/src/components/bottom-shee
 import { SvgBarChart } from "@/src/components/charts/svg-bar-chart";
 import { SvgLineChart } from "@/src/components/charts/svg-line-chart";
 import { SvgMultiLineChart } from "@/src/components/charts/svg-multi-line-chart";
+import { HeatmapCanvas, type HeatPoint } from "@/src/components/heatmap-canvas";
 import { InsightCard } from "@/src/components/insight-card";
 import { PageContainer } from "@/src/components/page-container";
-import { ReportChatSheet } from "@/src/components/report-chat-sheet";
+// import { ReportChatSheet } from "@/src/components/report-chat-sheet"; // Deshabilitado hasta tener backend de IA
 import {
-  ALERTS_BY_MODULE,
-  CAMERA_HOURLY,
-  CAMERAS,
-  DAILY_ALERTS_7D,
-  DAILY_PEOPLE_30D,
-  DAILY_PEOPLE_7D,
-  DAILY_PEOPLE_7D_PREV,
   filterHourly,
   HOUR_RANGES,
-  HOURLY_ACTIVITY_TODAY,
   INSIGHTS,
   type DailyPeoplePoint,
   type HourRange,
 } from "@/src/data/mock";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useColors } from "@/src/hooks/use-colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Image } from "expo-image";
@@ -36,7 +30,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react-native";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -167,10 +161,185 @@ export default function ReportsScreen() {
   const chatSheetRef = useRef<BottomSheet>(null);
   const filterSheetRef = useRef<BottomSheet>(null);
   const { isDesktop } = useBreakpoint();
+  const { supabase, ready } = useSupabaseAuth();
+
+  // ── Live data from Supabase ────────────────────────────────────────────────
+  const [CAMERAS, setCameras] = useState<any[]>([]);
+  const [DAILY_PEOPLE_7D, setDailyPeople7d] = useState<DailyPeoplePoint[]>([]);
+  const [DAILY_PEOPLE_30D, setDailyPeople30d] = useState<DailyPeoplePoint[]>([]);
+  const [DAILY_PEOPLE_7D_PREV, setDailyPeople7dPrev] = useState<DailyPeoplePoint[]>([]);
+  const [HOURLY_ACTIVITY_TODAY, setHourlyActivityToday] = useState<
+    { hour: string; count: number }[]
+  >([]);
+  const [ALERTS_BY_MODULE, setAlertsByModule] = useState<
+    { moduleId: string; label: string; count: number; color: string }[]
+  >([]);
+  const [DAILY_ALERTS_7D, setDailyAlerts7d] = useState<any[]>([]);
+  const [CAMERA_HOURLY, setCameraHourly] = useState<
+    Record<string, { hour: string; count: number }[]>
+  >({});
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        // Cameras
+        const { data: cams } = await supabase
+          .from("cameras")
+          .select("*, camera_services(is_enabled, service_catalog(key))")
+          .eq("is_active", true);
+        if (!cancelled) {
+          const mapped = (cams ?? []).map((cam: any) => {
+            const services = (cam.camera_services ?? [])
+              .filter((cs: any) => cs.is_enabled)
+              .map((cs: any) => cs.service_catalog?.key)
+              .filter(Boolean);
+            return { ...cam, services };
+          });
+          setCameras(mapped);
+        }
+
+        // Daily people 7d
+        const now = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const { data: dp7 } = await supabase
+          .from("pa_person_counts")
+          .select("interval_start, count_in")
+          .eq("interval_type", "day")
+          .gte("interval_start", sevenDaysAgo.toISOString())
+          .lte("interval_start", now.toISOString())
+          .order("interval_start", { ascending: true });
+        if (!cancelled) {
+          const mapped = (dp7 ?? []).map((row: any) => ({
+            day: new Date(row.interval_start)
+              .toLocaleDateString("es-BO", { weekday: "short" })
+              .slice(0, 3),
+            date: row.interval_start.split("T")[0],
+            count: row.count_in || 0,
+          }));
+          setDailyPeople7d(mapped);
+        }
+
+        // Daily people 30d
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const { data: dp30 } = await supabase
+          .from("pa_person_counts")
+          .select("interval_start, count_in")
+          .eq("interval_type", "day")
+          .gte("interval_start", thirtyDaysAgo.toISOString())
+          .lte("interval_start", now.toISOString())
+          .order("interval_start", { ascending: true });
+        if (!cancelled) {
+          const mapped = (dp30 ?? []).map((row: any) => ({
+            day: new Date(row.interval_start)
+              .toLocaleDateString("es-BO", { weekday: "short" })
+              .slice(0, 3),
+            date: row.interval_start.split("T")[0],
+            count: row.count_in || 0,
+          }));
+          setDailyPeople30d(mapped);
+        }
+
+        // Prev 7d (comparative)
+        const prev7Start = new Date();
+        prev7Start.setDate(prev7Start.getDate() - 14);
+        const prev7End = new Date();
+        prev7End.setDate(prev7End.getDate() - 7);
+        const { data: dpPrev } = await supabase
+          .from("pa_person_counts")
+          .select("interval_start, count_in")
+          .eq("interval_type", "day")
+          .gte("interval_start", prev7Start.toISOString())
+          .lte("interval_start", prev7End.toISOString())
+          .order("interval_start", { ascending: true });
+        if (!cancelled) {
+          const mapped = (dpPrev ?? []).map((row: any) => ({
+            day: new Date(row.interval_start)
+              .toLocaleDateString("es-BO", { weekday: "short" })
+              .slice(0, 3),
+            date: row.interval_start.split("T")[0],
+            count: row.count_in || 0,
+          }));
+          setDailyPeople7dPrev(mapped);
+        }
+
+        // Hourly today
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const { data: hourly } = await supabase
+          .from("pa_person_counts")
+          .select("interval_start, count_in")
+          .eq("interval_type", "hour")
+          .gte("interval_start", startOfDay.toISOString())
+          .lte("interval_start", now.toISOString())
+          .order("interval_start", { ascending: true });
+        if (!cancelled) {
+          const mapped = (hourly ?? []).map((row: any) => ({
+            hour: new Date(row.interval_start).getHours().toString().padStart(2, "0") + ":00",
+            count: row.count_in || 0,
+          }));
+          setHourlyActivityToday(mapped);
+        }
+
+        // Alerts proxy from dwell events
+        const { data: dwells } = await supabase
+          .from("pa_dwell_events")
+          .select("created_at")
+          .gte("created_at", sevenDaysAgo.toISOString());
+        if (!cancelled) {
+          const byDay: Record<string, any> = {};
+          const days = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
+          days.forEach((d) => {
+            byDay[d] = {
+              day: d,
+              intrusion: 0,
+              stolen: 0,
+              fall: 0,
+              ocr: 0,
+              people: 0,
+              tampering: 0,
+            };
+          });
+          (dwells ?? []).forEach((e: any) => {
+            const d = new Date(e.created_at)
+              .toLocaleDateString("es-BO", { weekday: "short" })
+              .slice(0, 3);
+            const key = d.charAt(0).toUpperCase() + d.slice(1);
+            if (byDay[key]) byDay[key].people++;
+          });
+          setDailyAlerts7d(Object.values(byDay));
+          setAlertsByModule([
+            {
+              moduleId: "people",
+              label: "Análisis de Personas",
+              count: (dwells ?? []).length,
+              color: "#3b82f6",
+            },
+          ]);
+        }
+
+        // Camera hourly (empty for now — needs per-camera hourly aggregation)
+        setCameraHourly({});
+      } catch (err: any) {
+        console.error("[reports] load error:", err.message);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready]);
 
   const [activeTab, setActiveTab] = useState<ReportTab>("traffic");
   const [period, setPeriod] = useState<Period>("7d");
   const [hourRange, setHourRange] = useState<HourRange>("all");
+  // ── Heatmap state ──────────────────────────────────────────────────────────
+  const [heatmapPoints, setHeatmapPoints] = useState<Record<string, HeatPoint[]>>({});
+  const [heatmapSnapshots, setHeatmapSnapshots] = useState<Record<string, string | null>>({});
   const [selectedHourFrom, setSelectedHourFrom] = useState<number | null>(null);
   const [selectedHourTo, setSelectedHourTo] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
@@ -190,12 +359,52 @@ export default function ReportsScreen() {
 
   const onBarPress = (label: string, value: number) => setSelectedBar({ label, value });
 
+  // Load live heatmap data from Supabase
+  useEffect(() => {
+    if (!ready || activeTab !== "heatmaps") return;
+    heatmapCameras.forEach(async (cam) => {
+      try {
+        const spaceId = (cam as any).space_id ?? cam.id;
+        const intervalType = period === "today" ? "hour" : period === "7d" ? "day" : "week";
+        const intervalStart = new Date();
+        intervalStart.setHours(0, 0, 0, 0);
+
+        const { data } = await supabase
+          .from("pa_heatmap_data")
+          .select("points")
+          .eq("space_id", spaceId)
+          .eq("interval_type", intervalType)
+          .eq("interval_start", intervalStart.toISOString())
+          .single();
+        if (data?.points?.length) {
+          setHeatmapPoints((prev) => ({ ...prev, [cam.id]: data.points }));
+        }
+
+        const { data: snapshots } = await supabase
+          .from("pa_space_snapshots")
+          .select("image_url")
+          .eq("space_id", spaceId)
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (snapshots?.[0]?.image_url) {
+          setHeatmapSnapshots((prev) => ({ ...prev, [cam.id]: snapshots[0].image_url }));
+        }
+      } catch {
+        // silently fall back to placeholder
+      }
+    });
+  }, [supabase, ready, activeTab, period]);
+
   const totalAlerts7d = DAILY_ALERTS_7D.reduce(
     (s, d) => s + d.intrusion + d.stolen + d.fall + d.ocr + d.people + d.tampering,
     0
   );
   const maxAlerts = Math.max(...ALERTS_BY_MODULE.map((a) => a.count), 1);
-  const topModule = ALERTS_BY_MODULE.reduce((b, a) => (a.count > b.count ? a : b));
+  const topModule =
+    ALERTS_BY_MODULE.length > 0
+      ? ALERTS_BY_MODULE.reduce((b, a) => (a.count > b.count ? a : b))
+      : { moduleId: "people", label: "Análisis de Personas", count: 0, color: "#3b82f6" };
 
   const heatmapCameras = CAMERAS.filter((c) => c.status !== "offline");
 
@@ -332,9 +541,9 @@ export default function ReportsScreen() {
                 alignItems="center"
                 justifyContent="center"
                 pressStyle={{ opacity: 0.7 }}
-                onPress={() => chatSheetRef.current?.expand()}
+                // onPress={() => chatSheetRef.current?.expand()}
               >
-                <MessageCircle size={18} color="#3b82f6" />
+                <MessageCircle size={18} color="#3b82f6" opacity={0.4} />
               </View>
             </XStack>
           </XStack>
@@ -1285,7 +1494,7 @@ export default function ReportsScreen() {
                         </XStack>
                       </XStack>
 
-                      {/* Heatmap from asset image */}
+                      {/* Heatmap — Skia canvas with real data or fallback */}
                       <View
                         height={160}
                         borderRadius={10}
@@ -1294,15 +1503,16 @@ export default function ReportsScreen() {
                         borderWidth={1}
                         borderColor={colors.border}
                       >
-                        <Image
-                          source={require("../../../assets/heatmap.png")}
-                          style={{ width: "100%", height: "100%" }}
-                          contentFit="cover"
+                        <HeatmapCanvas
+                          snapshotUrl={heatmapSnapshots[cam.id] ?? null}
+                          points={heatmapPoints[cam.id] ?? []}
+                          width={isDesktop ? 340 : 340}
+                          height={160}
                         />
                       </View>
                       <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
-                        Heatmap de la cámara: {cam.name} ({cam.room}). Este es un placeholder
-                        gráfico de la carga de personas.
+                        Mapa de calor — {cam.name} ({cam.room}). Datos en tiempo real vía
+                        people-analytics.
                       </Text>
 
                       <SectionHeader
@@ -1375,7 +1585,8 @@ export default function ReportsScreen() {
             </YStack>
           )}
 
-          {/* AI Chat CTA */}
+          {/* AI Chat CTA — deshabilitado hasta tener backend de IA */}
+          {/*
           <View
             backgroundColor={colors.card}
             borderRadius={14}
@@ -1416,6 +1627,7 @@ export default function ReportsScreen() {
               </Text>
             </XStack>
           </View>
+          */}
         </ScrollView>
 
         {/* Filter Modal */}
@@ -1700,7 +1912,7 @@ export default function ReportsScreen() {
           </BottomSheetScrollView>
         </BottomSheet>
 
-        <ReportChatSheet sheetRef={chatSheetRef} contextLabel={chatContext} />
+        {/* <ReportChatSheet sheetRef={chatSheetRef} contextLabel={chatContext} /> */}
       </View>
     </PageContainer>
   );

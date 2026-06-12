@@ -109,7 +109,7 @@ const media = createMedia({
 });
 
 const bodyFont = createFont({
-  family: "Outfit",
+  family: "DM Sans",
   size: {
     1: 12,
     2: 13,
@@ -153,10 +153,10 @@ const bodyFont = createFont({
   },
   letterSpacing: { 4: 0 },
   face: {
-    400: { normal: "Outfit_400Regular" },
-    500: { normal: "Outfit_500Medium" },
-    600: { normal: "Outfit_600SemiBold" },
-    700: { normal: "Outfit_700Bold" },
+    400: { normal: "DMSans_400Regular" },
+    500: { normal: "DMSans_500Medium" },
+    600: { normal: "DMSans_600SemiBold" },
+    700: { normal: "DMSans_700Bold" },
   },
 });
 

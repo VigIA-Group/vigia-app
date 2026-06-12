@@ -1,12 +1,14 @@
 import { EventItemCard } from "@/src/components/event-item-card";
 import { ModuleChip } from "@/src/components/module-chip";
 import { PageContainer } from "@/src/components/page-container";
-import { CAMERAS, getEventsByCameraId } from "@/src/data/mock";
+import type { Camera, ModuleId } from "@/src/data/mock";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { router, useLocalSearchParams } from "expo-router";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { ArrowLeft, Camera as CameraIcon } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -20,14 +22,93 @@ const VIDEO_SOURCES = [
   require("@/assets/video6.mp4"),
 ];
 
+const SERVICE_TO_MODULE: Record<string, ModuleId> = {
+  people_analytics: "people",
+  person_detection: "people",
+  vehicle_plates: "ocr",
+  theft_detection: "stolen",
+  heat_map: "people",
+  intrusion_detection: "intrusion",
+  fall_detection: "fall",
+  tampering_detection: "tampering",
+  ocr: "ocr",
+  people: "people",
+  intrusion: "intrusion",
+  stolen: "stolen",
+  fall: "fall",
+  tampering: "tampering",
+};
+
+function mapDbToCamera(dbCam: any): Camera {
+  const services: string[] = dbCam.services ?? [];
+  const activeModules = services.map((s) => SERVICE_TO_MODULE[s]).filter(Boolean) as ModuleId[];
+
+  const status: Camera["status"] =
+    dbCam.status === "offline" ? "offline" : dbCam.status === "online" ? "online" : "alert";
+
+  return {
+    id: dbCam.id,
+    name: dbCam.name,
+    zone: "",
+    floor: "Planta baja",
+    room: "",
+    activeModules,
+    status,
+    metrics: {
+      peopleDetected: 0,
+      alertsToday: 0,
+      uptimePercent: status === "offline" ? 0 : 99,
+    },
+    description: "",
+  };
+}
+
 export default function CameraDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { isDesktop } = useBreakpoint();
-  const camera = CAMERAS.find((c) => c.id === id);
-  const cameraEvents = camera ? getEventsByCameraId(camera.id) : [];
-  const cameraIndex = camera ? CAMERAS.findIndex((c) => c.id === camera.id) : 0;
+  const { supabase, ready } = useSupabaseAuth();
+  const [camera, setCamera] = useState<Camera | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const { data, error: dbError } = await supabase
+          .from("cameras")
+          .select("*, camera_services(is_enabled, service_catalog(key))")
+          .eq("id", id)
+          .single();
+
+        if (dbError) throw new Error(dbError.message);
+        if (cancelled) return;
+
+        const services = (data.camera_services ?? [])
+          .filter((cs: any) => cs.is_enabled)
+          .map((cs: any) => cs.service_catalog?.key)
+          .filter(Boolean);
+        setCamera(mapDbToCamera({ ...data, services }));
+        setError(null);
+      } catch (err: any) {
+        if (!cancelled) setError(err.message ?? "Error al cargar cámara");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready, id]);
+
+  const cameraEvents: any[] = []; // TODO: endpoint real de eventos por cámara
+  const cameraIndex = 0;
 
   const player = useVideoPlayer(VIDEO_SOURCES[cameraIndex % 6], (p) => {
     p.loop = true;
@@ -35,11 +116,21 @@ export default function CameraDetailScreen() {
     if (camera && camera.status !== "offline") p.play();
   });
 
-  if (!camera) {
+  if (!ready || loading) {
     return (
       <View flex={1} backgroundColor={colors.bg} alignItems="center" justifyContent="center">
         <Text color={colors.textLabel} fontFamily="$body">
-          Cámara no encontrada
+          Cargando cámara…
+        </Text>
+      </View>
+    );
+  }
+
+  if (error || !camera) {
+    return (
+      <View flex={1} backgroundColor={colors.bg} alignItems="center" justifyContent="center">
+        <Text color="#f87171" fontFamily="$body">
+          {error ?? "Cámara no encontrada"}
         </Text>
       </View>
     );

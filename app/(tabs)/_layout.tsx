@@ -1,12 +1,13 @@
 import { WebSidebar } from "@/src/components/web-sidebar";
-import { getUnreviewedCount } from "@/src/data/mock";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { Tabs } from "expo-router";
 import { BarChart2, BellRing, Cctv, CircleUser, LayoutDashboard } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { Text } from "tamagui";
 
@@ -49,10 +50,23 @@ function TabBarIcon({
 }
 
 export default function TabLayout() {
-  const unreviewedCount = getUnreviewedCount();
+  const { supabase, ready } = useSupabaseAuth();
+  const [unreviewedCount, setUnreviewedCount] = useState(0);
   const colors = useColors();
   const { theme } = useAppTheme();
   const { isWide } = useBreakpoint();
+
+  useEffect(() => {
+    if (!ready) return;
+    const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+    supabase
+      .from("pa_dwell_events")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", since)
+      .then(({ count, error }) => {
+        if (!error && count != null) setUnreviewedCount(count);
+      });
+  }, [supabase, ready]);
 
   const tabs = (
     <Tabs

@@ -1,7 +1,8 @@
 import { SeverityBadge } from "@/src/components/event-item-card";
 import { ModuleChip } from "@/src/components/module-chip";
 import { PageContainer } from "@/src/components/page-container";
-import { EVENTS, formatTimestamp } from "@/src/data/mock";
+import type { ModuleId } from "@/src/data/mock";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { Image } from "expo-image";
@@ -14,12 +15,9 @@ import {
   Clock,
   Download,
   MapPin,
-  PackageX,
   PersonStanding,
-  ScanLine,
-  ShieldAlert,
-  Users,
 } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -31,10 +29,10 @@ const ALERT_IMAGES = [
 ];
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
-  ocr: ScanLine,
-  people: Users,
-  intrusion: ShieldAlert,
-  stolen: PackageX,
+  ocr: Camera,
+  people: PersonStanding,
+  intrusion: Camera,
+  stolen: Camera,
   fall: PersonStanding,
   tampering: Camera,
 };
@@ -48,18 +46,68 @@ const MODULE_COLORS: Record<string, string> = {
   tampering: "#a78bfa",
 };
 
+function formatTimestamp(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleString("es-BO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function AlertDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { isDesktop } = useBreakpoint();
-  const event = EVENTS.find((e) => e.id === id);
+  const { supabase, ready } = useSupabaseAuth();
+  const [event, setEvent] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const { data, error } = await supabase
+          .from("pa_dwell_events")
+          .select("*, spaces(name, cameras(name))")
+          .eq("id", id)
+          .single();
+        if (cancelled) return;
+        if (error) throw error;
+        setEvent(data);
+      } catch (err: any) {
+        console.error("[alert-detail] error:", err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready, id]);
 
   const player = useVideoPlayer(require("@/assets/alert.webm"), (p) => {
     p.loop = true;
     p.muted = false;
     p.play();
   });
+
+  if (!ready || loading) {
+    return (
+      <View flex={1} backgroundColor={colors.bg} alignItems="center" justifyContent="center">
+        <Text color={colors.textLabel} fontFamily="$body">
+          Cargando evento…
+        </Text>
+      </View>
+    );
+  }
 
   if (!event) {
     return (
@@ -71,8 +119,11 @@ export default function AlertDetailScreen() {
     );
   }
 
-  const IconComponent = MODULE_ICONS[event.module];
-  const moduleColor = MODULE_COLORS[event.module];
+  const moduleId: ModuleId = "people";
+  const moduleColor = MODULE_COLORS[moduleId];
+  const IconComponent = MODULE_ICONS[moduleId];
+  const cameraName = event.spaces?.cameras?.name ?? "Cámara";
+  const durationMin = Math.round((event.duration_seconds || 0) / 60);
 
   const videoSection = (
     <View borderRadius={16} overflow="hidden" borderWidth={1} borderColor={colors.borderSoft}>
@@ -117,25 +168,21 @@ export default function AlertDetailScreen() {
       borderColor={colors.borderSoft}
       overflow="hidden"
     >
-      <MetaRow label="Tipo de evento" value={event.type} />
+      <MetaRow label="Tipo de evento" value="Permanencia prolongada" />
       <MetaDivider />
-      <MetaRow
-        label="Cámara"
-        value={event.cameraName}
-        icon={<MapPin size={14} color="#64748b" />}
-      />
+      <MetaRow label="Cámara" value={cameraName} icon={<MapPin size={14} color="#64748b" />} />
       <MetaDivider />
       <MetaRow label="Módulo">
-        <ModuleChip moduleId={event.module} />
+        <ModuleChip moduleId={moduleId} />
       </MetaRow>
       <MetaDivider />
       <MetaRow label="Severidad">
-        <SeverityBadge severity={event.severity} />
+        <SeverityBadge severity="MEDIA" />
       </MetaRow>
       <MetaDivider />
       <MetaRow
         label="Fecha y hora"
-        value={formatTimestamp(event.timestamp)}
+        value={formatTimestamp(event.entered_at)}
         icon={<Clock size={14} color="#64748b" />}
       />
     </YStack>
@@ -160,7 +207,8 @@ export default function AlertDetailScreen() {
         DESCRIPCIÓN DEL EVENTO
       </Text>
       <Text fontSize={13} color={colors.textSec} fontFamily="$body" lineHeight={20}>
-        {event.description}
+        Visitante permaneció {durationMin} minutos en la zona {event.spaces?.name ?? ""}. Evento
+        registrado por el módulo de análisis de personas.
       </Text>
     </YStack>
   );
@@ -236,10 +284,10 @@ export default function AlertDetailScreen() {
               flex={1}
               numberOfLines={1}
             >
-              {event.type}
+              Permanencia prolongada
             </Text>
           </XStack>
-          <SeverityBadge severity={event.severity} />
+          <SeverityBadge severity="MEDIA" />
         </XStack>
 
         <ScrollView

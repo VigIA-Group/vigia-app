@@ -1,24 +1,43 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@clerk/expo";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { MotiView } from "moti";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { View } from "tamagui";
+import { Text, View } from "tamagui";
 
 export default function SplashScreen() {
+  const { isSignedIn, isLoaded } = useAuth({ treatPendingAsSignedOut: false });
+  const [decided, setDecided] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      const session = await AsyncStorage.getItem("vigia_session");
-      if (session) {
+    // Esperar mínimo 1.5s para el splash visual + tiempo para Clerk
+    const minDelay = new Promise((r) => setTimeout(r, 1500));
+
+    // Esperar a que Clerk esté listo (máximo 5s)
+    const waitForClerk = async () => {
+      let attempts = 0;
+      while (!isLoaded && attempts < 50) {
+        attempts++;
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      console.log("[splash] Clerk loaded:", isLoaded, "isSignedIn:", isSignedIn);
+    };
+
+    Promise.all([minDelay, waitForClerk()]).then(() => {
+      if (decided) return;
+      setDecided(true);
+
+      if (isSignedIn) {
+        console.log("[splash] session found → home");
         router.replace("/(tabs)/home");
       } else {
+        console.log("[splash] no session → login");
         router.replace("/auth/login");
       }
-    }, 2200);
-    return () => clearTimeout(timer);
-  }, []);
+    });
+  }, [isLoaded, isSignedIn]);
 
   return (
     <View flex={1}>
@@ -39,6 +58,11 @@ export default function SplashScreen() {
             contentFit="contain"
           />
         </MotiView>
+        {!isLoaded && (
+          <Text fontSize={12} color="#64748b" marginTop={16} fontFamily="$body">
+            Iniciando…
+          </Text>
+        )}
       </View>
     </View>
   );

@@ -1,13 +1,13 @@
 import type { Module } from "@/src/data/mock";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-    Camera,
-    Info,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    ShieldAlert,
-    Users,
+  Camera,
+  Info,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 

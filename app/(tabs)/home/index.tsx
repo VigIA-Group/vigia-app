@@ -4,25 +4,30 @@ import { KPICard } from "@/src/components/kpi-card";
 import { ModuleCard } from "@/src/components/module-card";
 import { PageContainer } from "@/src/components/page-container";
 import { VigIALogoText } from "@/src/components/vigia-logo-text";
-import {
-  DAILY_PEOPLE_7D,
-  EVENTS,
-  INSIGHTS,
-  KPIs,
-  MODULES,
-  USER,
-  getUnreviewedCount,
-} from "@/src/data/mock";
+
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
+import { useUser } from "@clerk/expo";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { BarChart2, Bell } from "lucide-react-native";
+import { useEffect, useMemo, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 
-const TODAY = new Date("2026-03-31");
+const SERVICE_NAMES_ES: Record<string, string> = {
+  people_analytics: "Análisis de Personas",
+  person_detection: "Detección de Personas",
+  vehicle_plates: "Reconocimiento de Placas",
+  theft_detection: "Detección de Robos",
+  heat_map: "Mapa de Calor",
+  intrusion_detection: "Detección de Intrusión",
+  fall_detection: "Detección de Caídas",
+  tampering_detection: "Detección de Sabotaje",
+};
+
 const DAY_NAMES = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 const MONTH_NAMES = [
   "enero",
@@ -46,14 +51,291 @@ function getGreeting(): string {
   return "Buenas noches";
 }
 
+function formatDayLabel(iso: string): string {
+  const d = new Date(iso);
+  return ["D", "L", "M", "X", "J", "V", "S"][d.getDay()];
+}
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { isDesktop } = useBreakpoint();
-  const unreviewedCount = getUnreviewedCount();
-  const recentEvents = EVENTS.slice(0, 5);
-  const activeModules = MODULES.slice(0, 4);
-  const maxPeople = Math.max(...DAILY_PEOPLE_7D.map((d) => d.count));
+  const { supabase, ready } = useSupabaseAuth();
+  const { user } = useUser();
+
+  const [todayCount, setTodayCount] = useState<number | null>(null);
+  const [alertCount, setAlertCount] = useState<number | null>(null);
+  const [cameraStats, setCameraStats] = useState<{ online: number; total: number } | null>(null);
+  const [avgDwell, setAvgDwell] = useState<number | null>(null);
+  const [recentEvents, setRecentEvents] = useState<any[]>([]);
+  const [activeModules, setActiveModules] = useState<any[]>([]);
+  const [dailyPeople7d, setDailyPeople7d] = useState<{ day: string; count: number }[]>([]);
+  const [unreviewedCount, setUnreviewedCount] = useState(0);
+  const [heatmapUrl, setHeatmapUrl] = useState<string | null>(null);
+  const [insightsData, setInsightsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const from = startOfDay.toISOString();
+    const to = now.toISOString();
+
+    // 1. KPI personas hoy
+    supabase
+      .from("pa_person_counts")
+      .select("count_in")
+      .eq("interval_type", "hour")
+      .gte("interval_start", from)
+      .lte("interval_start", to)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error cargando counts:", error.message);
+          return;
+        }
+        const total = (data ?? []).reduce((sum: number, row: any) => sum + (row.count_in || 0), 0);
+        setTodayCount(total);
+      });
+
+    // 2. Alertas activas (dwell events últimas 24h)
+    const since24h = new Date(Date.now() - 24 * 3600_000).toISOString();
+    supabase
+      .from("pa_dwell_events")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", since24h)
+      .then(({ count, error }) => {
+        if (!error && count != null) setAlertCount(count);
+      });
+
+    // 2b. Cámaras activas (online / total)
+    supabase
+      .from("cameras")
+      .select("status")
+      .eq("is_active", true)
+      .then(({ data, error }) => {
+        if (error) return;
+        const total = (data ?? []).length;
+        const online = (data ?? []).filter((c: any) => c.status !== "offline").length;
+        setCameraStats({ online, total });
+      });
+
+    // 2c. Permanencia promedio (dwell events últimas 24h)
+    supabase
+      .from("pa_dwell_events")
+      .select("dwell_seconds")
+      .gte("created_at", since24h)
+      .not("dwell_seconds", "is", null)
+      .then(({ data, error }) => {
+        if (error || !data?.length) return;
+        const values = (data as any[]).map((r) => r.dwell_seconds || 0);
+        const avg = values.reduce((a, b) => a + b, 0) / values.length;
+        setAvgDwell(Math.round(avg / 60)); // en minutos
+      });
+
+    // 3. Eventos recientes (pa_dwell_events)
+    supabase
+      .from("pa_dwell_events")
+      .select("*, spaces(name)")
+      .order("created_at", { ascending: false })
+      .limit(5)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[home] events error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((e: any) => ({
+          id: e.id,
+          type: "Permanencia prolongada",
+          module: "people",
+          severity: "MEDIA",
+          cameraName: e.spaces?.name ?? "Zona",
+          timestamp: e.created_at,
+          description: `Visitante permaneció ${Math.round((e.duration_seconds || 0) / 60)} min en ${e.spaces?.name ?? "zona"}`,
+          reviewed: false,
+        }));
+        setRecentEvents(mapped);
+      });
+
+    // 3. Módulos activos (service_catalog)
+    supabase
+      .from("service_catalog")
+      .select("*")
+      .limit(4)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[home] modules error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((s: any) => ({
+          id:
+            s.key === "people_analytics" || s.key === "person_detection" || s.key === "heat_map"
+              ? "people"
+              : s.key === "vehicle_plates"
+                ? "ocr"
+                : s.key === "theft_detection"
+                  ? "stolen"
+                  : s.key === "intrusion_detection"
+                    ? "intrusion"
+                    : s.key === "fall_detection"
+                      ? "fall"
+                      : s.key === "tampering_detection"
+                        ? "tampering"
+                        : s.key,
+          name: SERVICE_NAMES_ES[s.key] ?? s.name,
+          description: s.description ?? "",
+          icon:
+            s.key === "vehicle_plates"
+              ? "ScanLine"
+              : s.key.includes("people") || s.key === "heat_map"
+                ? "Users"
+                : "ShieldAlert",
+          color:
+            s.key === "theft_detection"
+              ? "#f87171"
+              : s.key === "intrusion_detection"
+                ? "#fbbf24"
+                : s.key === "fall_detection"
+                  ? "#fb923c"
+                  : s.key === "tampering_detection"
+                    ? "#a78bfa"
+                    : "#3b82f6",
+          stat: "0",
+          statLabel: "Activado",
+          whatItDetects: [s.description ?? ""],
+          howToUse: "Configurado automáticamente",
+          valueGenerated: "",
+        }));
+        setActiveModules(mapped);
+      });
+
+    // 4. Personas últimos 7 días
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    supabase
+      .from("pa_person_counts")
+      .select("interval_start, count_in")
+      .eq("interval_type", "day")
+      .gte("interval_start", sevenDaysAgo.toISOString())
+      .lte("interval_start", to)
+      .order("interval_start", { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[home] 7d error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((row: any) => ({
+          day: formatDayLabel(row.interval_start),
+          count: row.count_in || 0,
+        }));
+        setDailyPeople7d(mapped);
+      });
+
+    // 5. Unreviewed count (dwell events últimas 24h)
+    // since24h ya declarado arriba
+    supabase
+      .from("pa_dwell_events")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", since24h)
+      .then(({ count, error }) => {
+        if (!error && count != null) setUnreviewedCount(count);
+      });
+
+    // 6. Heatmap snapshot
+    supabase
+      .from("pa_space_snapshots")
+      .select("image_url")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .then(({ data, error }) => {
+        if (!error && data?.[0]?.image_url) setHeatmapUrl(data[0].image_url);
+      });
+
+    // 7. Insights heurísticos — generar + leer
+    (async () => {
+      try {
+        await supabase.rpc("generate_insights");
+        console.log("[home] generate_insights OK");
+      } catch (err: any) {
+        console.error("[home] generate_insights error:", err.message ?? err);
+      }
+
+      const { data, error } = await supabase
+        .from("pa_insights")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (error) {
+        console.error("[home] insights read error:", error.message);
+        return;
+      }
+      const mapped = (data ?? []).map((row: any) => ({
+        id: row.id,
+        type:
+          row.severity === "info"
+            ? "positive"
+            : row.severity === "warning"
+              ? "warning"
+              : "critical",
+        title: row.title,
+        description: row.description,
+        recommendation: row.recommendation ?? "",
+        source: row.category === "dwell" ? "traffic" : row.category,
+      }));
+      setInsightsData(mapped);
+    })();
+  }, [supabase, ready]);
+
+  const kpiList = useMemo(() => {
+    const list = [
+      {
+        id: "kpi-traffic",
+        label: "Personas hoy",
+        value: todayCount != null ? todayCount.toLocaleString("es-BO") : "—",
+        change: "hoy",
+        changePositive: true,
+        accentColor: "#3b82f6",
+        icon: "Users",
+      },
+      {
+        id: "kpi-alerts",
+        label: "Alertas activas",
+        value: alertCount != null ? String(alertCount) : "—",
+        change: "24h",
+        changePositive: false,
+        accentColor: "#f87171",
+        icon: "AlertTriangle",
+      },
+      {
+        id: "kpi-dwell",
+        label: "Permanencia prom.",
+        value: avgDwell != null ? `${avgDwell} min` : "—",
+        change: "24h",
+        changePositive: true,
+        accentColor: "#a78bfa",
+        icon: "Timer",
+      },
+      {
+        id: "kpi-uptime",
+        label: "Cámaras activas",
+        value: cameraStats != null ? `${cameraStats.online}/${cameraStats.total}` : "—",
+        change:
+          cameraStats && cameraStats.total > 0
+            ? `${Math.round((cameraStats.online / cameraStats.total) * 100)}% online`
+            : "—",
+        changePositive: true,
+        accentColor: "#34d399",
+        icon: "Cctv",
+      },
+    ];
+    return list;
+  }, [todayCount, alertCount, avgDwell, cameraStats]);
+
+  const maxPeople = Math.max(...dailyPeople7d.map((d) => d.count), 1);
+  const userFirstName = user?.firstName ?? user?.fullName?.split(" ")[0] ?? "Usuario";
+  const today = new Date();
 
   // ── Shared section components ─────────────────────────────────────
 
@@ -62,7 +344,7 @@ export default function HomeScreen() {
       <Text fontSize={isDesktop ? 32 : 26} fontWeight="700" color={colors.text} fontFamily="$body">
         {getGreeting()},{" "}
         <Text fontSize={isDesktop ? 32 : 26} fontWeight="700" fontFamily="$body" color="#60a5fa">
-          {USER.name.split(" ")[0]}
+          {userFirstName}
         </Text>
       </Text>
       <Text
@@ -71,8 +353,8 @@ export default function HomeScreen() {
         fontFamily="$body"
         marginTop={4}
       >
-        {DAY_NAMES[TODAY.getDay()]}, {TODAY.getDate()} de {MONTH_NAMES[TODAY.getMonth()]}{" "}
-        {TODAY.getFullYear()}
+        {DAY_NAMES[today.getDay()]}, {today.getDate()} de {MONTH_NAMES[today.getMonth()]}{" "}
+        {today.getFullYear()}
       </Text>
     </YStack>
   );
@@ -84,7 +366,7 @@ export default function HomeScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
       >
-        {KPIs.map((kpi, i) => (
+        {kpiList.map((kpi, i) => (
           <KPICard key={kpi.id} kpi={kpi} index={i} />
         ))}
       </ScrollView>
@@ -115,15 +397,25 @@ export default function HomeScreen() {
         borderColor={colors.borderSoft}
         overflow="hidden"
       >
-        {recentEvents.map((event, i) => (
-          <View key={event.id}>
-            {i > 0 && <View height={1} backgroundColor={colors.borderSoft} marginHorizontal={12} />}
-            <EventItemCard
-              event={event}
-              onPress={() => router.push(`/(tabs)/alerts/${event.id}`)}
-            />
+        {recentEvents.length === 0 ? (
+          <View padding={24} alignItems="center">
+            <Text fontSize={13} color={colors.textLabel} fontFamily="$body">
+              Sin actividad reciente
+            </Text>
           </View>
-        ))}
+        ) : (
+          recentEvents.map((event, i) => (
+            <View key={event.id}>
+              {i > 0 && (
+                <View height={1} backgroundColor={colors.borderSoft} marginHorizontal={12} />
+              )}
+              <EventItemCard
+                event={event}
+                onPress={() => router.push(`/(tabs)/alerts/${event.id}`)}
+              />
+            </View>
+          ))
+        )}
       </View>
     </YStack>
   );
@@ -147,11 +439,17 @@ export default function HomeScreen() {
       </XStack>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <XStack gap={12}>
-          {activeModules.map((mod) => (
-            <View key={mod.id} width={150} minHeight={185}>
-              <ModuleCard module={mod} />
-            </View>
-          ))}
+          {activeModules.length === 0 ? (
+            <Text fontSize={13} color={colors.textLabel}>
+              Cargando módulos…
+            </Text>
+          ) : (
+            activeModules.map((mod: any) => (
+              <View key={mod.id + mod.name} width={150} minHeight={185}>
+                <ModuleCard module={mod} />
+              </View>
+            ))
+          )}
         </XStack>
       </ScrollView>
     </YStack>
@@ -189,41 +487,47 @@ export default function HomeScreen() {
         >
           Personas detectadas — últimos 7 días
         </Text>
-        <XStack alignItems="flex-end" gap={6} height={64}>
-          {DAILY_PEOPLE_7D.map((point) => {
-            const barH = Math.max(4, (point.count / maxPeople) * 64);
-            const isToday = point.day === "Mar";
-            return (
-              <YStack key={point.day} flex={1} alignItems="center" gap={4}>
-                <View
-                  height={barH}
-                  borderRadius={4}
-                  width="100%"
-                  overflow="hidden"
-                  style={{ marginTop: 64 - barH }}
-                >
-                  {isToday ? (
-                    <LinearGradient
-                      colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
-                      start={{ x: 0, y: 1 }}
-                      end={{ x: 0, y: 0 }}
-                      style={{ flex: 1 }}
-                    />
-                  ) : (
-                    <View flex={1} backgroundColor={colors.cardAlt} />
-                  )}
-                </View>
-                <Text
-                  fontSize={10}
-                  color={isToday ? "#3b82f6" : colors.textLabel}
-                  fontFamily="$mono"
-                >
-                  {point.day}
-                </Text>
-              </YStack>
-            );
-          })}
-        </XStack>
+        {dailyPeople7d.length === 0 ? (
+          <Text fontSize={13} color={colors.textLabel} textAlign="center" marginTop={20}>
+            Sin datos aún
+          </Text>
+        ) : (
+          <XStack alignItems="flex-end" gap={6} height={64}>
+            {dailyPeople7d.map((point, idx) => {
+              const barH = Math.max(4, (point.count / maxPeople) * 64);
+              const isToday = idx === dailyPeople7d.length - 1;
+              return (
+                <YStack key={point.day + idx} flex={1} alignItems="center" gap={4}>
+                  <View
+                    height={barH}
+                    borderRadius={4}
+                    width="100%"
+                    overflow="hidden"
+                    style={{ marginTop: 64 - barH }}
+                  >
+                    {isToday ? (
+                      <LinearGradient
+                        colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
+                        start={{ x: 0, y: 1 }}
+                        end={{ x: 0, y: 0 }}
+                        style={{ flex: 1 }}
+                      />
+                    ) : (
+                      <View flex={1} backgroundColor={colors.cardAlt} />
+                    )}
+                  </View>
+                  <Text
+                    fontSize={10}
+                    color={isToday ? "#3b82f6" : colors.textLabel}
+                    fontFamily="$mono"
+                  >
+                    {point.day}
+                  </Text>
+                </YStack>
+              );
+            })}
+          </XStack>
+        )}
       </View>
     </YStack>
   );
@@ -245,9 +549,22 @@ export default function HomeScreen() {
           </Text>
         </View>
       </XStack>
-      {INSIGHTS.slice(0, 3).map((ins) => (
-        <InsightCard key={ins.id} insight={ins} compact />
-      ))}
+      {insightsData.length === 0 ? (
+        <View
+          backgroundColor={colors.card}
+          borderRadius={14}
+          borderWidth={1}
+          borderColor={colors.borderSoft}
+          padding={16}
+          alignItems="center"
+        >
+          <Text fontSize={13} color={colors.textLabel} fontFamily="$body">
+            Aún no hay insights. Aparecerán cuando haya datos suficientes.
+          </Text>
+        </View>
+      ) : (
+        insightsData.map((ins: any) => <InsightCard key={ins.id} insight={ins} compact />)
+      )}
     </YStack>
   );
 
@@ -270,7 +587,11 @@ export default function HomeScreen() {
         overflow="hidden"
         height={200}
       >
-        <Image source={require("@/assets/heatmap.png")} style={{ flex: 1 }} contentFit="cover" />
+        {heatmapUrl ? (
+          <Image source={{ uri: heatmapUrl }} style={{ flex: 1 }} contentFit="cover" />
+        ) : (
+          <Image source={require("@/assets/heatmap.png")} style={{ flex: 1 }} contentFit="cover" />
+        )}
       </View>
     </YStack>
   );

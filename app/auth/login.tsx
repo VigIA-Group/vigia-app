@@ -1,21 +1,86 @@
 import { OwlState } from "@/src/components/owl-state";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useClerk } from "@clerk/expo";
+import { useSignIn } from "@clerk/expo/legacy";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 
 export default function LoginScreen() {
+  const { signIn, isLoaded } = useSignIn();
+  const clerk = useClerk();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Two-factor / email-code verification
+  const [needsCode, setNeedsCode] = useState(false);
+  const [code, setCode] = useState("");
 
   const handleLogin = async () => {
-    await AsyncStorage.setItem("vigia_session", "mock_session");
-    router.replace("/(tabs)/home");
+    if (!isLoaded || loading) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === "complete") {
+        // ACTIVAR la sesión en Clerk — sin esto useAuth() no detecta login
+        await clerk.setActive({ session: result.createdSessionId });
+        router.replace("/"); // splash screen decidirá basado en Clerk.session real
+      } else if (
+        result.status === "needs_second_factor" ||
+        result.status === "needs_new_password"
+      ) {
+        // Trigger email code second factor
+        await signIn.prepareSecondFactor({ strategy: "email_code" });
+        setNeedsCode(true);
+      }
+    } catch (e: any) {
+      const msg = e?.errors?.[0]?.message ?? e?.message ?? "Credenciales incorrectas";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!isLoaded || loading) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await signIn.attemptSecondFactor({
+        strategy: "email_code",
+        code,
+      });
+      if (result.status === "complete") {
+        await clerk.setActive({ session: result.createdSessionId });
+        router.replace("/"); // splash screen decidirá basado en Clerk.session real
+      }
+    } catch (e: any) {
+      setError(e?.errors?.[0]?.message ?? e?.message ?? "Código incorrecto");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,7 +103,7 @@ export default function LoginScreen() {
 
             {/* Owl */}
             <YStack alignItems="center" marginBottom={28}>
-              <OwlState variant="idle" size="medium" floating />
+              <OwlState variant={error ? "intrusion" : "idle"} size="medium" floating />
             </YStack>
 
             {/* Title */}
@@ -50,7 +115,7 @@ export default function LoginScreen() {
                 fontFamily="$body"
                 textAlign="center"
               >
-                Bienvenido
+                {needsCode ? "Verificar cuenta" : "Bienvenido"}
               </Text>
               <Text
                 fontSize={14}
@@ -59,111 +124,185 @@ export default function LoginScreen() {
                 textAlign="center"
                 marginTop={4}
               >
-                Ingresa a tu panel de monitoreo
+                {needsCode
+                  ? "Ingresa el código enviado a tu email"
+                  : "Ingresa a tu panel de monitoreo"}
               </Text>
             </YStack>
 
-            {/* Form */}
-            <YStack gap={14} marginBottom={20}>
-              {/* Email */}
-              <XStack
-                backgroundColor="#0f172a"
-                borderRadius={12}
-                borderWidth={1}
-                borderColor="#334155"
-                alignItems="center"
-                paddingHorizontal={14}
-                gap={10}
-              >
-                <Mail size={16} color="#64748b" />
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: "#ffffff",
-                    fontFamily: "DMSans_400Regular",
-                    fontSize: 14,
-                    height: 48,
-                  }}
-                  placeholder="Email corporativo"
-                  placeholderTextColor="#64748b"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </XStack>
-
-              {/* Password */}
-              <XStack
-                backgroundColor="#0f172a"
-                borderRadius={12}
-                borderWidth={1}
-                borderColor="#334155"
-                alignItems="center"
-                paddingHorizontal={14}
-                gap={10}
-              >
-                <Lock size={16} color="#64748b" />
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: "#ffffff",
-                    fontFamily: "DMSans_400Regular",
-                    fontSize: 14,
-                    height: 48,
-                  }}
-                  placeholder="Contraseña"
-                  placeholderTextColor="#64748b"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPass}
-                />
-                <View pressStyle={{ opacity: 0.6 }} onPress={() => setShowPass(!showPass)}>
-                  {showPass ? (
-                    <EyeOff size={16} color="#64748b" />
-                  ) : (
-                    <Eye size={16} color="#64748b" />
-                  )}
+            {needsCode ? (
+              /* ── Email verification code ── */
+              <YStack gap={14} marginBottom={20}>
+                <XStack
+                  backgroundColor="#0f172a"
+                  borderRadius={12}
+                  borderWidth={1}
+                  borderColor="#334155"
+                  alignItems="center"
+                  paddingHorizontal={14}
+                >
+                  <TextInput
+                    style={{
+                      flex: 1,
+                      color: "#ffffff",
+                      fontSize: 22,
+                      height: 56,
+                      letterSpacing: 8,
+                      textAlign: "center",
+                    }}
+                    placeholder="000000"
+                    placeholderTextColor="#64748b"
+                    value={code}
+                    onChangeText={setCode}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                </XStack>
+                {error && (
+                  <Text fontSize={13} color="#ef4444" fontFamily="$body">
+                    {error}
+                  </Text>
+                )}
+                <View
+                  height={52}
+                  borderRadius={14}
+                  overflow="hidden"
+                  position="relative"
+                  pressStyle={{ opacity: 0.85 }}
+                  onPress={handleVerifyCode}
+                >
+                  <LinearGradient
+                    colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents="none"
+                  />
+                  <View flex={1} alignItems="center" justifyContent="center">
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text fontSize={15} fontWeight="700" color="#ffffff" fontFamily="$body">
+                        Verificar
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              </XStack>
-            </YStack>
+                <XStack
+                  justifyContent="center"
+                  marginTop={8}
+                  pressStyle={{ opacity: 0.7 }}
+                  onPress={() => signIn?.prepareSecondFactor({ strategy: "email_code" })}
+                >
+                  <Text fontSize={13} color="#3b82f6" fontFamily="$body">
+                    Reenviar código
+                  </Text>
+                </XStack>
+              </YStack>
+            ) : (
+              /* ── Email + password form ── */
+              <YStack gap={14} marginBottom={20}>
+                {/* Email */}
+                <XStack
+                  backgroundColor="#0f172a"
+                  borderRadius={12}
+                  borderWidth={1}
+                  borderColor="#334155"
+                  alignItems="center"
+                  paddingHorizontal={14}
+                  gap={10}
+                >
+                  <Mail size={16} color="#64748b" />
+                  <TextInput
+                    style={{ flex: 1, color: "#ffffff", fontSize: 14, height: 48 }}
+                    placeholder="Email corporativo"
+                    placeholderTextColor="#64748b"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </XStack>
 
-            {/* Login Button */}
-            <View
-              height={52}
-              borderRadius={14}
-              overflow="hidden"
-              pressStyle={{ opacity: 0.85 }}
-              onPress={handleLogin}
-            >
-              <LinearGradient
-                colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <View flex={1} alignItems="center" justifyContent="center">
-                <Text fontSize={15} fontWeight="700" color="#ffffff" fontFamily="$body">
-                  Ingresar
-                </Text>
-              </View>
-            </View>
+                {/* Password */}
+                <XStack
+                  backgroundColor="#0f172a"
+                  borderRadius={12}
+                  borderWidth={1}
+                  borderColor="#334155"
+                  alignItems="center"
+                  paddingHorizontal={14}
+                  gap={10}
+                >
+                  <Lock size={16} color="#64748b" />
+                  <TextInput
+                    style={{ flex: 1, color: "#ffffff", fontSize: 14, height: 48 }}
+                    placeholder="Contraseña"
+                    placeholderTextColor="#64748b"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPass}
+                  />
+                  <View pressStyle={{ opacity: 0.6 }} onPress={() => setShowPass(!showPass)}>
+                    {showPass ? (
+                      <EyeOff size={16} color="#64748b" />
+                    ) : (
+                      <Eye size={16} color="#64748b" />
+                    )}
+                  </View>
+                </XStack>
 
-            {/* Sign up link */}
-            <XStack
-              justifyContent="center"
-              marginTop={20}
-              gap={4}
-              pressStyle={{ opacity: 0.7 }}
-              onPress={() => router.push("/auth/signup")}
-            >
-              <Text fontSize={13} color="#64748b" fontFamily="$body">
-                ¿Primera vez?
-              </Text>
-              <Text fontSize={13} color="#3b82f6" fontFamily="$body" fontWeight="600">
-                Crear cuenta
-              </Text>
-            </XStack>
+                {error && (
+                  <Text fontSize={13} color="#ef4444" fontFamily="$body">
+                    {error}
+                  </Text>
+                )}
+
+                {/* Login Button */}
+                <View
+                  height={52}
+                  borderRadius={14}
+                  overflow="hidden"
+                  position="relative"
+                  pressStyle={{ opacity: 0.85 }}
+                  onPress={handleLogin}
+                  opacity={!email || !password || loading ? 0.6 : 1}
+                >
+                  <LinearGradient
+                    colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents="none"
+                  />
+                  <View flex={1} alignItems="center" justifyContent="center">
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text fontSize={15} fontWeight="700" color="#ffffff" fontFamily="$body">
+                        Ingresar
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                {/* Sign up link */}
+                <XStack
+                  justifyContent="center"
+                  marginTop={20}
+                  gap={4}
+                  pressStyle={{ opacity: 0.7 }}
+                  onPress={() => router.push("/auth/signup")}
+                >
+                  <Text fontSize={13} color="#64748b" fontFamily="$body">
+                    ¿Primera vez?
+                  </Text>
+                  <Text fontSize={13} color="#3b82f6" fontFamily="$body" fontWeight="600">
+                    Crear cuenta
+                  </Text>
+                </XStack>
+              </YStack>
+            )}
           </YStack>
         </ScrollView>
       </KeyboardAvoidingView>

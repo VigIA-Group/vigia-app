@@ -1,15 +1,30 @@
 {
   "expo": {
     "name": "VigIA",
-    "slug": "VigIA",
+    "slug": "vigia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "vigia",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "notification": {
+      "vapidPublicKey": "BC0B0YuTKZYuHgfUcsWzhvSuvldVHR3q3r7ZwgX-9G1lQQNQOdX8JQR-eOZpOMbXSunGrqyOF94vFV9gsUV-b6M",
+      "serviceWorkerPath": "./public/service-worker.js"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "world.vigia.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "VigIA usa la cámara para capturar imágenes de cámaras de seguridad.",
+        "NSMicrophoneUsageDescription": "VigIA puede capturar audio junto con video.",
+        "NSPhotoLibraryUsageDescription": "VigIA guarda capturas en tu galería.",
+        "NSFaceIDUsageDescription": "VigIA usa Face ID para autenticación biométrica.",
+        "UIBackgroundModes": ["remote-notification", "fetch", "processing"]
+      },
+      "entitlements": {
+        "aps-environment": "production"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +34,19 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "world.vigia.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
@@ -39,14 +66,54 @@
           }
         }
       ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#1d4ed8",
+          "defaultChannel": "alerts",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "VigIA usa la cámara para capturar imágenes.",
+          "microphonePermission": "VigIA puede capturar audio junto con video.",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "VigIA guarda capturas en tu galería.",
+          "savePhotosPermission": "VigIA guarda capturas en tu galería.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "VigIA usa Face ID para autenticación biométrica."
+        }
+      ],
       "expo-sqlite",
       "expo-video",
       "expo-web-browser",
+      "expo-background-fetch",
+      "expo-task-manager",
       "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9e5ed94f-0835-4aca-b9fb-eec02f7ec7ec"
+      }
+    },
+    "owner": "vigia.vision"
   }
 }

@@ -5,12 +5,13 @@ import { ModuleChip } from "@/src/components/module-chip";
 import { OwlState } from "@/src/components/owl-state";
 import { PageContainer } from "@/src/components/page-container";
 import type { EventItem, HourRange, ModuleId, Severity } from "@/src/data/mock";
-import { EVENTS, HOUR_RANGES, INSIGHTS, MODULES, groupEventsByDate } from "@/src/data/mock";
+import { HOUR_RANGES, groupEventsByDate } from "@/src/data/mock";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useColors } from "@/src/hooks/use-colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import { Bell, Filter, Sparkles, X } from "lucide-react-native";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, SectionList, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -80,6 +81,7 @@ function filterEvents(
 export default function AlertsScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const { supabase, ready } = useSupabaseAuth();
   const filterSheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["70%", "92%"];
 
@@ -101,8 +103,116 @@ export default function AlertsScreen() {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [showTimePickerFor, setShowTimePickerFor] = useState<"start" | "end" | null>(null);
 
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [modules, setModules] = useState<any[]>([]);
+  const [insightsData, setInsightsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    // Load dwell events as alerts
+    supabase
+      .from("pa_dwell_events")
+      .select("*, spaces(name)")
+      .order("created_at", { ascending: false })
+      .limit(100)
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error("[alerts] events error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((e: any) => ({
+          id: e.id,
+          type: "Permanencia prolongada",
+          module: "people" as ModuleId,
+          severity: "MEDIA" as Severity,
+          cameraId: e.space_id ?? "",
+          cameraName: e.spaces?.name ?? "Zona",
+          timestamp: e.created_at,
+          description: `Visitante permaneció ${Math.round((e.duration_seconds || 0) / 60)} min`,
+          reviewed: false,
+          hasVideoClip: false,
+        }));
+        setEvents(mapped);
+      });
+
+    // Load modules for filters
+    supabase
+      .from("service_catalog")
+      .select("*")
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error("[alerts] modules error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((s: any) => ({
+          id:
+            s.key === "people_analytics" || s.key === "person_detection" || s.key === "heat_map"
+              ? "people"
+              : s.key === "vehicle_plates"
+                ? "ocr"
+                : s.key === "theft_detection"
+                  ? "stolen"
+                  : s.key === "intrusion_detection"
+                    ? "intrusion"
+                    : s.key === "fall_detection"
+                      ? "fall"
+                      : s.key === "tampering_detection"
+                        ? "tampering"
+                        : s.key,
+          name: s.name,
+          color:
+            s.key === "theft_detection"
+              ? "#f87171"
+              : s.key === "intrusion_detection"
+                ? "#fbbf24"
+                : s.key === "fall_detection"
+                  ? "#fb923c"
+                  : s.key === "tampering_detection"
+                    ? "#a78bfa"
+                    : "#3b82f6",
+        }));
+        setModules(mapped);
+      });
+
+    // Load insights
+    supabase
+      .from("pa_insights")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error("[alerts] insights error:", error.message);
+          return;
+        }
+        const mapped = (data ?? []).map((row: any) => ({
+          id: row.id,
+          type:
+            row.severity === "info"
+              ? "positive"
+              : row.severity === "warning"
+                ? "warning"
+                : "critical",
+          title: row.title,
+          description: row.description,
+          recommendation: row.recommendation ?? "",
+          source: row.category === "dwell" ? "traffic" : row.category,
+        }));
+        setInsightsData(mapped);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready]);
+
   const filtered = filterEvents(
-    EVENTS,
+    events,
     selectedModules,
     selectedSeverities,
     selectedDateRange,
@@ -223,7 +333,7 @@ export default function AlertsScreen() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <XStack gap={6}>
                 {selectedModules.map((m) => {
-                  const mod = MODULES.find((x) => x.id === m)!;
+                  const mod = modules.find((x: any) => x.id === m)!;
                   return (
                     <XStack
                       key={m}
@@ -360,9 +470,22 @@ export default function AlertsScreen() {
                 Análisis automático basado en la actividad reciente
               </Text>
             </YStack>
-            {INSIGHTS.map((ins) => (
-              <InsightCard key={ins.id} insight={ins} />
-            ))}
+            {insightsData.length === 0 ? (
+              <View
+                backgroundColor={colors.card}
+                borderRadius={14}
+                borderWidth={1}
+                borderColor={colors.borderSoft}
+                padding={16}
+                alignItems="center"
+              >
+                <Text fontSize={13} color={colors.textLabel} fontFamily="$body">
+                  Aún no hay insights. Aparecerán cuando haya datos suficientes.
+                </Text>
+              </View>
+            ) : (
+              insightsData.map((ins: any) => <InsightCard key={ins.id} insight={ins} />)
+            )}
 
             <View
               backgroundColor="rgba(167,139,250,0.08)"
@@ -381,7 +504,7 @@ export default function AlertsScreen() {
                     Ver todas las alertas
                   </Text>
                   <Text fontSize={11} color={colors.textTer} fontFamily="$body">
-                    {EVENTS.length} eventos registrados en total
+                    {events.length} eventos registrados en total
                   </Text>
                 </YStack>
                 <Text fontSize={18} color={colors.textLabel}>
@@ -476,7 +599,7 @@ export default function AlertsScreen() {
                   MÓDULO
                 </Text>
                 <XStack flexWrap="wrap" gap={8}>
-                  {MODULES.map((mod) => (
+                  {modules.map((mod: any) => (
                     <ModuleChip
                       key={mod.id}
                       moduleId={mod.id as ModuleId}

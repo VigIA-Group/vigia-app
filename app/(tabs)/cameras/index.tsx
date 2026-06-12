@@ -1,35 +1,70 @@
 import { CameraCard } from "@/src/components/camera-card";
 import { PageContainer } from "@/src/components/page-container";
-import type { Camera } from "@/src/data/mock";
-import { CAMERAS } from "@/src/data/mock";
+import type { Camera, ModuleId } from "@/src/data/mock";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { router } from "expo-router";
 import { MotiView } from "moti";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 
-// Unique rooms derived from camera data
-const ALL_ROOMS = Array.from(new Set(CAMERAS.map((c) => c.room)));
-type Filter = "Todas" | "Con alertas" | "Planta baja" | "Planta alta" | "Exterior" | string;
-const BASE_FILTERS: Filter[] = ["Todas", "Con alertas", "Planta baja", "Planta alta", "Exterior"];
-const FILTERS: Filter[] = [...BASE_FILTERS, ...ALL_ROOMS];
+type Filter = "Todas" | "Con alertas" | "Online" | "Offline";
+const FILTERS: Filter[] = ["Todas", "Con alertas", "Online", "Offline"];
+
+const SERVICE_TO_MODULE: Record<string, ModuleId> = {
+  people_analytics: "people",
+  person_detection: "people",
+  vehicle_plates: "ocr",
+  theft_detection: "stolen",
+  heat_map: "people",
+  intrusion_detection: "intrusion",
+  fall_detection: "fall",
+  tampering_detection: "tampering",
+  ocr: "ocr",
+  people: "people",
+  intrusion: "intrusion",
+  stolen: "stolen",
+  fall: "fall",
+  tampering: "tampering",
+};
+
+function mapDbToCamera(dbCam: any): Camera {
+  const services: string[] = dbCam.services ?? [];
+  const activeModules = services.map((s) => SERVICE_TO_MODULE[s]).filter(Boolean) as ModuleId[];
+
+  const status: Camera["status"] =
+    dbCam.status === "offline" ? "offline" : dbCam.status === "online" ? "online" : "alert";
+
+  return {
+    id: dbCam.id,
+    name: dbCam.name,
+    zone: "",
+    floor: "Planta baja",
+    room: "",
+    activeModules,
+    status,
+    metrics: {
+      peopleDetected: 0,
+      alertsToday: 0,
+      uptimePercent: status === "offline" ? 0 : 99,
+    },
+    description: "",
+  };
+}
 
 function filterCameras(cameras: Camera[], filter: Filter): Camera[] {
   switch (filter) {
     case "Con alertas":
       return cameras.filter((c) => c.status === "alert" || c.metrics.alertsToday > 0);
-    case "Planta baja":
-      return cameras.filter((c) => c.floor === "Planta baja");
-    case "Planta alta":
-      return cameras.filter((c) => c.floor === "Planta alta");
-    case "Exterior":
-      return cameras.filter((c) => c.floor === "Exterior");
+    case "Online":
+      return cameras.filter((c) => c.status === "online");
+    case "Offline":
+      return cameras.filter((c) => c.status === "offline");
     case "Todas":
-      return cameras;
     default:
-      return cameras.filter((c) => c.room === filter);
+      return cameras;
   }
 }
 
@@ -37,14 +72,57 @@ export default function CamerasScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { isDesktop, isWide } = useBreakpoint();
+  const { supabase, ready } = useSupabaseAuth();
+  const [cameras, setCameras] = useState<Camera[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<Filter>("Todas");
-  const filtered = filterCameras(CAMERAS, activeFilter);
 
-  const online = CAMERAS.filter((c) => c.status === "online").length;
-  const withAlerts = CAMERAS.filter(
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const { data, error: dbError } = await supabase
+          .from("cameras")
+          .select("*, camera_services(is_enabled, service_catalog(key))")
+          .eq("is_active", true)
+          .order("created_at");
+
+        if (dbError) throw new Error(dbError.message);
+        if (cancelled) return;
+
+        const flattened = (data ?? []).map((cam: any) => {
+          const services = (cam.camera_services ?? [])
+            .filter((cs: any) => cs.is_enabled)
+            .map((cs: any) => cs.service_catalog?.key)
+            .filter(Boolean);
+          return mapDbToCamera({ ...cam, services });
+        });
+
+        setCameras(flattened);
+        setError(null);
+      } catch (err: any) {
+        if (!cancelled) setError(err.message ?? "Error al cargar cámaras");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, ready]);
+
+  const filtered = filterCameras(cameras, activeFilter);
+
+  const online = cameras.filter((c) => c.status === "online").length;
+  const withAlerts = cameras.filter(
     (c) => c.status === "alert" || c.metrics.alertsToday > 0
   ).length;
-  const offline = CAMERAS.filter((c) => c.status === "offline").length;
+  const offline = cameras.filter((c) => c.status === "offline").length;
 
   return (
     <PageContainer>
@@ -165,7 +243,19 @@ export default function CamerasScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
         >
-          {filtered.length === 0 ? (
+          {!ready || loading ? (
+            <YStack flex={1} alignItems="center" justifyContent="center" paddingTop={60} gap={12}>
+              <Text fontSize={15} color={colors.textLabel} fontFamily="$body" textAlign="center">
+                Cargando cámaras…
+              </Text>
+            </YStack>
+          ) : error ? (
+            <YStack flex={1} alignItems="center" justifyContent="center" paddingTop={60} gap={12}>
+              <Text fontSize={15} color="#f87171" fontFamily="$body" textAlign="center">
+                {error}
+              </Text>
+            </YStack>
+          ) : filtered.length === 0 ? (
             <YStack flex={1} alignItems="center" justifyContent="center" paddingTop={60} gap={12}>
               <Text fontSize={15} color={colors.textLabel} fontFamily="$body" textAlign="center">
                 Sin cámaras para este filtro

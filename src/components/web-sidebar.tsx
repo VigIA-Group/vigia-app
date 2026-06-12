@@ -1,8 +1,9 @@
-import { getUnreviewedCount } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
+import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import { LinearGradient } from "expo-linear-gradient";
 import { usePathname, useRouter } from "expo-router";
 import { BarChart2, BellRing, Cctv, CircleUser, LayoutDashboard } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text, YStack } from "tamagui";
 import { VigIALogoText } from "./vigia-logo-text";
@@ -22,7 +23,20 @@ export function WebSidebar() {
   const colors = useColors();
   const router = useRouter();
   const pathname = usePathname();
-  const unreviewedCount = getUnreviewedCount();
+  const { supabase, ready } = useSupabaseAuth();
+  const [unreviewedCount, setUnreviewedCount] = useState(0);
+
+  useEffect(() => {
+    if (!ready) return;
+    const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+    supabase
+      .from("pa_dwell_events")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", since)
+      .then(({ count, error }) => {
+        if (!error && count != null) setUnreviewedCount(count);
+      });
+  }, [supabase, ready]);
 
   return (
     <View
