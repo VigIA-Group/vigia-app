@@ -20,7 +20,11 @@
         "NSMicrophoneUsageDescription": "VigIA puede capturar audio junto con video.",
         "NSPhotoLibraryUsageDescription": "VigIA guarda capturas en tu galería.",
         "NSFaceIDUsageDescription": "VigIA usa Face ID para autenticación biométrica.",
-        "UIBackgroundModes": ["remote-notification", "fetch", "processing"]
+        "UIBackgroundModes": [
+          "remote-notification",
+          "fetch",
+          "processing"
+        ]
       },
       "entitlements": {
         "aps-environment": "production"
@@ -102,7 +106,8 @@
       "expo-web-browser",
       "expo-background-fetch",
       "expo-task-manager",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
