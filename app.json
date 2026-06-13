@@ -4,13 +4,13 @@
     "slug": "vigia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/isotipo.png",
     "scheme": "vigia",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "notification": {
-      "vapidPublicKey": "BC0B0YuTKZYuHgfUcsWzhvSuvldVHR3q3r7ZwgX-9G1lQQNQOdX8JQR-eOZpOMbXSunGrqyOF94vFV9gsUV-b6M",
-      "serviceWorkerPath": "./public/service-worker.js"
+      "icon": "./assets/images/isotipo.png",
+      "color": "#1d4ed8"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,11 +20,7 @@
         "NSMicrophoneUsageDescription": "VigIA puede capturar audio junto con video.",
         "NSPhotoLibraryUsageDescription": "VigIA guarda capturas en tu galería.",
         "NSFaceIDUsageDescription": "VigIA usa Face ID para autenticación biométrica.",
-        "UIBackgroundModes": [
-          "remote-notification",
-          "fetch",
-          "processing"
-        ]
+        "UIBackgroundModes": ["remote-notification", "fetch", "processing"]
       },
       "entitlements": {
         "aps-environment": "production"
@@ -33,9 +29,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/isotipo.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -54,7 +48,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/isotipo.png"
     },
     "plugins": [
       "expo-router",
@@ -73,7 +67,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/notification-icon.png",
+          "icon": "./assets/images/isotipo.png",
           "color": "#1d4ed8",
           "defaultChannel": "alerts",
           "sounds": []
