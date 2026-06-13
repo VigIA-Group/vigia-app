@@ -7,25 +7,25 @@ import { InsightCard } from "@/src/components/insight-card";
 import { PageContainer } from "@/src/components/page-container";
 // import { ReportChatSheet } from "@/src/components/report-chat-sheet"; // Deshabilitado hasta tener backend de IA
 import {
-    filterHourly,
-    HOUR_RANGES,
-    INSIGHTS,
-    type DailyPeoplePoint,
-    type HourRange,
+  filterHourly,
+  HOUR_RANGES,
+  INSIGHTS,
+  type DailyPeoplePoint,
+  type HourRange,
 } from "@/src/data/mock";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { useSupabaseAuth } from "@/src/hooks/use-supabase-auth";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
-    BarChart2,
-    Bell,
-    Filter,
-    GitCompareArrows,
-    Map,
-    MessageCircle,
-    ShieldAlert,
-    Users,
+  BarChart2,
+  Bell,
+  Filter,
+  GitCompareArrows,
+  Map,
+  MessageCircle,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, Switch } from "react-native";
