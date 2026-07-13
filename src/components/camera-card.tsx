@@ -2,12 +2,12 @@ import type { Camera } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { VideoView, useVideoPlayer } from "expo-video";
 import {
-  Camera as CameraIcon,
-  PackageX,
-  PersonStanding,
-  ScanLine,
-  ShieldAlert,
-  Users,
+    Camera as CameraIcon,
+    PackageX,
+    PersonStanding,
+    ScanLine,
+    ShieldAlert,
+    Users,
 } from "lucide-react-native";
 import { MotiView } from "moti";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -23,12 +23,12 @@ const MODULE_ICONS: Record<string, React.ElementType> = {
 };
 
 const VIDEO_SOURCES = [
-  require("@/assets/video1.mp4"),
-  require("@/assets/video2.mp4"),
-  require("@/assets/video3.mp4"),
-  require("@/assets/video4.mp4"),
-  require("@/assets/video5.mp4"),
-  require("@/assets/video6.mp4"),
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo.mp4?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo2.mp4?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo3.mp4?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo4.mp4?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo5.mp4?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fvideo6.mp4?alt=media",
 ];
 
 interface CameraCardProps {
