@@ -8,17 +8,17 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { VideoView, useVideoPlayer } from "expo-video";
 import {
-  ArrowLeft,
-  Camera,
-  CheckCircle,
-  Clock,
-  Download,
-  MapPin,
-  PackageX,
-  PersonStanding,
-  ScanLine,
-  ShieldAlert,
-  Users,
+    ArrowLeft,
+    Camera,
+    CheckCircle,
+    Clock,
+    Download,
+    MapPin,
+    PackageX,
+    PersonStanding,
+    ScanLine,
+    ShieldAlert,
+    Users,
 } from "lucide-react-native";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -55,11 +55,14 @@ export default function AlertDetailScreen() {
   const { isDesktop } = useBreakpoint();
   const event = EVENTS.find((e) => e.id === id);
 
-  const player = useVideoPlayer(require("@/assets/alert.webm"), (p) => {
-    p.loop = true;
-    p.muted = false;
-    p.play();
-  });
+  const player = useVideoPlayer(
+    "https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Falert.webm",
+    (p) => {
+      p.loop = true;
+      p.muted = false;
+      p.play();
+    }
+  );
 
   if (!event) {
     return (
