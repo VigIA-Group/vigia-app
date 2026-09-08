@@ -1,6 +1,6 @@
 import type { KPI } from "@/src/data/mock";
 import { LinearGradient } from "expo-linear-gradient";
-import { AlertTriangle, Cctv, Timer, TrendingUp, Users } from "lucide-react-native";
+import { AlertTriangle, Cctv, ShoppingCart, Timer, TrendingUp, Users } from "lucide-react-native";
 import { MotiView } from "moti";
 import { Text, XStack, YStack } from "tamagui";
 
@@ -10,6 +10,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   AlertTriangle,
   Timer,
   Cctv,
+  ShoppingCart,
 };
 
 interface KPICardProps {
@@ -27,16 +28,16 @@ export function KPICard({ kpi, index }: KPICardProps) {
       transition={{ type: "timing", duration: 350, delay: index * 80 }}
     >
       <YStack
-        width={148}
+        width={154}
         backgroundColor="$backgroundStrong"
         borderRadius={14}
         overflow="hidden"
         borderWidth={1}
         borderColor="$borderColor"
       >
-        {/* Top accent bar — brand gradient */}
+        {/* Top accent bar — VigIA brand gradient */}
         <LinearGradient
-          colors={["#1e3a8a", kpi.accentColor]}
+          colors={["#02209A", kpi.accentColor]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{ height: 3 }}
@@ -48,18 +49,18 @@ export function KPICard({ kpi, index }: KPICardProps) {
               fontSize={11}
               color="$placeholderColor"
               fontFamily="$body"
-              fontWeight="500"
+              fontWeight="600"
               numberOfLines={1}
             >
               {kpi.label}
             </Text>
-            {IconComponent && <IconComponent size={14} color={kpi.accentColor} />}
+            {IconComponent && <IconComponent size={15} color={kpi.accentColor} />}
           </XStack>
 
           <Text
-            fontSize={24}
-            fontFamily="$mono"
-            fontWeight="700"
+            fontSize={23}
+            fontFamily="$heading"
+            fontWeight="800"
             color="$color"
             letterSpacing={-0.5}
           >

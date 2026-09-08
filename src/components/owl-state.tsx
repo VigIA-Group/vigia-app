@@ -29,10 +29,10 @@ const SIZE_MAP: Record<OwlSize, number> = {
 };
 
 const VARIANT_COLORS: Record<OwlVariant, string> = {
-  idle: "#3b82f6",
+  idle: "#056EFA",
   empty: "#64748b",
-  ocr: "#3b82f6",
-  people: "#3b82f6",
+  ocr: "#6366f1",
+  people: "#056EFA",
   intrusion: "#fbbf24",
   stolen: "#f87171",
   fall: "#fb923c",

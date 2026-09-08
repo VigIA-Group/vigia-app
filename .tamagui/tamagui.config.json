@@ -25810,7 +25810,7 @@
   "tamaguiConfig": {
     "fonts": {
       "body": {
-        "family": "Outfit",
+        "family": "PlusJakartaSans",
         "size": {
           "1": 12,
           "2": 13,
@@ -25842,18 +25842,18 @@
           "true": 22
         },
         "weight": {
-          "1": "400",
-          "2": "400",
+          "1": "300",
+          "2": "300",
           "3": "400",
           "4": "400",
-          "5": "400",
+          "5": "500",
           "6": "500",
           "7": "600",
           "8": "700",
-          "9": "700",
-          "10": "700",
-          "11": "700",
-          "12": "700",
+          "9": "800",
+          "10": "800",
+          "11": "800",
+          "12": "800",
           "true": "400"
         },
         "letterSpacing": {
@@ -25873,36 +25873,36 @@
         },
         "face": {
           "100": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans"
           },
           "200": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans"
           },
           "300": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans_300Light"
           },
           "400": {
-            "normal": "Outfit_400Regular"
+            "normal": "PlusJakartaSans_400Regular"
           },
           "500": {
-            "normal": "Outfit_500Medium"
+            "normal": "PlusJakartaSans_500Medium"
           },
           "600": {
-            "normal": "Outfit_600SemiBold"
+            "normal": "PlusJakartaSans_600SemiBold"
           },
           "700": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_700Bold"
           },
           "800": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           },
           "900": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           }
         }
       },
       "heading": {
-        "family": "Outfit",
+        "family": "PlusJakartaSans",
         "size": {
           "1": 12,
           "2": 13,
@@ -25934,138 +25934,154 @@
           "true": 22
         },
         "weight": {
-          "1": "400",
-          "2": "400",
+          "1": "300",
+          "2": "300",
           "3": "400",
           "4": "400",
-          "5": "400",
+          "5": "500",
           "6": "500",
           "7": "600",
           "8": "700",
-          "9": "700",
-          "10": "700",
-          "11": "700",
-          "12": "700",
-          "true": "400"
+          "9": "800",
+          "10": "800",
+          "11": "800",
+          "12": "800",
+          "true": "700"
         },
         "letterSpacing": {
-          "1": 0,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 0,
-          "6": 0,
-          "7": 0,
-          "8": 0,
-          "9": 0,
-          "10": 0,
-          "11": 0,
-          "12": 0,
-          "true": 0
+          "1": -0.4,
+          "2": -0.4,
+          "3": -0.4,
+          "4": -0.4,
+          "5": -0.4,
+          "6": -0.4,
+          "7": -0.4,
+          "8": -0.4,
+          "9": -0.4,
+          "10": -0.4,
+          "11": -0.4,
+          "12": -0.4,
+          "true": -0.4
         },
         "face": {
           "100": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans"
           },
           "200": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans"
           },
           "300": {
-            "normal": "Outfit"
+            "normal": "PlusJakartaSans_300Light"
           },
           "400": {
-            "normal": "Outfit_400Regular"
+            "normal": "PlusJakartaSans_400Regular"
           },
           "500": {
-            "normal": "Outfit_500Medium"
+            "normal": "PlusJakartaSans_500Medium"
           },
           "600": {
-            "normal": "Outfit_600SemiBold"
+            "normal": "PlusJakartaSans_600SemiBold"
           },
           "700": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_700Bold"
           },
           "800": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           },
           "900": {
-            "normal": "Outfit_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           }
         }
       },
       "mono": {
-        "family": "IBMPlexMono",
+        "family": "PlusJakartaSans",
         "size": {
-          "1": 11,
-          "2": 12,
-          "3": 13,
-          "4": 14,
-          "5": 15,
+          "1": 12,
+          "2": 13,
+          "3": 14,
+          "4": 15,
+          "5": 16,
           "6": 17,
-          "7": 19,
-          "8": 21,
-          "true": 14
+          "7": 20,
+          "8": 22,
+          "9": 24,
+          "10": 26,
+          "11": 30,
+          "12": 34,
+          "true": 15
         },
         "lineHeight": {
-          "1": 15,
-          "2": 17,
-          "3": 19,
-          "4": 21,
+          "1": 17,
+          "2": 19,
+          "3": 21,
+          "4": 22,
           "5": 23,
           "6": 25,
-          "7": 27,
-          "8": 29,
-          "true": 21
+          "7": 28,
+          "8": 30,
+          "9": 32,
+          "10": 34,
+          "11": 38,
+          "12": 42,
+          "true": 22
         },
         "weight": {
-          "1": "400",
-          "2": "400",
+          "1": "300",
+          "2": "300",
           "3": "400",
           "4": "400",
-          "5": "400",
-          "6": "400",
-          "7": "400",
-          "8": "400",
-          "true": "400"
+          "5": "500",
+          "6": "500",
+          "7": "600",
+          "8": "700",
+          "9": "800",
+          "10": "800",
+          "11": "800",
+          "12": "800",
+          "true": "600"
         },
         "letterSpacing": {
-          "1": 0,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 0,
-          "6": 0,
-          "7": 0,
-          "8": 0,
-          "true": 0
+          "1": -0.2,
+          "2": -0.2,
+          "3": -0.2,
+          "4": -0.2,
+          "5": -0.2,
+          "6": -0.2,
+          "7": -0.2,
+          "8": -0.2,
+          "9": -0.2,
+          "10": -0.2,
+          "11": -0.2,
+          "12": -0.2,
+          "true": -0.2
         },
         "face": {
           "100": {
-            "normal": "IBMPlexMono"
+            "normal": "PlusJakartaSans"
           },
           "200": {
-            "normal": "IBMPlexMono"
+            "normal": "PlusJakartaSans"
           },
           "300": {
-            "normal": "IBMPlexMono"
+            "normal": "PlusJakartaSans_300Light"
           },
           "400": {
-            "normal": "IBMPlexMono_400Regular"
+            "normal": "PlusJakartaSans_400Regular"
           },
           "500": {
-            "normal": "IBMPlexMono_400Regular"
+            "normal": "PlusJakartaSans_500Medium"
           },
           "600": {
-            "normal": "IBMPlexMono_400Regular"
+            "normal": "PlusJakartaSans_600SemiBold"
           },
           "700": {
-            "normal": "IBMPlexMono_700Bold"
+            "normal": "PlusJakartaSans_700Bold"
           },
           "800": {
-            "normal": "IBMPlexMono_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           },
           "900": {
-            "normal": "IBMPlexMono_700Bold"
+            "normal": "PlusJakartaSans_800ExtraBold"
           }
         }
       }
@@ -26122,35 +26138,63 @@
           "isVar": true,
           "key": "$brandNavy",
           "name": "c-brandNavy",
-          "val": "#1e3a8a",
+          "val": "#050E1D",
+          "variable": ""
+        },
+        "brandBlueDark": {
+          "isVar": true,
+          "key": "$brandBlueDark",
+          "name": "c-brandBlueDark",
+          "val": "#02209A",
+          "variable": ""
+        },
+        "brandBluePrimary": {
+          "isVar": true,
+          "key": "$brandBluePrimary",
+          "name": "c-brandBluePrimary",
+          "val": "#0A4CE8",
+          "variable": ""
+        },
+        "brandBlueAccent": {
+          "isVar": true,
+          "key": "$brandBlueAccent",
+          "name": "c-brandBlueAccent",
+          "val": "#056EFA",
+          "variable": ""
+        },
+        "brandBlueCyan": {
+          "isVar": true,
+          "key": "$brandBlueCyan",
+          "name": "c-brandBlueCyan",
+          "val": "#2198F4",
           "variable": ""
         },
         "brandBlue": {
           "isVar": true,
           "key": "$brandBlue",
           "name": "c-brandBlue",
-          "val": "#2563eb",
+          "val": "#0A4CE8",
           "variable": ""
         },
         "primary": {
           "isVar": true,
           "key": "$primary",
           "name": "c-primary",
-          "val": "#3b82f6",
+          "val": "#056EFA",
           "variable": ""
         },
         "secondary": {
           "isVar": true,
           "key": "$secondary",
           "name": "c-secondary",
-          "val": "#1d4ed8",
+          "val": "#02209A",
           "variable": ""
         },
         "brandSky": {
           "isVar": true,
           "key": "$brandSky",
           "name": "c-brandSky",
-          "val": "#60a5fa",
+          "val": "#2198F4",
           "variable": ""
         },
         "brandIce": {
@@ -26199,14 +26243,14 @@
           "isVar": true,
           "key": "$ocr",
           "name": "c-ocr",
-          "val": "#3b82f6",
+          "val": "#6366f1",
           "variable": ""
         },
         "people": {
           "isVar": true,
           "key": "$people",
           "name": "c-people",
-          "val": "#3b82f6",
+          "val": "#056EFA",
           "variable": ""
         },
         "intrusion": {
@@ -26241,28 +26285,28 @@
           "isVar": true,
           "key": "$darkBg",
           "name": "c-darkBg",
-          "val": "#020617",
+          "val": "#050E1D",
           "variable": ""
         },
         "darkCard": {
           "isVar": true,
           "key": "$darkCard",
           "name": "c-darkCard",
-          "val": "#0f172a",
+          "val": "#0b172a",
           "variable": ""
         },
         "darkSecondary": {
           "isVar": true,
           "key": "$darkSecondary",
           "name": "c-darkSecondary",
-          "val": "#1e293b",
+          "val": "#13233e",
           "variable": ""
         },
         "darkBorder": {
           "isVar": true,
           "key": "$darkBorder",
           "name": "c-darkBorder",
-          "val": "#334155",
+          "val": "#1e3357",
           "variable": ""
         },
         "darkTextPrimary": {
@@ -26318,7 +26362,7 @@
           "isVar": true,
           "key": "$lightTextPrimary",
           "name": "c-lightTextPrimary",
-          "val": "#0f172a",
+          "val": "#050E1D",
           "variable": ""
         },
         "lightTextSecondary": {
@@ -27082,27 +27126,31 @@
     },
     "themes": {
       "dark": {
-        "brandNavy": "#1e3a8a",
-        "brandBlue": "#2563eb",
-        "primary": "#3b82f6",
-        "secondary": "#1d4ed8",
-        "brandSky": "#60a5fa",
+        "brandNavy": "#050E1D",
+        "brandBlueDark": "#02209A",
+        "brandBluePrimary": "#0A4CE8",
+        "brandBlueAccent": "#056EFA",
+        "brandBlueCyan": "#2198F4",
+        "brandBlue": "#0A4CE8",
+        "primary": "#056EFA",
+        "secondary": "#02209A",
+        "brandSky": "#2198F4",
         "brandIce": "#93c5fd",
         "success": "#34d399",
         "purple": "#a78bfa",
         "warning": "#fbbf24",
         "danger": "#f87171",
         "alert": "#fb923c",
-        "ocr": "#3b82f6",
-        "people": "#3b82f6",
+        "ocr": "#6366f1",
+        "people": "#056EFA",
         "intrusion": "#fbbf24",
         "stolen": "#f87171",
         "fall": "#fb923c",
         "tampering": "#a78bfa",
-        "darkBg": "#020617",
-        "darkCard": "#0f172a",
-        "darkSecondary": "#1e293b",
-        "darkBorder": "#334155",
+        "darkBg": "#050E1D",
+        "darkCard": "#0b172a",
+        "darkSecondary": "#13233e",
+        "darkBorder": "#1e3357",
         "darkTextPrimary": "#ffffff",
         "darkTextSecondary": "#e2e8f0",
         "darkTextTertiary": "#cbd5e1",
@@ -27110,49 +27158,53 @@
         "lightBg": "#f8fafc",
         "lightCard": "#ffffff",
         "lightBorder": "#cbd5e1",
-        "lightTextPrimary": "#0f172a",
+        "lightTextPrimary": "#050E1D",
         "lightTextSecondary": "#334155",
-        "background": "#020617",
-        "backgroundHover": "#0f172a",
-        "backgroundPress": "#1e293b",
-        "backgroundFocus": "#0f172a",
-        "backgroundStrong": "#0f172a",
+        "background": "#050E1D",
+        "backgroundHover": "#0b172a",
+        "backgroundPress": "#13233e",
+        "backgroundFocus": "#0b172a",
+        "backgroundStrong": "#0b172a",
         "backgroundTransparent": "rgba(0,0,0,0)",
         "color": "#ffffff",
         "colorHover": "#ffffff",
         "colorPress": "#ffffff",
         "colorFocus": "#ffffff",
         "colorTransparent": "rgba(255,255,255,0)",
-        "borderColor": "#334155",
+        "borderColor": "#1e3357",
         "borderColorHover": "#e2e8f0",
-        "borderColorFocus": "#3b82f6",
-        "borderColorPress": "#3b82f6",
+        "borderColorFocus": "#056EFA",
+        "borderColorPress": "#056EFA",
         "placeholderColor": "#e2e8f0",
         "outlineColor": "transparent",
         "id": "dark"
       },
       "light": {
-        "brandNavy": "#1e3a8a",
-        "brandBlue": "#2563eb",
-        "primary": "#3b82f6",
-        "secondary": "#1d4ed8",
-        "brandSky": "#60a5fa",
+        "brandNavy": "#050E1D",
+        "brandBlueDark": "#02209A",
+        "brandBluePrimary": "#0A4CE8",
+        "brandBlueAccent": "#056EFA",
+        "brandBlueCyan": "#2198F4",
+        "brandBlue": "#0A4CE8",
+        "primary": "#056EFA",
+        "secondary": "#02209A",
+        "brandSky": "#2198F4",
         "brandIce": "#93c5fd",
         "success": "#34d399",
         "purple": "#a78bfa",
         "warning": "#fbbf24",
         "danger": "#f87171",
         "alert": "#fb923c",
-        "ocr": "#3b82f6",
-        "people": "#3b82f6",
+        "ocr": "#6366f1",
+        "people": "#056EFA",
         "intrusion": "#fbbf24",
         "stolen": "#f87171",
         "fall": "#fb923c",
         "tampering": "#a78bfa",
-        "darkBg": "#020617",
-        "darkCard": "#0f172a",
-        "darkSecondary": "#1e293b",
-        "darkBorder": "#334155",
+        "darkBg": "#050E1D",
+        "darkCard": "#0b172a",
+        "darkSecondary": "#13233e",
+        "darkBorder": "#1e3357",
         "darkTextPrimary": "#ffffff",
         "darkTextSecondary": "#e2e8f0",
         "darkTextTertiary": "#cbd5e1",
@@ -27160,7 +27212,7 @@
         "lightBg": "#f8fafc",
         "lightCard": "#ffffff",
         "lightBorder": "#cbd5e1",
-        "lightTextPrimary": "#0f172a",
+        "lightTextPrimary": "#050E1D",
         "lightTextSecondary": "#334155",
         "background": "#f8fafc",
         "backgroundHover": "#ffffff",
@@ -27168,15 +27220,15 @@
         "backgroundFocus": "#ffffff",
         "backgroundStrong": "#ffffff",
         "backgroundTransparent": "rgba(255,255,255,0)",
-        "color": "#0f172a",
-        "colorHover": "#0f172a",
-        "colorPress": "#0f172a",
-        "colorFocus": "#0f172a",
+        "color": "#050E1D",
+        "colorHover": "#050E1D",
+        "colorPress": "#050E1D",
+        "colorFocus": "#050E1D",
         "colorTransparent": "rgba(0,0,0,0)",
         "borderColor": "#cbd5e1",
         "borderColorHover": "#334155",
-        "borderColorFocus": "#3b82f6",
-        "borderColorPress": "#3b82f6",
+        "borderColorFocus": "#056EFA",
+        "borderColorPress": "#056EFA",
         "placeholderColor": "#334155",
         "outlineColor": "transparent",
         "id": "light"
@@ -27305,7 +27357,35 @@
         "isVar": true,
         "key": "$brandBlue",
         "name": "c-brandBlue",
-        "val": "#2563eb",
+        "val": "#0A4CE8",
+        "variable": ""
+      },
+      "$color.brandBlueAccent": {
+        "isVar": true,
+        "key": "$brandBlueAccent",
+        "name": "c-brandBlueAccent",
+        "val": "#056EFA",
+        "variable": ""
+      },
+      "$color.brandBlueCyan": {
+        "isVar": true,
+        "key": "$brandBlueCyan",
+        "name": "c-brandBlueCyan",
+        "val": "#2198F4",
+        "variable": ""
+      },
+      "$color.brandBlueDark": {
+        "isVar": true,
+        "key": "$brandBlueDark",
+        "name": "c-brandBlueDark",
+        "val": "#02209A",
+        "variable": ""
+      },
+      "$color.brandBluePrimary": {
+        "isVar": true,
+        "key": "$brandBluePrimary",
+        "name": "c-brandBluePrimary",
+        "val": "#0A4CE8",
         "variable": ""
       },
       "$color.brandIce": {
@@ -27319,14 +27399,14 @@
         "isVar": true,
         "key": "$brandNavy",
         "name": "c-brandNavy",
-        "val": "#1e3a8a",
+        "val": "#050E1D",
         "variable": ""
       },
       "$color.brandSky": {
         "isVar": true,
         "key": "$brandSky",
         "name": "c-brandSky",
-        "val": "#60a5fa",
+        "val": "#2198F4",
         "variable": ""
       },
       "$color.danger": {
@@ -27340,28 +27420,28 @@
         "isVar": true,
         "key": "$darkBg",
         "name": "c-darkBg",
-        "val": "#020617",
+        "val": "#050E1D",
         "variable": ""
       },
       "$color.darkBorder": {
         "isVar": true,
         "key": "$darkBorder",
         "name": "c-darkBorder",
-        "val": "#334155",
+        "val": "#1e3357",
         "variable": ""
       },
       "$color.darkCard": {
         "isVar": true,
         "key": "$darkCard",
         "name": "c-darkCard",
-        "val": "#0f172a",
+        "val": "#0b172a",
         "variable": ""
       },
       "$color.darkSecondary": {
         "isVar": true,
         "key": "$darkSecondary",
         "name": "c-darkSecondary",
-        "val": "#1e293b",
+        "val": "#13233e",
         "variable": ""
       },
       "$color.darkTextLabel": {
@@ -27431,7 +27511,7 @@
         "isVar": true,
         "key": "$lightTextPrimary",
         "name": "c-lightTextPrimary",
-        "val": "#0f172a",
+        "val": "#050E1D",
         "variable": ""
       },
       "$color.lightTextSecondary": {
@@ -27445,21 +27525,21 @@
         "isVar": true,
         "key": "$ocr",
         "name": "c-ocr",
-        "val": "#3b82f6",
+        "val": "#6366f1",
         "variable": ""
       },
       "$color.people": {
         "isVar": true,
         "key": "$people",
         "name": "c-people",
-        "val": "#3b82f6",
+        "val": "#056EFA",
         "variable": ""
       },
       "$color.primary": {
         "isVar": true,
         "key": "$primary",
         "name": "c-primary",
-        "val": "#3b82f6",
+        "val": "#056EFA",
         "variable": ""
       },
       "$color.purple": {
@@ -27473,7 +27553,7 @@
         "isVar": true,
         "key": "$secondary",
         "name": "c-secondary",
-        "val": "#1d4ed8",
+        "val": "#02209A",
         "variable": ""
       },
       "$color.stolen": {

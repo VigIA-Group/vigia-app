@@ -19,8 +19,8 @@ const MODULE_ICONS: Record<ModuleId, React.ElementType> = {
 };
 
 const MODULE_COLORS: Record<ModuleId, string> = {
-  ocr: "#3b82f6",
-  people: "#3b82f6",
+  ocr: "#6366f1",
+  people: "#056EFA",
   intrusion: "#fbbf24",
   stolen: "#f87171",
   fall: "#fb923c",

@@ -7,13 +7,17 @@ import { createFont, createTamagui, createTokens } from "tamagui";
 const tokens = createTokens({
   ...defaultTokens,
   color: {
-    // Colores primarios de marca — degradé del logotipo
-    brandNavy: "#1e3a8a", // azul oscuro (izquierda del isotipo)
-    brandBlue: "#2563eb", // azul medio
-    primary: "#3b82f6", // azul principal
-    secondary: "#1d4ed8", // blue-700
-    brandSky: "#60a5fa", // azul claro (parte derecha del isotipo)
-    brandIce: "#93c5fd", // celeste suave (gradiente final)
+    // Colores primarios de marca VigIA
+    brandNavy: "#050E1D", // base navy VigIA
+    brandBlueDark: "#02209A", // azul de acento oscuro
+    brandBluePrimary: "#0A4CE8", // azul de acento primario
+    brandBlueAccent: "#056EFA", // azul de acento vibrante
+    brandBlueCyan: "#2198F4", // azul cian
+    brandBlue: "#0A4CE8",
+    primary: "#056EFA", // azul principal
+    secondary: "#02209A",
+    brandSky: "#2198F4",
+    brandIce: "#93c5fd",
 
     // Colores de acento
     success: "#34d399", // emerald - confirmaciones y estados positivos
@@ -23,29 +27,29 @@ const tokens = createTokens({
     alert: "#fb923c", // orange - caídas y urgencia media
 
     // Colores por módulo
-    ocr: "#3b82f6", // cyan - OCR y placas
-    people: "#3b82f6", // blue - análisis de personas
+    ocr: "#6366f1", // índigo - OCR y placas (independiente de personas)
+    people: "#056EFA", // azul - análisis de personas
     intrusion: "#fbbf24", // amber - intrusión y perímetros
     stolen: "#f87171", // red - objetos robados
     fall: "#fb923c", // orange - caídas y movimiento
     tampering: "#a78bfa", // purple - clasificación y tampering
 
-    // Dark mode colors - improved contrast
-    darkBg: "#020617", // slate-950 - fondo más profundo
-    darkCard: "#0f172a", // slate-900 - fondo de cards
-    darkSecondary: "#1e293b", // slate-800 - elementos secundarios
-    darkBorder: "#334155", // slate-700 - bordes
+    // Dark mode colors - VigIA Navy base
+    darkBg: "#050E1D", // navy profundo #050E1D
+    darkCard: "#0b172a", // navy card
+    darkSecondary: "#13233e", // elementos secundarios
+    darkBorder: "#1e3357", // bordes sutiles
     darkTextPrimary: "#ffffff", // blanco puro
-    darkTextSecondary: "#e2e8f0", // slate-200 - lighter for better contrast
-    darkTextTertiary: "#cbd5e1", // slate-300 - lighter
-    darkTextLabel: "#94a3b8", // slate-400 - lighter
+    darkTextSecondary: "#e2e8f0", // slate-200
+    darkTextTertiary: "#cbd5e1", // slate-300
+    darkTextLabel: "#94a3b8", // slate-400
 
-    // Light mode colors - using more blue
-    lightBg: "#f8fafc", // slate-50 - fondo principal
-    lightCard: "#ffffff", // blanco - cards
-    lightBorder: "#cbd5e1", // slate-300 - darker borders for better contrast
-    lightTextPrimary: "#0f172a", // slate-900 - texto principal
-    lightTextSecondary: "#334155", // slate-700 - darker secondary text
+    // Light mode colors
+    lightBg: "#f8fafc",
+    lightCard: "#ffffff",
+    lightBorder: "#cbd5e1",
+    lightTextPrimary: "#050E1D",
+    lightTextSecondary: "#334155",
   },
 });
 
@@ -109,7 +113,7 @@ const media = createMedia({
 });
 
 const bodyFont = createFont({
-  family: "Outfit",
+  family: "PlusJakartaSans",
   size: {
     1: 12,
     2: 13,
@@ -141,58 +145,50 @@ const bodyFont = createFont({
     true: 22,
   },
   weight: {
-    1: "400",
-    2: "400",
+    1: "300",
+    2: "300",
     3: "400",
     4: "400",
-    5: "400",
+    5: "500",
     6: "500",
     7: "600",
     8: "700",
+    9: "800",
     true: "400",
   },
   letterSpacing: { 4: 0 },
   face: {
-    400: { normal: "Outfit_400Regular" },
-    500: { normal: "Outfit_500Medium" },
-    600: { normal: "Outfit_600SemiBold" },
-    700: { normal: "Outfit_700Bold" },
+    300: { normal: "PlusJakartaSans_300Light" },
+    400: { normal: "PlusJakartaSans_400Regular" },
+    500: { normal: "PlusJakartaSans_500Medium" },
+    600: { normal: "PlusJakartaSans_600SemiBold" },
+    700: { normal: "PlusJakartaSans_700Bold" },
+    800: { normal: "PlusJakartaSans_800ExtraBold" },
   },
 });
 
-const monoFont = createFont({
-  family: "IBMPlexMono",
-  size: {
-    1: 11,
-    2: 12,
-    3: 13,
-    4: 14,
-    5: 15,
-    6: 17,
-    7: 19,
-    8: 21,
-    true: 14,
-  },
-  lineHeight: {
-    1: 15,
-    2: 17,
-    3: 19,
-    4: 21,
-    5: 23,
-    6: 25,
-    7: 27,
-    8: 29,
-    true: 21,
-  },
+const headingFont = createFont({
+  family: "PlusJakartaSans",
+  size: bodyFont.size,
+  lineHeight: bodyFont.lineHeight,
   weight: {
-    1: "400",
-    true: "400",
+    ...bodyFont.weight,
+    true: "700",
   },
-  letterSpacing: { 4: 0 },
-  face: {
-    400: { normal: "IBMPlexMono_400Regular" },
-    700: { normal: "IBMPlexMono_700Bold" },
+  letterSpacing: { 4: -0.4 },
+  face: bodyFont.face,
+});
+
+const monoFont = createFont({
+  family: "PlusJakartaSans",
+  size: bodyFont.size,
+  lineHeight: bodyFont.lineHeight,
+  weight: {
+    ...bodyFont.weight,
+    true: "600",
   },
+  letterSpacing: { 4: -0.2 },
+  face: bodyFont.face,
 });
 
 export const tamaguiConfig = createTamagui({
@@ -205,7 +201,7 @@ export const tamaguiConfig = createTamagui({
   themeClassNameOnRoot: true,
   fonts: {
     body: bodyFont,
-    heading: bodyFont,
+    heading: headingFont,
     mono: monoFont,
   },
 });

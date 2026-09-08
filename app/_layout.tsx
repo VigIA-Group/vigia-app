@@ -1,23 +1,20 @@
 import { ThemeContext, useThemeState } from "@/src/hooks/use-app-theme";
 import config from "@/tamagui.config";
 import {
-    IBMPlexMono_400Regular,
-    IBMPlexMono_700Bold,
-    useFonts as useIBMPlexMono,
-} from "@expo-google-fonts/ibm-plex-mono";
-import {
-    Outfit_400Regular,
-    Outfit_500Medium,
-    Outfit_600SemiBold,
-    Outfit_700Bold,
-    useFonts as useOutfit,
-} from "@expo-google-fonts/outfit";
+    PlusJakartaSans_300Light,
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
+    useFonts,
+} from "@expo-google-fonts/plus-jakarta-sans";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import "react-native-gesture-handler";
+import { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -31,25 +28,15 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const { theme: appTheme, setTheme: setAppTheme } = useThemeState("dark");
-  const [fontsReady, setFontsReady] = useState(false);
 
-  const [outfitLoaded] = useOutfit({
-    Outfit_400Regular,
-    Outfit_500Medium,
-    Outfit_600SemiBold,
-    Outfit_700Bold,
+  const [fontsLoaded, fontError] = useFonts({
+    PlusJakartaSans_300Light,
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
-
-  const [monoLoaded] = useIBMPlexMono({
-    IBMPlexMono_400Regular,
-    IBMPlexMono_700Bold,
-  });
-
-  useEffect(() => {
-    if (outfitLoaded && monoLoaded) {
-      setFontsReady(true);
-    }
-  }, [outfitLoaded, monoLoaded]);
 
   useEffect(() => {
     async function init() {
@@ -59,16 +46,54 @@ export default function RootLayout() {
       }
     }
     init();
+
+    if (Platform.OS === "web" && typeof document !== "undefined") {
+      const linkId = "vigia-google-fonts";
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href =
+          "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap";
+        document.head.appendChild(link);
+      }
+
+      const styleId = "vigia-runtime-fonts";
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement("style");
+        style.id = styleId;
+        style.textContent = `
+          @font-face {
+            font-family: 'PlusJakartaSans';
+            src: local('Plus Jakarta Sans'), local('PlusJakartaSans');
+            font-weight: 300 800;
+            font-display: swap;
+          }
+          @font-face {
+            font-family: 'IBMPlexMono';
+            src: local('Plus Jakarta Sans'), local('PlusJakartaSans');
+            font-weight: 300 800;
+            font-display: swap;
+          }
+          html, body, #root, [data-tamagui-component], input, button, textarea, select, text, tspan, * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (fontsReady) {
+    if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsReady]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsReady) return null;
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

@@ -1,7 +1,18 @@
 import BottomSheet, { BottomSheetScrollView } from "@/src/components/bottom-sheet";
+import { BidirectionalTrafficChart } from "@/src/components/charts/bidirectional-traffic-chart";
+import { ConversionChart } from "@/src/components/charts/conversion-chart";
+import { DailyTrafficTable } from "@/src/components/charts/daily-traffic-table";
+import { StoreOccupancyGauge } from "@/src/components/charts/store-occupancy-gauge";
 import { SvgBarChart } from "@/src/components/charts/svg-bar-chart";
 import { SvgLineChart } from "@/src/components/charts/svg-line-chart";
 import { SvgMultiLineChart } from "@/src/components/charts/svg-multi-line-chart";
+import { TrafficHeatmapMatrix } from "@/src/components/charts/traffic-heatmap-matrix";
+import { WeekdayVsWeekendCard } from "@/src/components/charts/weekday-vs-weekend-card";
+import { ZoneDwellChart } from "@/src/components/charts/zone-dwell-chart";
+import { OperationsKpiSummary } from "@/src/components/charts/operations-kpi-summary";
+import { UniformComplianceCard } from "@/src/components/charts/uniform-compliance-card";
+import { StoreOpeningPunctualityCard } from "@/src/components/charts/store-opening-punctuality-card";
+import { OperationalIncidentsFeed } from "@/src/components/charts/operational-incidents-feed";
 import { InsightCard } from "@/src/components/insight-card";
 import { PageContainer } from "@/src/components/page-container";
 import { ReportChatSheet } from "@/src/components/report-chat-sheet";
@@ -14,6 +25,8 @@ import {
   DAILY_PEOPLE_7D,
   DAILY_PEOPLE_7D_PREV,
   filterHourly,
+  getPeakHourToday,
+  getWeeklyChangePercent,
   HOUR_RANGES,
   HOURLY_ACTIVITY_TODAY,
   INSIGHTS,
@@ -24,16 +37,15 @@ import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   BarChart2,
   Bell,
+  Briefcase,
   Filter,
   GitCompareArrows,
   Map,
   MessageCircle,
   ShieldAlert,
-  Sparkles,
   Users,
 } from "lucide-react-native";
 import { useRef, useState } from "react";
@@ -41,11 +53,20 @@ import { Platform, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
 
-type ReportTab = "traffic" | "alerts" | "modules" | "heatmaps";
+type ReportTab = "traffic" | "operations" | "alerts" | "modules" | "heatmaps";
 type Period = "today" | "7d" | "30d";
+type TrafficSubTab = "all" | "occupancy" | "trends" | "breakdown";
+
+const TRAFFIC_SUB_TABS: { id: TrafficSubTab; label: string }[] = [
+  { id: "all", label: "Vista Completa" },
+  { id: "occupancy", label: "Aforo & En Vivo" },
+  { id: "trends", label: "Tendencias & Matriz" },
+  { id: "breakdown", label: "Desglose & Conversión" },
+];
 
 const TABS: { id: ReportTab; label: string; Icon: typeof BarChart2 }[] = [
   { id: "traffic", label: "Tráfico", Icon: Users },
+  { id: "operations", label: "Operaciones", Icon: Briefcase },
   { id: "alerts", label: "Alertas", Icon: Bell },
   { id: "modules", label: "Módulos", Icon: ShieldAlert },
   { id: "heatmaps", label: "Mapas de Calor", Icon: Map },
@@ -169,6 +190,7 @@ export default function ReportsScreen() {
   const { isDesktop } = useBreakpoint();
 
   const [activeTab, setActiveTab] = useState<ReportTab>("traffic");
+  const [trafficSubTab, setTrafficSubTab] = useState<TrafficSubTab>("all");
   const [period, setPeriod] = useState<Period>("7d");
   const [hourRange, setHourRange] = useState<HourRange>("all");
   const [selectedHourFrom, setSelectedHourFrom] = useState<number | null>(null);
@@ -729,220 +751,343 @@ export default function ReportsScreen() {
           {/* ══ TRÁFICO ══ */}
           {activeTab === "traffic" && (
             <YStack gap={14}>
-              <XStack gap={8}>
-                <KpiMini
-                  label={
-                    period === "today"
-                      ? "Personas hoy"
-                      : period === "7d"
-                        ? "Esta semana"
-                        : "Este mes"
-                  }
-                  value={totalTraffic.toLocaleString("es-BO")}
-                  color="#3b82f6"
-                />
-                <KpiMini
-                  label="Promedio / día"
-                  value={avgTraffic.toLocaleString("es-BO")}
-                  color="#3b82f6"
-                />
-                <KpiMini
-                  label={`Pico`}
-                  value={maxDay.count.toLocaleString("es-BO")}
-                  color="#a78bfa"
-                />
-              </XStack>
+              {/* Traffic sub-tabs */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
+                <XStack gap={8} paddingVertical={2}>
+                  {TRAFFIC_SUB_TABS.map((subTab) => {
+                    const active = trafficSubTab === subTab.id;
+                    return (
+                      <View
+                        key={subTab.id}
+                        paddingHorizontal={14}
+                        paddingVertical={6}
+                        borderRadius={20}
+                        backgroundColor={active ? "rgba(10, 76, 232, 0.15)" : colors.card}
+                        borderWidth={1}
+                        borderColor={active ? "#056EFA" : colors.borderSoft}
+                        pressStyle={{ opacity: 0.7 }}
+                        onPress={() => setTrafficSubTab(subTab.id)}
+                      >
+                        <Text
+                          fontSize={12}
+                          fontWeight={active ? "700" : "500"}
+                          color={active ? "#056EFA" : colors.textSec}
+                          fontFamily="$body"
+                        >
+                          {subTab.label}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </XStack>
+              </ScrollView>
 
-              {selectedBar && (
-                <XStack
-                  backgroundColor="rgba(59,130,246,0.10)"
-                  borderRadius={10}
-                  borderWidth={1}
-                  borderColor="rgba(59,130,246,0.3)"
-                  paddingHorizontal={14}
-                  paddingVertical={10}
-                  alignItems="center"
-                  gap={8}
-                >
-                  <View width={8} height={8} borderRadius={4} backgroundColor="#3b82f6" />
-                  <Text fontSize={13} color={colors.text} fontFamily="$body">
-                    <Text fontWeight="700" color="#3b82f6" fontFamily="$mono">
-                      {selectedBar.label}
-                    </Text>
-                    {"  "}
-                    <Text fontFamily="$mono" color={colors.text}>
-                      {selectedBar.value.toLocaleString("es-BO")}
-                    </Text>{" "}
-                    personas detectadas
-                  </Text>
+              {/* SECCIÓN 1: Aforo & En Vivo (Occupancy & Live Capacity) */}
+              {(trafficSubTab === "all" || trafficSubTab === "occupancy") && (
+                <XStack gap={14} flexDirection={isDesktop ? "row" : "column"} alignItems="stretch">
+                  <View flex={isDesktop ? 1 : undefined} width={isDesktop ? undefined : "100%"}>
+                    <StoreOccupancyGauge />
+                  </View>
+                  <View flex={isDesktop ? 1 : undefined} width={isDesktop ? undefined : "100%"}>
+                    <BidirectionalTrafficChart />
+                  </View>
                 </XStack>
               )}
 
-              {/* Desktop: chart left, side panel right */}
-              <XStack gap={14} alignItems="flex-start" flexDirection={isDesktop ? "row" : "column"}>
-                <View
-                  flex={isDesktop ? 3 : undefined}
-                  backgroundColor={colors.card}
-                  borderRadius={14}
-                  borderWidth={1}
-                  borderColor={colors.borderSoft}
-                  padding={16}
-                  width={isDesktop ? undefined : "100%"}
-                >
-                  <XStack justifyContent="space-between" alignItems="center" marginBottom={4}>
-                    <SectionHeader
-                      title={
+              {/* SECCIÓN 2: Tendencias & Matriz (Trends & Volume) */}
+              {(trafficSubTab === "all" || trafficSubTab === "trends") && (
+                <YStack gap={14}>
+                  <XStack gap={8}>
+                    <KpiMini
+                      label={
                         period === "today"
-                          ? `Afluencia por hora — ${HOUR_RANGES[hourRange].label}`
+                          ? "Personas hoy"
                           : period === "7d"
-                            ? "Personas por día — 7 días"
-                            : "Personas por día — 30 días"
+                            ? "Esta semana"
+                            : "Este mes"
                       }
+                      value={totalTraffic.toLocaleString("es-BO")}
+                      color="#056EFA"
                     />
-                    {period === "7d" && (
-                      <XStack gap={6} alignItems="center">
-                        <GitCompareArrows size={13} color={colors.textLabel} />
-                        <Text fontSize={11} color={colors.textTer} fontFamily="$body">
-                          Comparar
-                        </Text>
-                        <Switch
-                          value={comparePeriod}
-                          onValueChange={setComparePeriod}
-                          trackColor={{ false: colors.cardAlt, true: "#3b82f6" }}
-                          thumbColor="#ffffff"
-                          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                        />
-                      </XStack>
-                    )}
+                    <KpiMini
+                      label="Promedio / día"
+                      value={avgTraffic.toLocaleString("es-BO")}
+                      color="#056EFA"
+                    />
+                    <KpiMini
+                      label="Pico"
+                      value={maxDay.count.toLocaleString("es-BO")}
+                      color="#a78bfa"
+                    />
                   </XStack>
 
-                  {isHourlySeries(trafficData) ? (
-                    <SvgLineChart
-                      data={trafficData}
-                      xKey="hour"
-                      yKey="count"
-                      color="#3b82f6"
-                      height={190}
-                      labelColor={colors.textLabel}
-                      gridColor={colors.borderSoft}
-                      xLabelStep={2}
-                      xLabelSuffix="h"
-                      onPointPress={onBarPress}
-                    />
-                  ) : (
-                    <SvgBarChart
-                      data={trafficData as DailyPeoplePoint[]}
-                      xKey={rangeStart && rangeEnd ? "date" : period === "30d" ? "date" : "day"}
-                      yKey="count"
-                      color="#3b82f6"
-                      compareData={applicableCompareTraffic as DailyPeoplePoint[] | undefined}
-                      compareColor="#475569"
-                      height={period === "30d" || (rangeStart && rangeEnd) ? 200 : 190}
-                      labelColor={colors.textLabel}
-                      gridColor={colors.borderSoft}
-                      onBarPress={onBarPress}
-                    />
-                  )}
-
-                  {comparePeriod && period === "7d" && (
-                    <XStack gap={16} marginTop={10}>
-                      <XStack gap={5} alignItems="center">
-                        <View width={12} height={3} borderRadius={2} backgroundColor="#3b82f6" />
-                        <Text fontSize={11} color={colors.textTer} fontFamily="$body">
-                          Actual
+                  {selectedBar && (
+                    <XStack
+                      backgroundColor="rgba(5, 110, 250, 0.10)"
+                      borderRadius={10}
+                      borderWidth={1}
+                      borderColor="rgba(5, 110, 250, 0.3)"
+                      paddingHorizontal={14}
+                      paddingVertical={10}
+                      alignItems="center"
+                      gap={8}
+                    >
+                      <View width={8} height={8} borderRadius={4} backgroundColor="#056EFA" />
+                      <Text fontSize={13} color={colors.text} fontFamily="$body">
+                        <Text fontWeight="700" color="#056EFA" fontFamily="$mono">
+                          {selectedBar.label}
                         </Text>
-                      </XStack>
-                      <XStack gap={5} alignItems="center">
-                        <View width={12} height={3} borderRadius={2} backgroundColor="#475569" />
-                        <Text fontSize={11} color={colors.textTer} fontFamily="$body">
-                          Período anterior
-                        </Text>
-                      </XStack>
+                        {"  "}
+                        <Text fontFamily="$mono" color={colors.text}>
+                          {selectedBar.value.toLocaleString("es-BO")}
+                        </Text>{" "}
+                        personas detectadas
+                      </Text>
                     </XStack>
                   )}
-                </View>
 
-                {/* Right column (desktop) or below (mobile) */}
-                <YStack
-                  flex={isDesktop ? 2 : undefined}
-                  gap={14}
-                  width={isDesktop ? undefined : "100%"}
-                >
-                  {/* By-camera for today */}
-                  {period === "today" && (
+                  {/* Desktop: chart left, side panel right */}
+                  <XStack gap={14} alignItems="flex-start" flexDirection={isDesktop ? "row" : "column"}>
                     <View
+                      flex={isDesktop ? 3 : undefined}
                       backgroundColor={colors.card}
                       borderRadius={14}
                       borderWidth={1}
                       borderColor={colors.borderSoft}
                       padding={16}
+                      width={isDesktop ? undefined : "100%"}
                     >
-                      <SectionHeader
-                        title={`Por cámara — ${HOUR_RANGES[hourRange].label}`}
-                        value={`Total: ${hourTotal.toLocaleString("es-BO")}`}
-                      />
-                      <YStack gap={10}>
-                        {CAMERAS.filter((c) => c.status !== "offline").map((cam) => {
-                          const camTotal = filterHourly(
-                            CAMERA_HOURLY[cam.id] ?? [],
-                            hourRange
-                          ).reduce((s, d) => s + d.count, 0);
-                          if (camTotal === 0) return null;
-                          return (
-                            <YStack key={cam.id} gap={4}>
-                              <XStack justifyContent="space-between" alignItems="center">
-                                <YStack>
-                                  <Text
-                                    fontSize={12}
-                                    fontWeight="600"
-                                    color={colors.textSec}
-                                    fontFamily="$body"
-                                  >
-                                    {cam.name}
-                                  </Text>
-                                  <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
-                                    {cam.room}
-                                  </Text>
-                                </YStack>
-                                <Text
-                                  fontSize={12}
-                                  fontWeight="700"
-                                  color="#3b82f6"
-                                  fontFamily="$mono"
-                                >
-                                  {camTotal.toLocaleString("es-BO")}
-                                </Text>
-                              </XStack>
-                              <View
-                                height={6}
-                                borderRadius={3}
-                                backgroundColor={colors.cardAlt}
-                                overflow="hidden"
-                              >
-                                <View
-                                  height={6}
-                                  borderRadius={3}
-                                  backgroundColor="#3b82f6"
-                                  width={
-                                    `${Math.round((camTotal / (hourTotal || 1)) * 100)}%` as `${number}%`
-                                  }
-                                />
-                              </View>
-                            </YStack>
-                          );
-                        })}
-                      </YStack>
-                    </View>
-                  )}
+                      <XStack justifyContent="space-between" alignItems="center" marginBottom={4}>
+                        <SectionHeader
+                          title={
+                            period === "today"
+                              ? `Afluencia por hora — ${HOUR_RANGES[hourRange].label}`
+                              : period === "7d"
+                                ? "Personas por día — 7 días"
+                                : "Personas por día — 30 días"
+                          }
+                        />
+                        {period === "7d" && (
+                          <XStack gap={6} alignItems="center">
+                            <GitCompareArrows size={13} color={colors.textLabel} />
+                            <Text fontSize={11} color={colors.textTer} fontFamily="$body">
+                              Comparar
+                            </Text>
+                            <Switch
+                              value={comparePeriod}
+                              onValueChange={setComparePeriod}
+                              trackColor={{ false: colors.cardAlt, true: "#056EFA" }}
+                              thumbColor="#ffffff"
+                              style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                            />
+                          </XStack>
+                        )}
+                      </XStack>
 
-                  <YStack gap={8}>
-                    <SectionHeader title="Insights — Tráfico" />
-                    {INSIGHTS.filter((i) => i.source === "traffic").map((ins) => (
-                      <InsightCard key={ins.id} insight={ins} />
-                    ))}
-                  </YStack>
+                      {isHourlySeries(trafficData) && (
+                        <XStack
+                          backgroundColor="rgba(10, 76, 232, 0.12)"
+                          borderColor="rgba(10, 76, 232, 0.3)"
+                          borderWidth={1}
+                          borderRadius={8}
+                          paddingHorizontal={10}
+                          paddingVertical={5}
+                          alignSelf="flex-start"
+                          alignItems="center"
+                          gap={6}
+                          marginBottom={10}
+                        >
+                          <View width={6} height={6} borderRadius={3} backgroundColor="#056EFA" />
+                          <Text fontSize={11} fontWeight="700" color="#056EFA" fontFamily="$body">
+                            Hora pico: {getPeakHourToday().hour}:00 – {getPeakHourToday().count} personas
+                          </Text>
+                        </XStack>
+                      )}
+
+                      {isHourlySeries(trafficData) ? (
+                        <SvgLineChart
+                          data={trafficData}
+                          xKey="hour"
+                          yKey="count"
+                          color="#056EFA"
+                          height={190}
+                          labelColor={colors.textLabel}
+                          gridColor={colors.borderSoft}
+                          xLabelStep={2}
+                          xLabelSuffix="h"
+                          onPointPress={onBarPress}
+                        />
+                      ) : (
+                        <SvgBarChart
+                          data={trafficData as DailyPeoplePoint[]}
+                          xKey={rangeStart && rangeEnd ? "date" : period === "30d" ? "date" : "day"}
+                          yKey="count"
+                          color="#056EFA"
+                          compareData={applicableCompareTraffic as DailyPeoplePoint[] | undefined}
+                          compareColor="#475569"
+                          height={period === "30d" || (rangeStart && rangeEnd) ? 200 : 190}
+                          labelColor={colors.textLabel}
+                          gridColor={colors.borderSoft}
+                          onBarPress={onBarPress}
+                        />
+                      )}
+
+                      {comparePeriod && period === "7d" && (
+                        <XStack justifyContent="space-between" alignItems="center" marginTop={12} flexWrap="wrap" gap={8}>
+                          <XStack gap={16}>
+                            <XStack gap={5} alignItems="center">
+                              <View width={12} height={3} borderRadius={2} backgroundColor="#056EFA" />
+                              <Text fontSize={11} color={colors.textTer} fontFamily="$body">
+                                Actual
+                              </Text>
+                            </XStack>
+                            <XStack gap={5} alignItems="center">
+                              <View width={12} height={3} borderRadius={2} backgroundColor="#475569" />
+                              <Text fontSize={11} color={colors.textTer} fontFamily="$body">
+                                Período anterior
+                              </Text>
+                            </XStack>
+                          </XStack>
+                          <View
+                            backgroundColor={getWeeklyChangePercent() >= 0 ? "rgba(52, 211, 153, 0.15)" : "rgba(248, 113, 113, 0.15)"}
+                            paddingHorizontal={8}
+                            paddingVertical={3}
+                            borderRadius={6}
+                          >
+                            <Text
+                              fontSize={11}
+                              fontWeight="700"
+                              fontFamily="$mono"
+                              color={getWeeklyChangePercent() >= 0 ? "#34d399" : "#f87171"}
+                            >
+                              {getWeeklyChangePercent() >= 0 ? "+" : ""}{getWeeklyChangePercent()}% vs. semana anterior
+                            </Text>
+                          </View>
+                        </XStack>
+                      )}
+                    </View>
+
+                    {/* Right column (desktop) or below (mobile) */}
+                    <YStack
+                      flex={isDesktop ? 2 : undefined}
+                      gap={14}
+                      width={isDesktop ? undefined : "100%"}
+                    >
+                      {/* By-camera for today */}
+                      {period === "today" && (
+                        <View
+                          backgroundColor={colors.card}
+                          borderRadius={14}
+                          borderWidth={1}
+                          borderColor={colors.borderSoft}
+                          padding={16}
+                        >
+                          <SectionHeader
+                            title={`Por cámara — ${HOUR_RANGES[hourRange].label}`}
+                            value={`Total: ${hourTotal.toLocaleString("es-BO")}`}
+                          />
+                          <YStack gap={10}>
+                            {CAMERAS.filter((c) => c.status !== "offline").map((cam) => {
+                              const camTotal = filterHourly(
+                                CAMERA_HOURLY[cam.id] ?? [],
+                                hourRange
+                              ).reduce((s, d) => s + d.count, 0);
+                              if (camTotal === 0) return null;
+                              return (
+                                <YStack key={cam.id} gap={4}>
+                                  <XStack justifyContent="space-between" alignItems="center">
+                                    <YStack>
+                                      <Text
+                                        fontSize={12}
+                                        fontWeight="600"
+                                        color={colors.textSec}
+                                        fontFamily="$body"
+                                      >
+                                        {cam.name}
+                                      </Text>
+                                      <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                                        {cam.room}
+                                      </Text>
+                                    </YStack>
+                                    <Text
+                                      fontSize={12}
+                                      fontWeight="700"
+                                      color="#056EFA"
+                                      fontFamily="$mono"
+                                    >
+                                      {camTotal.toLocaleString("es-BO")}
+                                    </Text>
+                                  </XStack>
+                                  <View
+                                    height={6}
+                                    borderRadius={3}
+                                    backgroundColor={colors.cardAlt}
+                                    overflow="hidden"
+                                  >
+                                    <View
+                                      height={6}
+                                      borderRadius={3}
+                                      backgroundColor="#056EFA"
+                                      width={
+                                        `${Math.round((camTotal / (hourTotal || 1)) * 100)}%` as `${number}%`
+                                      }
+                                    />
+                                  </View>
+                                </YStack>
+                              );
+                            })}
+                          </YStack>
+                        </View>
+                      )}
+
+                      <YStack gap={8}>
+                        <SectionHeader title="Insights — Tráfico" />
+                        {INSIGHTS.filter((i) => i.source === "traffic").map((ins) => (
+                          <InsightCard key={ins.id} insight={ins} />
+                        ))}
+                      </YStack>
+                    </YStack>
+                  </XStack>
+
+                  {/* Matriz Semanal de Calor */}
+                  <TrafficHeatmapMatrix />
                 </YStack>
+              )}
+
+              {/* SECCIÓN 3: Desglose & Conversión (Breakdown & Conversion) */}
+              {(trafficSubTab === "all" || trafficSubTab === "breakdown") && (
+                <YStack gap={14}>
+                  {/* Comparativa Lun-Vie vs Sáb-Dom */}
+                  <WeekdayVsWeekendCard />
+
+                  {/* Gráfico de Conversión e Impacto Comercial (3 modos con pérdida estimada) */}
+                  <ConversionChart />
+
+                  {/* Tabla Ejecutiva de Desglose Diario */}
+                  <DailyTrafficTable />
+                </YStack>
+              )}
+            </YStack>
+          )}
+
+          {/* ══ OPERACIONES & SOP ══ */}
+          {activeTab === "operations" && (
+            <YStack gap={14}>
+              {/* Resumen Ejecutivo KPI de Operaciones */}
+              <OperationsKpiSummary />
+
+              {/* Fila 2: Cumplimiento de Uniforme/EPP y Puntualidad de Apertura */}
+              <XStack gap={14} flexDirection={isDesktop ? "row" : "column"} alignItems="stretch">
+                <View flex={1}>
+                  <UniformComplianceCard />
+                </View>
+                <View flex={1}>
+                  <StoreOpeningPunctualityCard />
+                </View>
               </XStack>
+
+              {/* Fila 3: Feed de Auditoría e Incidentes Operativos en Vivo */}
+              <OperationalIncidentsFeed />
             </YStack>
           )}
 
@@ -1058,8 +1203,8 @@ export default function ReportsScreen() {
                   xKey="day"
                   lines={[
                     { yKey: "intrusion", color: "#fbbf24", label: "Intrusión" },
-                    { yKey: "people", color: "#3b82f6", label: "Personas" },
-                    { yKey: "ocr", color: "#3b82f6", label: "OCR/Placas" },
+                    { yKey: "people", color: "#056EFA", label: "Personas" },
+                    { yKey: "ocr", color: "#6366f1", label: "OCR/Placas" },
                     { yKey: "stolen", color: "#f87171", label: "Robados" },
                     { yKey: "fall", color: "#fb923c", label: "Caídas" },
                     { yKey: "tampering", color: "#a78bfa", label: "Tampering" },
@@ -1071,8 +1216,8 @@ export default function ReportsScreen() {
                 <XStack gap={10} marginTop={10} flexWrap="wrap">
                   {[
                     { color: "#fbbf24", label: "Intrusión" },
-                    { color: "#3b82f6", label: "Personas" },
-                    { color: "#3b82f6", label: "OCR" },
+                    { color: "#056EFA", label: "Personas" },
+                    { color: "#6366f1", label: "OCR" },
                     { color: "#f87171", label: "Robados" },
                     { color: "#fb923c", label: "Caídas" },
                     { color: "#a78bfa", label: "Tampering" },
@@ -1225,6 +1370,9 @@ export default function ReportsScreen() {
                 </ScrollView>
               )}
 
+              {/* Tiempo de permanencia por zona (Entrada, Cajas, Pasillos Centro, Bebidas) */}
+              <ZoneDwellChart />
+
               <View
                 flexDirection={isDesktop ? "row" : "column"}
                 flexWrap={isDesktop ? "wrap" : "nowrap"}
@@ -1376,7 +1524,7 @@ export default function ReportsScreen() {
           )}
 
           {/* AI Chat CTA */}
-          <View
+          {/* <View
             backgroundColor={colors.card}
             borderRadius={14}
             borderWidth={1}
@@ -1415,7 +1563,7 @@ export default function ReportsScreen() {
                 ›
               </Text>
             </XStack>
-          </View>
+          </View> */}
         </ScrollView>
 
         {/* Filter Modal */}

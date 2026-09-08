@@ -5,6 +5,7 @@ import { ModuleCard } from "@/src/components/module-card";
 import { PageContainer } from "@/src/components/page-container";
 import { VigIALogoText } from "@/src/components/vigia-logo-text";
 import {
+  CONVERSION_KPI,
   DAILY_PEOPLE_7D,
   EVENTS,
   INSIGHTS,
@@ -12,6 +13,7 @@ import {
   MODULES,
   USER,
   getUnreviewedCount,
+  getWeeklyChangePercent,
 } from "@/src/data/mock";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
@@ -22,7 +24,7 @@ import { BarChart2, Bell } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 
-const TODAY = new Date("2026-03-31");
+const TODAY = new Date("2026-09-09");
 const DAY_NAMES = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 const MONTH_NAMES = [
   "enero",
@@ -54,6 +56,7 @@ export default function HomeScreen() {
   const recentEvents = EVENTS.slice(0, 5);
   const activeModules = MODULES.slice(0, 4);
   const maxPeople = Math.max(...DAILY_PEOPLE_7D.map((d) => d.count));
+  const allKPIs = [...KPIs, CONVERSION_KPI];
 
   // ── Shared section components ─────────────────────────────────────
 
@@ -79,15 +82,25 @@ export default function HomeScreen() {
 
   const kpiCards = (
     <YStack marginBottom={28}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
-      >
-        {KPIs.map((kpi, i) => (
-          <KPICard key={kpi.id} kpi={kpi} index={i} />
-        ))}
-      </ScrollView>
+      {isDesktop ? (
+        <XStack paddingHorizontal={20} gap={10} flexWrap="wrap">
+          {allKPIs.map((kpi, i) => (
+            <View key={kpi.id} flex={1} minWidth={140}>
+              <KPICard kpi={kpi} index={i} />
+            </View>
+          ))}
+        </XStack>
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
+        >
+          {allKPIs.map((kpi, i) => (
+            <KPICard key={kpi.id} kpi={kpi} index={i} />
+          ))}
+        </ScrollView>
+      )}
     </YStack>
   );
 
@@ -181,14 +194,23 @@ export default function HomeScreen() {
         borderColor={colors.borderSoft}
         padding={16}
       >
-        <Text
-          fontSize={isDesktop ? 14 : 13}
-          color={colors.textLabel}
-          fontFamily="$body"
-          marginBottom={12}
-        >
-          Personas detectadas — últimos 7 días
-        </Text>
+        <XStack justifyContent="space-between" alignItems="center" marginBottom={24}>
+          <Text
+            fontSize={isDesktop ? 14 : 13}
+            color={colors.textLabel}
+            fontFamily="$body"
+          >
+            Personas detectadas — últimos 7 días
+          </Text>
+          <Text
+            fontSize={11}
+            fontWeight="700"
+            color={getWeeklyChangePercent() >= 0 ? "#34d399" : "#f87171"}
+            fontFamily="$mono"
+          >
+            {getWeeklyChangePercent() >= 0 ? "+" : ""}{getWeeklyChangePercent()}% vs. semana anterior
+          </Text>
+        </XStack>
         <XStack alignItems="flex-end" gap={6} height={64}>
           {DAILY_PEOPLE_7D.map((point) => {
             const barH = Math.max(4, (point.count / maxPeople) * 64);
@@ -204,7 +226,7 @@ export default function HomeScreen() {
                 >
                   {isToday ? (
                     <LinearGradient
-                      colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
+                      colors={["#02209A", "#0A4CE8", "#056EFA"]}
                       start={{ x: 0, y: 1 }}
                       end={{ x: 0, y: 0 }}
                       style={{ flex: 1 }}

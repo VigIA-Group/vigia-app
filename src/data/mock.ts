@@ -1,6 +1,7 @@
 // ============================================================
 // VigIA — Mock Data
 // Supermercado ficticio: "SuperFamilia Mercados S.A." — Cochabamba, Bolivia
+// Snapshot simulado: martes 08 de septiembre de 2026, 15:45
 // ============================================================
 
 export type ModuleId = "ocr" | "people" | "intrusion" | "stolen" | "fall" | "tampering";
@@ -36,7 +37,7 @@ export const MODULES: Module[] = [
     name: "OCR y Placas",
     description: "Reconocimiento óptico de placas vehiculares y textos",
     icon: "ScanLine",
-    color: "#3b82f6",
+    color: "#6366f1",
     stat: "147",
     statLabel: "Placas hoy",
     whatItDetects: [
@@ -75,7 +76,7 @@ export const MODULES: Module[] = [
     description: "Detección de acceso a zonas restringidas y perímetros",
     icon: "ShieldAlert",
     color: "#fbbf24",
-    stat: "3",
+    stat: "2",
     statLabel: "Alertas hoy",
     whatItDetects: [
       "Personas cruzando líneas virtuales de perímetro",
@@ -94,7 +95,7 @@ export const MODULES: Module[] = [
     description: "Detección de sustracción y manipulación de productos",
     icon: "PackageX",
     color: "#f87171",
-    stat: "0",
+    stat: "1",
     statLabel: "Incidentes hoy",
     whatItDetects: [
       "Productos retirados de estantes sin escanear",
@@ -113,8 +114,8 @@ export const MODULES: Module[] = [
     description: "Detección de caídas, desmayos y comportamientos anómalos",
     icon: "PersonStanding",
     color: "#fb923c",
-    stat: "1",
-    statLabel: "Evento hoy",
+    stat: "0",
+    statLabel: "Eventos hoy",
     whatItDetects: [
       "Caídas de personas al suelo",
       "Personas que permanecen inmóviles en el piso por más de 10 segundos",
@@ -170,7 +171,7 @@ export interface Camera {
 export const CAMERAS: Camera[] = [
   {
     id: "cam-001",
-    name: "Cajas Salida",
+    name: "Entrada Principal",
     zone: "Acceso Norte",
     floor: "Planta baja",
     room: "Hall de Acceso",
@@ -214,7 +215,7 @@ export const CAMERAS: Camera[] = [
   },
   {
     id: "cam-005",
-    name: "Pasillos Tiendas",
+    name: "Parqueo Externo",
     zone: "Estacionamiento",
     floor: "Exterior",
     room: "Parqueo 80 vehículos",
@@ -225,7 +226,7 @@ export const CAMERAS: Camera[] = [
   },
   {
     id: "cam-006",
-    name: "Sector Bebidas", // ← video muestra góndolas con bebidas/snacks
+    name: "Sector Bebidas",
     zone: "Área de Góndolas",
     floor: "Planta baja",
     room: "Sector Bebidas y Snacks",
@@ -234,8 +235,6 @@ export const CAMERAS: Camera[] = [
     metrics: { peopleDetected: 89, alertsToday: 0, uptimePercent: 100 },
     description: "Pasillo de bebidas, snacks y productos envasados",
   },
-  // cam-007 y cam-008 no aparecen en el mock visible,
-  // pero se mantienen para coherencia del sistema:
   {
     id: "cam-007",
     name: "Planta Alta — Oficinas",
@@ -277,7 +276,11 @@ export interface EventItem {
   hasVideoClip: boolean;
 }
 
-const now = new Date("2026-03-31T10:30:00-04:00");
+// "Ahora" simulado del dashboard. Todo timestamp relativo (hoursAgo/daysAgo)
+// y todo texto relativo en la UI (getRelativeTime) debe basarse en este valor,
+// NO en la fecha real del dispositivo — así el demo se ve igual de "vivo"
+// sin importar qué día se presente.
+const now = new Date("2026-09-08T15:45:00-04:00");
 
 function hoursAgo(h: number): string {
   const d = new Date(now.getTime() - h * 60 * 60 * 1000);
@@ -365,7 +368,7 @@ export const EVENTS: EventItem[] = [
     cameraId: "cam-004",
     cameraName: "Pasillos Centro",
     severity: "ALTA",
-    timestamp: hoursAgo(5.8),
+    timestamp: daysAgo(1, "16:20"),
     description:
       "Cliente detectado inmóvil en el piso del pasillo 5 por más de 12 segundos. Personal de seguridad respondió en 2 minutos. Resultado: resbalón sin gravedad.",
     reviewed: true,
@@ -399,14 +402,14 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: "evt-009",
-    type: "Merma detectada en frescos",
+    type: "Merma detectada en bebidas",
     module: "stolen",
     cameraId: "cam-006",
-    cameraName: "Carnicería y Frescos",
+    cameraName: "Sector Bebidas",
     severity: "BAJA",
     timestamp: daysAgo(1, "14:22"),
     description:
-      "Producto retirado de la sección de carnes sin pasar por caja registradora. Item estimado: corte premium, aprox. Bs. 85.",
+      "Producto retirado del sector de bebidas sin pasar por caja registradora. Item estimado: pack de cervezas, aprox. Bs. 85.",
     reviewed: true,
     hasVideoClip: true,
   },
@@ -449,6 +452,35 @@ export const EVENTS: EventItem[] = [
     reviewed: true,
     hasVideoClip: false,
   },
+  // NUEVO — se agregaron para que el insight "3 caídas en 7 días, todas en
+  // Pasillos Centro entre 15:00–17:00" (ver INSIGHTS, ins-002) esté respaldado
+  // por eventos reales y verificables, no solo por texto.
+  {
+    id: "evt-013",
+    type: "Persona en el suelo",
+    module: "fall",
+    cameraId: "cam-004",
+    cameraName: "Pasillos Centro",
+    severity: "MEDIA",
+    timestamp: daysAgo(3, "15:40"),
+    description:
+      "Cliente tropezó cerca de la góndola de lácteos y cayó sin lograr levantarse de inmediato. Personal de piso asistió en menos de 1 minuto.",
+    reviewed: true,
+    hasVideoClip: true,
+  },
+  {
+    id: "evt-014",
+    type: "Persona en el suelo",
+    module: "fall",
+    cameraId: "cam-004",
+    cameraName: "Pasillos Centro",
+    severity: "BAJA",
+    timestamp: daysAgo(6, "16:05"),
+    description:
+      "Adulto mayor se sentó momentáneamente en el suelo del pasillo por fatiga. No requirió asistencia médica.",
+    reviewed: true,
+    hasVideoClip: false,
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -468,13 +500,13 @@ export interface UserProfile {
 
 export const USER: UserProfile = {
   id: "usr-001",
-  name: "Carlos Mamani Flores",
-  email: "c.mamani@superfamilia.com.bo",
+  name: "Fabián",
+  email: "fabian@superfamilia.com.bo",
   role: "Administrador",
   organization: "SuperFamilia Mercados S.A.",
   location: "Av. Blanco Galindo N° 3450, Cochabamba, Bolivia",
   activeCameras: 7,
-  initials: "CM",
+  initials: "AF",
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -496,9 +528,9 @@ export const LICENSE: License = {
   plan: "PRO",
   camerasUsed: 8,
   camerasTotal: 30,
-  expiresAt: "2026-05-15T00:00:00-04:00",
-  daysRemaining: 45,
-  startedAt: "2025-05-15T00:00:00-04:00",
+  expiresAt: "2026-11-15T00:00:00-04:00",
+  daysRemaining: 68,
+  startedAt: "2025-11-15T00:00:00-04:00",
   monthlyPrice: 349,
   currency: "USD",
 };
@@ -539,9 +571,9 @@ export const KPIs: KPI[] = [
   {
     id: "kpi-dwell",
     label: "Permanencia prom.",
-    value: "14 min",
-    change: "-1.3 min",
-    changePositive: false,
+    value: "22 min",
+    change: "+1.4 min",
+    changePositive: true,
     accentColor: "#a78bfa",
     icon: "Timer",
   },
@@ -634,9 +666,12 @@ export function formatTimestamp(iso: string): string {
 }
 
 export function getRelativeTime(iso: string): string {
-  const now = new Date();
+  // Usa el "ahora" simulado del dashboard (no la fecha real del dispositivo)
+  // para que los tiempos relativos ("hace 2h") tengan sentido sin importar
+  // qué día se ejecute o presente el demo.
+  const reference = now;
   const date = new Date(iso);
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diff = Math.floor((reference.getTime() - date.getTime()) / 1000);
 
   if (diff < 60) return "Ahora";
   if (diff < 3600) return `${Math.floor(diff / 60)}m`;
@@ -650,8 +685,8 @@ export function groupEventsByDate(events: EventItem[]): { label: string; data: E
 
   events.forEach((event) => {
     const date = new Date(event.timestamp);
-    const today = new Date();
-    const yesterday = new Date();
+    const today = now;
+    const yesterday = new Date(now);
     yesterday.setDate(today.getDate() - 1);
 
     let label: string;
@@ -675,7 +710,7 @@ export function groupEventsByDate(events: EventItem[]): { label: string; data: E
 }
 
 // ─────────────────────────────────────────────────────────────
-// DATOS DE REPORTES — Gráficos por día (últimos 7 días)
+// DATOS DE REPORTES — Gráficos por día (últimos 7 días, hasta 08/09)
 // ─────────────────────────────────────────────────────────────
 
 export interface DailyPeoplePoint {
@@ -704,48 +739,53 @@ export interface HourlyActivityPoint {
 }
 
 export const DAILY_PEOPLE_7D: DailyPeoplePoint[] = [
-  { day: "Mié", date: "25/03", count: 1087 },
-  { day: "Jue", date: "26/03", count: 1143 },
-  { day: "Vie", date: "27/03", count: 1389 },
-  { day: "Sáb", date: "28/03", count: 1820 },
-  { day: "Dom", date: "29/03", count: 1654 },
-  { day: "Lun", date: "30/03", count: 978 },
-  { day: "Mar", date: "31/03", count: 1204 },
+  { day: "Mié", date: "02/09", count: 1087 },
+  { day: "Jue", date: "03/09", count: 1143 },
+  { day: "Vie", date: "04/09", count: 1389 },
+  { day: "Sáb", date: "05/09", count: 1820 },
+  { day: "Dom", date: "06/09", count: 1654 },
+  { day: "Lun", date: "07/09", count: 978 },
+  { day: "Mar", date: "08/09", count: 1204 },
 ];
 
+// fall: redistribuido para coincidir exactamente con las fechas reales de
+// los eventos de caída en EVENTS (evt-006, evt-013, evt-014, evt-012).
 export const DAILY_ALERTS_7D: DailyAlertsPoint[] = [
-  { day: "Mié", date: "25/03", intrusion: 1, stolen: 0, fall: 0, ocr: 2, people: 1, tampering: 0 },
-  { day: "Jue", date: "26/03", intrusion: 0, stolen: 1, fall: 1, ocr: 1, people: 0, tampering: 0 },
-  { day: "Vie", date: "27/03", intrusion: 2, stolen: 1, fall: 0, ocr: 3, people: 2, tampering: 0 },
-  { day: "Sáb", date: "28/03", intrusion: 3, stolen: 2, fall: 1, ocr: 4, people: 3, tampering: 1 },
-  { day: "Dom", date: "29/03", intrusion: 2, stolen: 1, fall: 0, ocr: 2, people: 1, tampering: 0 },
-  { day: "Lun", date: "30/03", intrusion: 1, stolen: 0, fall: 1, ocr: 1, people: 0, tampering: 0 },
-  { day: "Mar", date: "31/03", intrusion: 2, stolen: 1, fall: 1, ocr: 1, people: 1, tampering: 1 },
+  { day: "Mié", date: "02/09", intrusion: 1, stolen: 0, fall: 1, ocr: 2, people: 1, tampering: 0 },
+  { day: "Jue", date: "03/09", intrusion: 0, stolen: 1, fall: 0, ocr: 1, people: 0, tampering: 0 },
+  { day: "Vie", date: "04/09", intrusion: 2, stolen: 1, fall: 0, ocr: 3, people: 2, tampering: 0 },
+  { day: "Sáb", date: "05/09", intrusion: 3, stolen: 2, fall: 1, ocr: 4, people: 3, tampering: 1 },
+  { day: "Dom", date: "06/09", intrusion: 2, stolen: 1, fall: 1, ocr: 2, people: 1, tampering: 0 },
+  { day: "Lun", date: "07/09", intrusion: 1, stolen: 0, fall: 1, ocr: 1, people: 0, tampering: 0 },
+  { day: "Mar", date: "08/09", intrusion: 2, stolen: 1, fall: 0, ocr: 1, people: 1, tampering: 1 },
 ];
 
 export const HOURLY_ACTIVITY_TODAY: HourlyActivityPoint[] = [
-  { hour: "06", count: 42 },
-  { hour: "07", count: 87 },
-  { hour: "08", count: 134 },
-  { hour: "09", count: 178 },
-  { hour: "10", count: 210 },
-  { hour: "11", count: 195 },
-  { hour: "12", count: 88 },
-  { hour: "13", count: 76 },
-  { hour: "14", count: 142 },
-  { hour: "15", count: 168 },
-  { hour: "16", count: 145 },
-  { hour: "17", count: 112 },
-  { hour: "18", count: 68 },
-  { hour: "19", count: 45 },
-  { hour: "20", count: 14 },
-  { hour: "21", count: 5 },
+  { hour: "06", count: 30 },
+  { hour: "07", count: 61 },
+  { hour: "08", count: 94 },
+  { hour: "09", count: 125 },
+  { hour: "10", count: 148 },
+  { hour: "11", count: 137 },
+  { hour: "12", count: 62 },
+  { hour: "13", count: 54 },
+  { hour: "14", count: 100 },
+  { hour: "15", count: 118 },
+  { hour: "16", count: 102 },
+  { hour: "17", count: 79 },
+  { hour: "18", count: 48 },
+  { hour: "19", count: 32 },
+  { hour: "20", count: 10 },
+  { hour: "21", count: 4 },
 ];
+// Nota: la suma de este arreglo es exactamente 1,204 — coincide con
+// KPIs["kpi-traffic"].value y con el último punto de DAILY_PEOPLE_7D.
 
-// Alertas por módulo totalizadas (para donut / barra horizontal)
+// Alertas por módulo totalizadas (para donut / barra horizontal).
+// Es la suma por columna de DAILY_ALERTS_7D — verificado, cuadra exacto.
 export const ALERTS_BY_MODULE = [
   { moduleId: "intrusion" as ModuleId, label: "Intrusión", count: 11, color: "#fbbf24" },
-  { moduleId: "ocr" as ModuleId, label: "OCR / Placas", count: 14, color: "#3b82f6" },
+  { moduleId: "ocr" as ModuleId, label: "OCR / Placas", count: 14, color: "#6366f1" },
   { moduleId: "stolen" as ModuleId, label: "Obj. Robados", count: 6, color: "#f87171" },
   { moduleId: "people" as ModuleId, label: "Personas", count: 8, color: "#3b82f6" },
   { moduleId: "fall" as ModuleId, label: "Caídas", count: 4, color: "#fb923c" },
@@ -837,164 +877,226 @@ export function getSchedulesByCameraId(cameraId: string): ModuleSchedule[] {
 }
 
 // ─────────────────────────────────────────────────────────────
-// DATOS DE REPORTES — 30 días (Marzo 2026)
+// DATOS DE REPORTES — Últimos 31 días (09 ago – 08 sep 2026)
 // ─────────────────────────────────────────────────────────────
 
 export const DAILY_PEOPLE_30D: DailyPeoplePoint[] = [
-  { day: "01/03", date: "01/03", count: 1567 },
-  { day: "02/03", date: "02/03", count: 912 },
-  { day: "03/03", date: "03/03", count: 1034 },
-  { day: "04/03", date: "04/03", count: 1089 },
-  { day: "05/03", date: "05/03", count: 1156 },
-  { day: "06/03", date: "06/03", count: 1387 },
-  { day: "07/03", date: "07/03", count: 1798 },
-  { day: "08/03", date: "08/03", count: 1634 },
-  { day: "09/03", date: "09/03", count: 934 },
-  { day: "10/03", date: "10/03", count: 1067 },
-  { day: "11/03", date: "11/03", count: 1102 },
-  { day: "12/03", date: "12/03", count: 1178 },
-  { day: "13/03", date: "13/03", count: 1421 },
-  { day: "14/03", date: "14/03", count: 1756 },
-  { day: "15/03", date: "15/03", count: 1589 },
-  { day: "16/03", date: "16/03", count: 901 },
-  { day: "17/03", date: "17/03", count: 1023 },
-  { day: "18/03", date: "18/03", count: 1090 },
-  { day: "19/03", date: "19/03", count: 1132 },
-  { day: "20/03", date: "20/03", count: 1356 },
-  { day: "21/03", date: "21/03", count: 1689 },
-  { day: "22/03", date: "22/03", count: 1612 },
-  { day: "23/03", date: "23/03", count: 945 },
-  { day: "24/03", date: "24/03", count: 1056 },
-  { day: "25/03", date: "25/03", count: 1087 },
-  { day: "26/03", date: "26/03", count: 1143 },
-  { day: "27/03", date: "27/03", count: 1389 },
-  { day: "28/03", date: "28/03", count: 1820 },
-  { day: "29/03", date: "29/03", count: 1654 },
-  { day: "30/03", date: "30/03", count: 978 },
-  { day: "31/03", date: "31/03", count: 1204 },
+  { day: "09/08", date: "09/08", count: 1567 },
+  { day: "10/08", date: "10/08", count: 912 },
+  { day: "11/08", date: "11/08", count: 1034 },
+  { day: "12/08", date: "12/08", count: 1089 },
+  { day: "13/08", date: "13/08", count: 1156 },
+  { day: "14/08", date: "14/08", count: 1387 },
+  { day: "15/08", date: "15/08", count: 1798 },
+  { day: "16/08", date: "16/08", count: 1634 },
+  { day: "17/08", date: "17/08", count: 934 },
+  { day: "18/08", date: "18/08", count: 1067 },
+  { day: "19/08", date: "19/08", count: 1102 },
+  { day: "20/08", date: "20/08", count: 1178 },
+  { day: "21/08", date: "21/08", count: 1421 },
+  { day: "22/08", date: "22/08", count: 1756 },
+  { day: "23/08", date: "23/08", count: 1589 },
+  { day: "24/08", date: "24/08", count: 901 },
+  { day: "25/08", date: "25/08", count: 1023 },
+  { day: "26/08", date: "26/08", count: 1090 },
+  { day: "27/08", date: "27/08", count: 1132 },
+  { day: "28/08", date: "28/08", count: 1356 },
+  { day: "29/08", date: "29/08", count: 1689 },
+  { day: "30/08", date: "30/08", count: 1612 },
+  { day: "31/08", date: "31/08", count: 945 },
+  { day: "01/09", date: "01/09", count: 1056 },
+  { day: "02/09", date: "02/09", count: 1087 },
+  { day: "03/09", date: "03/09", count: 1143 },
+  { day: "04/09", date: "04/09", count: 1389 },
+  { day: "05/09", date: "05/09", count: 1820 },
+  { day: "06/09", date: "06/09", count: 1654 },
+  { day: "07/09", date: "07/09", count: 978 },
+  { day: "08/09", date: "08/09", count: 1204 },
 ];
 
 // Período anterior (7 días previos, para comparación)
 export const DAILY_PEOPLE_7D_PREV: DailyPeoplePoint[] = [
-  { day: "Mié", date: "18/03", count: 1090 },
-  { day: "Jue", date: "19/03", count: 1132 },
-  { day: "Vie", date: "20/03", count: 1356 },
-  { day: "Sáb", date: "21/03", count: 1689 },
-  { day: "Dom", date: "22/03", count: 1612 },
-  { day: "Lun", date: "23/03", count: 945 },
-  { day: "Mar", date: "24/03", count: 1056 },
+  { day: "Mié", date: "26/08", count: 1090 },
+  { day: "Jue", date: "27/08", count: 1132 },
+  { day: "Vie", date: "28/08", count: 1356 },
+  { day: "Sáb", date: "29/08", count: 1689 },
+  { day: "Dom", date: "30/08", count: 1612 },
+  { day: "Lun", date: "31/08", count: 945 },
+  { day: "Mar", date: "01/09", count: 1056 },
+];
+
+// ─────────────────────────────────────────────────────────────
+// NUEVO — CONVERSIÓN: personas contadas vs. transacciones registradas
+// Esta es la métrica que el pitch de VigIA vende como el gran ausente en el
+// retail boliviano: "sin conteo de personas no hay tasa de conversión".
+// ─────────────────────────────────────────────────────────────
+
+export interface ConversionPoint {
+  [key: string]: unknown;
+  day: string;
+  date: string;
+  visitors: number;
+  transactions: number;
+  conversionRate: number; // %
+}
+
+export const CONVERSION_7D: ConversionPoint[] = [
+  { day: "Mié", date: "02/09", visitors: 1087, transactions: 890, conversionRate: 81.9 },
+  { day: "Jue", date: "03/09", visitors: 1143, transactions: 945, conversionRate: 82.7 },
+  { day: "Vie", date: "04/09", visitors: 1389, transactions: 1120, conversionRate: 80.6 },
+  { day: "Sáb", date: "05/09", visitors: 1820, transactions: 1410, conversionRate: 77.5 },
+  { day: "Dom", date: "06/09", visitors: 1654, transactions: 1260, conversionRate: 76.2 },
+  { day: "Lun", date: "07/09", visitors: 978, transactions: 845, conversionRate: 86.4 },
+  { day: "Mar", date: "08/09", visitors: 1204, transactions: 1020, conversionRate: 84.7 },
+];
+
+export function getAverageConversionRate(): number {
+  const rates = CONVERSION_7D.map((d) => d.conversionRate);
+  return Number((rates.reduce((a, b) => a + b, 0) / rates.length).toFixed(1));
+}
+
+// NUEVO — KPI de conversión. No se agregó directamente al array KPIs de arriba
+// para no romper un grid de 4 columnas ya existente en el front-end; el prompt
+// de Antigravity indica cómo incorporarlo como 5ta tarjeta.
+export const CONVERSION_KPI: KPI = {
+  id: "kpi-conversion",
+  label: "Conversión promedio",
+  value: `${getAverageConversionRate()}%`,
+  change: "+2.1 pts",
+  changePositive: true,
+  accentColor: "#22c55e",
+  icon: "ShoppingCart",
+};
+
+// ─────────────────────────────────────────────────────────────
+// NUEVO — Tiempo de permanencia por zona (clientes, no personal)
+// Las 4 zonas suman ~22 min, coincide con KPIs["kpi-dwell"].value.
+// ─────────────────────────────────────────────────────────────
+
+export interface ZoneDwellTime {
+  zone: string;
+  cameraId: string;
+  avgMinutes: number;
+}
+
+export const ZONE_DWELL_TIME: ZoneDwellTime[] = [
+  { zone: "Entrada", cameraId: "cam-001", avgMinutes: 1.0 },
+  { zone: "Área de Cajas", cameraId: "cam-002", avgMinutes: 5.4 },
+  { zone: "Pasillos Centro (Góndolas)", cameraId: "cam-004", avgMinutes: 11.8 },
+  { zone: "Sector Bebidas y Snacks", cameraId: "cam-006", avgMinutes: 3.8 },
 ];
 
 // ─────────────────────────────────────────────────────────────
 // DATOS POR CÁMARA — Afluencia horaria (hoy)
+// Cada arreglo suma exactamente metrics.peopleDetected de su cámara en CAMERAS.
 // ─────────────────────────────────────────────────────────────
 
 export const CAMERA_HOURLY: Record<string, HourlyActivityPoint[]> = {
   "cam-001": [
-    { hour: "06", count: 28 },
-    { hour: "07", count: 72 },
-    { hour: "08", count: 115 },
-    { hour: "09", count: 148 },
-    { hour: "10", count: 132 },
-    { hour: "11", count: 120 },
-    { hour: "12", count: 54 },
-    { hour: "13", count: 48 },
-    { hour: "14", count: 98 },
-    { hour: "15", count: 112 },
-    { hour: "16", count: 87 },
-    { hour: "17", count: 63 },
-    { hour: "18", count: 42 },
-    { hour: "19", count: 28 },
-    { hour: "20", count: 9 },
-    { hour: "21", count: 3 },
+    { hour: "06", count: 10 },
+    { hour: "07", count: 26 },
+    { hour: "08", count: 41 },
+    { hour: "09", count: 53 },
+    { hour: "10", count: 47 },
+    { hour: "11", count: 43 },
+    { hour: "12", count: 19 },
+    { hour: "13", count: 17 },
+    { hour: "14", count: 35 },
+    { hour: "15", count: 40 },
+    { hour: "16", count: 31 },
+    { hour: "17", count: 22 },
+    { hour: "18", count: 15 },
+    { hour: "19", count: 10 },
+    { hour: "20", count: 3 },
+    { hour: "21", count: 0 },
   ],
   "cam-002": [
-    { hour: "06", count: 5 },
-    { hour: "07", count: 18 },
-    { hour: "08", count: 34 },
-    { hour: "09", count: 52 },
-    { hour: "10", count: 68 },
-    { hour: "11", count: 75 },
-    { hour: "12", count: 41 },
-    { hour: "13", count: 38 },
-    { hour: "14", count: 55 },
-    { hour: "15", count: 62 },
-    { hour: "16", count: 49 },
-    { hour: "17", count: 34 },
-    { hour: "18", count: 21 },
-    { hour: "19", count: 12 },
-    { hour: "20", count: 4 },
-    { hour: "21", count: 1 },
+    { hour: "06", count: 3 },
+    { hour: "07", count: 10 },
+    { hour: "08", count: 19 },
+    { hour: "09", count: 29 },
+    { hour: "10", count: 38 },
+    { hour: "11", count: 42 },
+    { hour: "12", count: 23 },
+    { hour: "13", count: 21 },
+    { hour: "14", count: 31 },
+    { hour: "15", count: 35 },
+    { hour: "16", count: 27 },
+    { hour: "17", count: 19 },
+    { hour: "18", count: 12 },
+    { hour: "19", count: 7 },
+    { hour: "20", count: 2 },
+    { hour: "21", count: 0 },
   ],
   "cam-003": [
-    { hour: "06", count: 3 },
-    { hour: "07", count: 8 },
-    { hour: "08", count: 12 },
-    { hour: "09", count: 9 },
-    { hour: "10", count: 7 },
-    { hour: "11", count: 5 },
-    { hour: "12", count: 2 },
-    { hour: "13", count: 3 },
-    { hour: "14", count: 6 },
-    { hour: "15", count: 4 },
-    { hour: "16", count: 5 },
-    { hour: "17", count: 3 },
+    { hour: "06", count: 1 },
+    { hour: "07", count: 3 },
+    { hour: "08", count: 4 },
+    { hour: "09", count: 3 },
+    { hour: "10", count: 3 },
+    { hour: "11", count: 2 },
+    { hour: "12", count: 1 },
+    { hour: "13", count: 1 },
+    { hour: "14", count: 2 },
+    { hour: "15", count: 1 },
+    { hour: "16", count: 2 },
+    { hour: "17", count: 1 },
     { hour: "18", count: 0 },
     { hour: "19", count: 0 },
     { hour: "20", count: 0 },
     { hour: "21", count: 0 },
   ],
   "cam-004": [
-    { hour: "06", count: 8 },
-    { hour: "07", count: 22 },
-    { hour: "08", count: 45 },
-    { hour: "09", count: 62 },
-    { hour: "10", count: 74 },
-    { hour: "11", count: 68 },
-    { hour: "12", count: 28 },
-    { hour: "13", count: 25 },
-    { hour: "14", count: 52 },
-    { hour: "15", count: 63 },
-    { hour: "16", count: 55 },
-    { hour: "17", count: 40 },
-    { hour: "18", count: 22 },
-    { hour: "19", count: 14 },
-    { hour: "20", count: 5 },
-    { hour: "21", count: 1 },
+    { hour: "06", count: 4 },
+    { hour: "07", count: 10 },
+    { hour: "08", count: 21 },
+    { hour: "09", count: 29 },
+    { hour: "10", count: 36 },
+    { hour: "11", count: 32 },
+    { hour: "12", count: 13 },
+    { hour: "13", count: 12 },
+    { hour: "14", count: 25 },
+    { hour: "15", count: 30 },
+    { hour: "16", count: 26 },
+    { hour: "17", count: 19 },
+    { hour: "18", count: 10 },
+    { hour: "19", count: 7 },
+    { hour: "20", count: 2 },
+    { hour: "21", count: 0 },
   ],
   "cam-005": [
-    { hour: "06", count: 12 },
-    { hour: "07", count: 28 },
-    { hour: "08", count: 35 },
-    { hour: "09", count: 22 },
-    { hour: "10", count: 18 },
-    { hour: "11", count: 14 },
-    { hour: "12", count: 8 },
-    { hour: "13", count: 10 },
-    { hour: "14", count: 15 },
-    { hour: "15", count: 18 },
-    { hour: "16", count: 22 },
-    { hour: "17", count: 30 },
-    { hour: "18", count: 38 },
-    { hour: "19", count: 25 },
-    { hour: "20", count: 8 },
-    { hour: "21", count: 4 },
+    { hour: "06", count: 6 },
+    { hour: "07", count: 13 },
+    { hour: "08", count: 17 },
+    { hour: "09", count: 11 },
+    { hour: "10", count: 9 },
+    { hour: "11", count: 7 },
+    { hour: "12", count: 4 },
+    { hour: "13", count: 5 },
+    { hour: "14", count: 7 },
+    { hour: "15", count: 9 },
+    { hour: "16", count: 11 },
+    { hour: "17", count: 14 },
+    { hour: "18", count: 18 },
+    { hour: "19", count: 12 },
+    { hour: "20", count: 3 },
+    { hour: "21", count: 1 },
   ],
   "cam-006": [
-    { hour: "06", count: 2 },
-    { hour: "07", count: 8 },
-    { hour: "08", count: 18 },
-    { hour: "09", count: 24 },
-    { hour: "10", count: 19 },
-    { hour: "11", count: 15 },
-    { hour: "12", count: 7 },
-    { hour: "13", count: 6 },
-    { hour: "14", count: 12 },
-    { hour: "15", count: 14 },
-    { hour: "16", count: 10 },
-    { hour: "17", count: 7 },
-    { hour: "18", count: 4 },
-    { hour: "19", count: 2 },
+    { hour: "06", count: 1 },
+    { hour: "07", count: 5 },
+    { hour: "08", count: 11 },
+    { hour: "09", count: 15 },
+    { hour: "10", count: 11 },
+    { hour: "11", count: 9 },
+    { hour: "12", count: 4 },
+    { hour: "13", count: 4 },
+    { hour: "14", count: 7 },
+    { hour: "15", count: 8 },
+    { hour: "16", count: 6 },
+    { hour: "17", count: 4 },
+    { hour: "18", count: 2 },
+    { hour: "19", count: 1 },
     { hour: "20", count: 1 },
     { hour: "21", count: 0 },
   ],
@@ -1018,19 +1120,19 @@ export const CAMERA_HOURLY: Record<string, HourlyActivityPoint[]> = {
   ],
   "cam-008": [
     { hour: "06", count: 1 },
-    { hour: "07", count: 2 },
-    { hour: "08", count: 3 },
-    { hour: "09", count: 2 },
+    { hour: "07", count: 1 },
+    { hour: "08", count: 2 },
+    { hour: "09", count: 1 },
     { hour: "10", count: 1 },
-    { hour: "11", count: 2 },
-    { hour: "12", count: 1 },
-    { hour: "13", count: 1 },
-    { hour: "14", count: 2 },
+    { hour: "11", count: 1 },
+    { hour: "12", count: 0 },
+    { hour: "13", count: 0 },
+    { hour: "14", count: 1 },
     { hour: "15", count: 1 },
     { hour: "16", count: 1 },
-    { hour: "17", count: 2 },
-    { hour: "18", count: 3 },
-    { hour: "19", count: 1 },
+    { hour: "17", count: 0 },
+    { hour: "18", count: 2 },
+    { hour: "19", count: 0 },
     { hour: "20", count: 0 },
     { hour: "21", count: 0 },
   ],
@@ -1064,6 +1166,657 @@ export function sumHourly(data: HourlyActivityPoint[], range: HourRange): number
   return filterHourly(data, range).reduce((s, d) => s + d.count, 0);
 }
 
+// NUEVO — hora pico calculada en vivo desde los datos, no hardcodeada.
+export function getPeakHourToday(): { hour: string; count: number } {
+  return HOURLY_ACTIVITY_TODAY.reduce((max, p) => (p.count > max.count ? p : max));
+}
+
+// NUEVO — comparación semanal calculada en vivo desde los datos reales.
+export function currentWeekTotal(): number {
+  return DAILY_PEOPLE_7D.reduce((s, d) => s + d.count, 0);
+}
+
+export function previousWeekTotal(): number {
+  return DAILY_PEOPLE_7D_PREV.reduce((s, d) => s + d.count, 0);
+}
+
+export function getWeeklyChangePercent(): number {
+  const current = currentWeekTotal();
+  const previous = previousWeekTotal();
+  return Number((((current - previous) / previous) * 100).toFixed(1));
+}
+
+// ─────────────────────────────────────────────────────────────
+// MATRIZ DE CALOR SEMANAL (Día de la semana vs. Hora del día)
+// 7 días × 14 horas (08:00 a 21:00)
+// ─────────────────────────────────────────────────────────────
+
+export interface HeatmapCell {
+  day: string;
+  dayLabel: string;
+  hour: string;
+  count: number;
+  level: "low" | "medium" | "high" | "peak";
+}
+
+export const MATRIX_HOURS = [
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+];
+export const MATRIX_DAYS = [
+  { key: "Lun", label: "Lunes" },
+  { key: "Mar", label: "Martes" },
+  { key: "Mié", label: "Miércoles" },
+  { key: "Jue", label: "Jueves" },
+  { key: "Vie", label: "Viernes" },
+  { key: "Sáb", label: "Sábado" },
+  { key: "Dom", label: "Domingo" },
+];
+
+export const WEEKLY_HOURLY_MATRIX: HeatmapCell[] = [
+  // Lunes (Total ~978 - Día más calmado)
+  { day: "Lun", dayLabel: "Lunes", hour: "08", count: 42, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "09", count: 68, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "10", count: 85, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "11", count: 82, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "12", count: 96, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "13", count: 70, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "14", count: 64, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "15", count: 78, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "16", count: 84, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "17", count: 92, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "18", count: 88, level: "medium" },
+  { day: "Lun", dayLabel: "Lunes", hour: "19", count: 65, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "20", count: 44, level: "low" },
+  { day: "Lun", dayLabel: "Lunes", hour: "21", count: 20, level: "low" },
+
+  // Martes (Total 1,204 - Hoy)
+  { day: "Mar", dayLabel: "Martes", hour: "08", count: 62, level: "low" },
+  { day: "Mar", dayLabel: "Martes", hour: "09", count: 98, level: "medium" },
+  { day: "Mar", dayLabel: "Martes", hour: "10", count: 148, level: "high" },
+  { day: "Mar", dayLabel: "Martes", hour: "11", count: 135, level: "high" },
+  { day: "Mar", dayLabel: "Martes", hour: "12", count: 86, level: "medium" },
+  { day: "Mar", dayLabel: "Martes", hour: "13", count: 62, level: "low" },
+  { day: "Mar", dayLabel: "Martes", hour: "14", count: 79, level: "medium" },
+  { day: "Mar", dayLabel: "Martes", hour: "15", count: 114, level: "high" },
+  { day: "Mar", dayLabel: "Martes", hour: "16", count: 108, level: "high" },
+  { day: "Mar", dayLabel: "Martes", hour: "17", count: 96, level: "medium" },
+  { day: "Mar", dayLabel: "Martes", hour: "18", count: 84, level: "medium" },
+  { day: "Mar", dayLabel: "Martes", hour: "19", count: 65, level: "low" },
+  { day: "Mar", dayLabel: "Martes", hour: "20", count: 42, level: "low" },
+  { day: "Mar", dayLabel: "Martes", hour: "21", count: 25, level: "low" },
+
+  // Miércoles (Total 1,087)
+  { day: "Mié", dayLabel: "Miércoles", hour: "08", count: 50, level: "low" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "09", count: 78, level: "medium" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "10", count: 112, level: "high" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "11", count: 105, level: "high" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "12", count: 98, level: "medium" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "13", count: 74, level: "low" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "14", count: 70, level: "low" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "15", count: 92, level: "medium" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "16", count: 99, level: "medium" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "17", count: 104, level: "high" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "18", count: 95, level: "medium" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "19", count: 60, level: "low" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "20", count: 32, level: "low" },
+  { day: "Mié", dayLabel: "Miércoles", hour: "21", count: 18, level: "low" },
+
+  // Jueves (Total 1,143)
+  { day: "Jue", dayLabel: "Jueves", hour: "08", count: 55, level: "low" },
+  { day: "Jue", dayLabel: "Jueves", hour: "09", count: 85, level: "medium" },
+  { day: "Jue", dayLabel: "Jueves", hour: "10", count: 118, level: "high" },
+  { day: "Jue", dayLabel: "Jueves", hour: "11", count: 112, level: "high" },
+  { day: "Jue", dayLabel: "Jueves", hour: "12", count: 102, level: "high" },
+  { day: "Jue", dayLabel: "Jueves", hour: "13", count: 78, level: "medium" },
+  { day: "Jue", dayLabel: "Jueves", hour: "14", count: 75, level: "medium" },
+  { day: "Jue", dayLabel: "Jueves", hour: "15", count: 95, level: "medium" },
+  { day: "Jue", dayLabel: "Jueves", hour: "16", count: 104, level: "high" },
+  { day: "Jue", dayLabel: "Jueves", hour: "17", count: 110, level: "high" },
+  { day: "Jue", dayLabel: "Jueves", hour: "18", count: 98, level: "medium" },
+  { day: "Jue", dayLabel: "Jueves", hour: "19", count: 65, level: "low" },
+  { day: "Jue", dayLabel: "Jueves", hour: "20", count: 32, level: "low" },
+  { day: "Jue", dayLabel: "Jueves", hour: "21", count: 14, level: "low" },
+
+  // Viernes (Total 1,389 - Pico de mediodía en cajas)
+  { day: "Vie", dayLabel: "Viernes", hour: "08", count: 65, level: "low" },
+  { day: "Vie", dayLabel: "Viernes", hour: "09", count: 95, level: "medium" },
+  { day: "Vie", dayLabel: "Viernes", hour: "10", count: 125, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "11", count: 140, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "12", count: 168, level: "peak" },
+  { day: "Vie", dayLabel: "Viernes", hour: "13", count: 155, level: "peak" },
+  { day: "Vie", dayLabel: "Viernes", hour: "14", count: 102, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "15", count: 110, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "16", count: 118, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "17", count: 128, level: "high" },
+  { day: "Vie", dayLabel: "Viernes", hour: "18", count: 95, level: "medium" },
+  { day: "Vie", dayLabel: "Viernes", hour: "19", count: 55, level: "low" },
+  { day: "Vie", dayLabel: "Viernes", hour: "20", count: 24, level: "low" },
+  { day: "Vie", dayLabel: "Viernes", hour: "21", count: 9, level: "low" },
+
+  // Sábado (Total 1,820 - Máximo semanal, pico en tarde)
+  { day: "Sáb", dayLabel: "Sábado", hour: "08", count: 68, level: "low" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "09", count: 115, level: "high" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "10", count: 152, level: "peak" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "11", count: 165, level: "peak" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "12", count: 145, level: "high" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "13", count: 110, level: "high" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "14", count: 135, level: "high" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "15", count: 195, level: "peak" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "16", count: 210, level: "peak" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "17", count: 188, level: "peak" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "18", count: 155, level: "high" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "19", count: 98, level: "medium" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "20", count: 58, level: "low" },
+  { day: "Sáb", dayLabel: "Sábado", hour: "21", count: 26, level: "low" },
+
+  // Domingo (Total 1,654 - Flujo familiar concentrado)
+  { day: "Dom", dayLabel: "Domingo", hour: "08", count: 52, level: "low" },
+  { day: "Dom", dayLabel: "Domingo", hour: "09", count: 104, level: "high" },
+  { day: "Dom", dayLabel: "Domingo", hour: "10", count: 162, level: "peak" },
+  { day: "Dom", dayLabel: "Domingo", hour: "11", count: 180, level: "peak" },
+  { day: "Dom", dayLabel: "Domingo", hour: "12", count: 172, level: "peak" },
+  { day: "Dom", dayLabel: "Domingo", hour: "13", count: 138, level: "high" },
+  { day: "Dom", dayLabel: "Domingo", hour: "14", count: 120, level: "high" },
+  { day: "Dom", dayLabel: "Domingo", hour: "15", count: 145, level: "high" },
+  { day: "Dom", dayLabel: "Domingo", hour: "16", count: 165, level: "peak" },
+  { day: "Dom", dayLabel: "Domingo", hour: "17", count: 150, level: "peak" },
+  { day: "Dom", dayLabel: "Domingo", hour: "18", count: 122, level: "high" },
+  { day: "Dom", dayLabel: "Domingo", hour: "19", count: 85, level: "medium" },
+  { day: "Dom", dayLabel: "Domingo", hour: "20", count: 42, level: "low" },
+  { day: "Dom", dayLabel: "Domingo", hour: "21", count: 17, level: "low" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// CONTEO BIDIRECCIONAL (Ingresos vs. Salidas & Ocupación en tienda)
+// Acceso Principal — cam-001 (Hoy martes 08 de septiembre)
+// ─────────────────────────────────────────────────────────────
+
+export interface BidirectionalPoint {
+  hour: string;
+  entries: number;
+  exits: number;
+  netOccupancy: number; // Personas dentro de la tienda al cierre de la hora
+}
+
+export const BIDIRECTIONAL_HOURLY_TODAY: BidirectionalPoint[] = [
+  { hour: "06", entries: 10, exits: 2, netOccupancy: 8 },
+  { hour: "07", entries: 26, exits: 12, netOccupancy: 22 },
+  { hour: "08", entries: 62, exits: 34, netOccupancy: 50 },
+  { hour: "09", entries: 98, exits: 58, netOccupancy: 90 },
+  { hour: "10", entries: 148, exits: 92, netOccupancy: 146 }, // Hora pico de entrada
+  { hour: "11", entries: 135, exits: 139, netOccupancy: 142 },
+  { hour: "12", entries: 86, exits: 118, netOccupancy: 110 },
+  { hour: "13", entries: 62, exits: 84, netOccupancy: 88 },
+  { hour: "14", entries: 79, exits: 65, netOccupancy: 102 },
+  { hour: "15", entries: 114, exits: 74, netOccupancy: 142 }, // Snapshot actual a las 15:45: ~142 pers
+  { hour: "16", entries: 108, exits: 102, netOccupancy: 148 },
+  { hour: "17", entries: 96, exits: 114, netOccupancy: 130 },
+  { hour: "18", entries: 84, exits: 112, netOccupancy: 102 },
+  { hour: "19", entries: 65, exits: 98, netOccupancy: 69 },
+  { hour: "20", entries: 42, exits: 78, netOccupancy: 33 },
+  { hour: "21", entries: 25, exits: 52, netOccupancy: 6 },
+];
+
+// ─────────────────────────────────────────────────────────────
+// CAPACIDAD Y DENSIDAD POR ZONA (En vivo — SuperFamilia Mercados)
+// ─────────────────────────────────────────────────────────────
+
+export interface ZoneDensityMetric {
+  zone: string;
+  cameraId: string;
+  areaM2: number;
+  currentPeople: number;
+  densityPerM2: number;
+  capacityMax: number;
+  status: "optimal" | "moderate" | "dense" | "saturated";
+}
+
+export interface StoreCapacityData {
+  maxCapacity: number;
+  currentOccupants: number;
+  occupancyPercent: number;
+  totalSalesAreaM2: number;
+  globalDensityPerM2: number;
+  zones: ZoneDensityMetric[];
+}
+
+export const STORE_CAPACITY_METRICS: StoreCapacityData = {
+  maxCapacity: 250,
+  currentOccupants: 142, // A las 15:45
+  occupancyPercent: 56.8,
+  totalSalesAreaM2: 480,
+  globalDensityPerM2: 0.3,
+  zones: [
+    {
+      zone: "Entrada Principal",
+      cameraId: "cam-001",
+      areaM2: 45,
+      currentPeople: 8,
+      densityPerM2: 0.18,
+      capacityMax: 30,
+      status: "optimal" as const,
+    },
+    {
+      zone: "Área de Cajas",
+      cameraId: "cam-002",
+      areaM2: 90,
+      currentPeople: 42,
+      densityPerM2: 0.47,
+      capacityMax: 50,
+      status: "dense" as const,
+    },
+    {
+      zone: "Pasillos Centro (Góndolas)",
+      cameraId: "cam-004",
+      areaM2: 280,
+      currentPeople: 74,
+      densityPerM2: 0.26,
+      capacityMax: 140,
+      status: "optimal" as const,
+    },
+    {
+      zone: "Sector Bebidas y Snacks",
+      cameraId: "cam-006",
+      areaM2: 65,
+      currentPeople: 18,
+      densityPerM2: 0.28,
+      capacityMax: 30,
+      status: "optimal" as const,
+    },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
+// FUNCIONES AGREGADORAS DE ANALÍTICA AVANZADA
+// ─────────────────────────────────────────────────────────────
+
+export interface WeekdayVsWeekend {
+  weekdayAvgVisitors: number;
+  weekendAvgVisitors: number;
+  trafficIncreasePercent: number;
+  weekdayAvgConversion: number;
+  weekendAvgConversion: number;
+  conversionDiffPts: number;
+  weekdayAvgDwellMin: number;
+  weekendAvgDwellMin: number;
+}
+
+export function getWeekdayVsWeekendStats(): WeekdayVsWeekend {
+  // Días entre semana: Mié, Jue, Vie, Lun, Mar (5 días)
+  const weekdays = CONVERSION_7D.filter((d) => d.day !== "Sáb" && d.day !== "Dom");
+  const weekends = CONVERSION_7D.filter((d) => d.day === "Sáb" || d.day === "Dom");
+
+  const weekdayAvgVis = Math.round(weekdays.reduce((s, d) => s + d.visitors, 0) / weekdays.length);
+  const weekendAvgVis = Math.round(weekends.reduce((s, d) => s + d.visitors, 0) / weekends.length);
+
+  const weekdayAvgConv = Number(
+    (weekdays.reduce((s, d) => s + d.conversionRate, 0) / weekdays.length).toFixed(1)
+  );
+  const weekendAvgConv = Number(
+    (weekends.reduce((s, d) => s + d.conversionRate, 0) / weekends.length).toFixed(1)
+  );
+
+  const trafficDiff = Number((((weekendAvgVis - weekdayAvgVis) / weekdayAvgVis) * 100).toFixed(1));
+  const convDiff = Number((weekendAvgConv - weekdayAvgConv).toFixed(1));
+
+  return {
+    weekdayAvgVisitors: weekdayAvgVis,
+    weekendAvgVisitors: weekendAvgVis,
+    trafficIncreasePercent: trafficDiff,
+    weekdayAvgConversion: weekdayAvgConv,
+    weekendAvgConversion: weekendAvgConv,
+    conversionDiffPts: convDiff,
+    weekdayAvgDwellMin: 20.2,
+    weekendAvgDwellMin: 25.8,
+  };
+}
+
+export interface DailyTrafficDetail {
+  day: string;
+  date: string;
+  visitors: number;
+  vsAvgPercent: number;
+  peakHour: string;
+  peakCount: number;
+  avgDwellMin: number;
+  conversionRate: number;
+  transactions: number;
+  isWeekend: boolean;
+}
+
+export function getDailyTrafficBreakdown(): DailyTrafficDetail[] {
+  const avgVisitors = Math.round(
+    CONVERSION_7D.reduce((s, d) => s + d.visitors, 0) / CONVERSION_7D.length
+  );
+
+  // Mapeo detallado con horas pico y permanencia estimada
+  const peaksMap: Record<string, { hour: string; count: number; dwell: number }> = {
+    Mié: { hour: "10:00", count: 112, dwell: 21.0 },
+    Jue: { hour: "10:00", count: 118, dwell: 20.5 },
+    Vie: { hour: "12:00", count: 168, dwell: 22.4 },
+    Sáb: { hour: "16:00", count: 210, dwell: 26.5 },
+    Dom: { hour: "11:00", count: 180, dwell: 25.1 },
+    Lun: { hour: "12:00", count: 96, dwell: 18.2 },
+    Mar: { hour: "10:00", count: 148, dwell: 22.0 },
+  };
+
+  return CONVERSION_7D.map((item) => {
+    const peak = peaksMap[item.day] ?? { hour: "11:00", count: 120, dwell: 21.0 };
+    const vsAvg = Number((((item.visitors - avgVisitors) / avgVisitors) * 100).toFixed(1));
+    const isWeekend = item.day === "Sáb" || item.day === "Dom";
+
+    return {
+      day: item.day,
+      date: item.date,
+      visitors: item.visitors,
+      vsAvgPercent: vsAvg,
+      peakHour: peak.hour,
+      peakCount: peak.count,
+      avgDwellMin: peak.dwell,
+      conversionRate: item.conversionRate,
+      transactions: item.transactions,
+      isWeekend,
+    };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// OPERACIONES Y CUMPLIMIENTO DE PERSONAL (SOP VIDEOANALYTICS)
+// ─────────────────────────────────────────────────────────────
+
+export interface UniformComplianceMetric {
+  category: "vestimenta" | "credencial" | "epp_sanitario" | "guantes";
+  label: string;
+  complianceRate: number; // e.g. 98.4
+  detectedTotal: number;
+  infractions: number;
+  status: "optimal" | "warning" | "critical";
+  targetRate: number; // 95.0
+}
+
+export interface ZoneUniformCompliance {
+  zone: string;
+  cameraId: string;
+  complianceRate: number;
+  staffCount: number;
+  infractions: number;
+  criticalMissing?: string;
+}
+
+export interface StorePunctualityDay {
+  day: string;
+  date: string;
+  scheduledTime: string; // "08:30"
+  actualOpenTime: string; // "08:42"
+  delayMinutes: number; // 12
+  status: "on_time" | "slight_delay" | "severe_delay";
+  openedByCamera: string; // "cam-001"
+  staffReadyBeforeOpen: boolean;
+}
+
+export interface OperationalIncident {
+  id: string;
+  time: string;
+  timestamp: string;
+  type: "uniform_missing" | "late_opening" | "phone_distraction" | "unattended_checkout" | "unauthorized_area";
+  title: string;
+  description: string;
+  zone: string;
+  cameraId: string;
+  severity: "low" | "medium" | "high";
+  resolved: boolean;
+  durationMinutes?: number;
+}
+
+export interface OperationsSummaryData {
+  overallScore: number; // 91 / 100
+  uniformComplianceRate: number; // 94.2%
+  punctualityScore: number; // 95.8%
+  todayOpeningDelayMin: number; // 12
+  todayOpeningStatus: "slight_delay";
+  activeCashierCoverageRate: number; // 98.2%
+  phoneDistractionEvents: number; // 7
+  phoneDistractionDurationMin: number; // 16
+  unattendedCounterIncidents: number; // 2
+  uniformCategories: UniformComplianceMetric[];
+  zoneCompliance: ZoneUniformCompliance[];
+  punctualityHistory7D: StorePunctualityDay[];
+  recentIncidents: OperationalIncident[];
+}
+
+export const OPERATIONS_METRICS: OperationsSummaryData = {
+  overallScore: 91,
+  uniformComplianceRate: 94.2,
+  punctualityScore: 95.8,
+  todayOpeningDelayMin: 12,
+  todayOpeningStatus: "slight_delay",
+  activeCashierCoverageRate: 98.2,
+  phoneDistractionEvents: 7,
+  phoneDistractionDurationMin: 16,
+  unattendedCounterIncidents: 2,
+  uniformCategories: [
+    {
+      category: "vestimenta",
+      label: "Mandil / Chaleco Reglamentario",
+      complianceRate: 98.4,
+      detectedTotal: 48,
+      infractions: 1,
+      status: "optimal",
+      targetRate: 95.0,
+    },
+    {
+      category: "credencial",
+      label: "Credencial / Fotocheck Visible",
+      complianceRate: 93.1,
+      detectedTotal: 48,
+      infractions: 3,
+      status: "warning",
+      targetRate: 95.0,
+    },
+    {
+      category: "epp_sanitario",
+      label: "Cofia / Mascarilla (Alimentos)",
+      complianceRate: 86.5,
+      detectedTotal: 16,
+      infractions: 4,
+      status: "critical",
+      targetRate: 98.0,
+    },
+    {
+      category: "guantes",
+      label: "Guantes de Protección (Bodega)",
+      complianceRate: 91.8,
+      detectedTotal: 22,
+      infractions: 2,
+      status: "warning",
+      targetRate: 95.0,
+    },
+  ],
+  zoneCompliance: [
+    {
+      zone: "Línea de Cajas",
+      cameraId: "cam-002",
+      complianceRate: 97.5,
+      staffCount: 8,
+      infractions: 1,
+    },
+    {
+      zone: "Pasillos & Sala de Ventas",
+      cameraId: "cam-004",
+      complianceRate: 95.0,
+      staffCount: 6,
+      infractions: 2,
+      criticalMissing: "1 fotocheck",
+    },
+    {
+      zone: "Panadería & Charcutería",
+      cameraId: "cam-005",
+      complianceRate: 85.7,
+      staffCount: 4,
+      infractions: 3,
+      criticalMissing: "2 cofias ausentes",
+    },
+    {
+      zone: "Bodega & Recepción Carga",
+      cameraId: "cam-003",
+      complianceRate: 91.0,
+      staffCount: 5,
+      infractions: 2,
+      criticalMissing: "1 sin guantes",
+    },
+  ],
+  punctualityHistory7D: [
+    {
+      day: "Mié",
+      date: "02 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:29",
+      delayMinutes: 0,
+      status: "on_time",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+    {
+      day: "Jue",
+      date: "03 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:31",
+      delayMinutes: 1,
+      status: "on_time",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+    {
+      day: "Vie",
+      date: "04 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:34",
+      delayMinutes: 4,
+      status: "on_time",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+    {
+      day: "Sáb",
+      date: "05 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:45",
+      delayMinutes: 15,
+      status: "severe_delay",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: false,
+    },
+    {
+      day: "Dom",
+      date: "06 Sep",
+      scheduledTime: "09:00",
+      actualOpenTime: "09:02",
+      delayMinutes: 2,
+      status: "on_time",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+    {
+      day: "Lun",
+      date: "07 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:30",
+      delayMinutes: 0,
+      status: "on_time",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+    {
+      day: "Mar",
+      date: "08 Sep",
+      scheduledTime: "08:30",
+      actualOpenTime: "08:42",
+      delayMinutes: 12,
+      status: "slight_delay",
+      openedByCamera: "cam-001",
+      staffReadyBeforeOpen: true,
+    },
+  ],
+  recentIncidents: [
+    {
+      id: "op-inc-01",
+      time: "14:32",
+      timestamp: "2026-09-08T14:32:00",
+      type: "phone_distraction",
+      title: "Uso indebido de celular en Caja 3",
+      description: "Operador de caja manipuló teléfono móvil durante 3.2 min con cliente esperando en cinta transportadora.",
+      zone: "Línea de Cajas",
+      cameraId: "cam-002",
+      severity: "medium",
+      resolved: true,
+      durationMinutes: 3.2,
+    },
+    {
+      id: "op-inc-02",
+      time: "12:15",
+      timestamp: "2026-09-08T12:15:00",
+      type: "unattended_checkout",
+      title: "Caja 2 desatendida con cola activa",
+      description: "Puesto de cobro desatendido durante 4.5 min con 3 clientes formados. Requirió llamada de supervisor.",
+      zone: "Línea de Cajas",
+      cameraId: "cam-002",
+      severity: "high",
+      resolved: true,
+      durationMinutes: 4.5,
+    },
+    {
+      id: "op-inc-03",
+      time: "10:40",
+      timestamp: "2026-09-08T10:40:00",
+      type: "uniform_missing",
+      title: "Manipulación de alimentos sin cofia",
+      description: "Personal en área de horneado ingresó sin cofia ni barbijo reglamentario. Riesgo de contaminación cruzada.",
+      zone: "Panadería & Charcutería",
+      cameraId: "cam-005",
+      severity: "medium",
+      resolved: false,
+    },
+    {
+      id: "op-inc-04",
+      time: "08:42",
+      timestamp: "2026-09-08T08:42:00",
+      type: "late_opening",
+      title: "Apertura de sucursal con 12 min de retraso",
+      description: "Cortina metálica principal levantada a las 08:42 h frente a hora programada (08:30 h). 6 clientes esperaban afuera.",
+      zone: "Entrada Principal",
+      cameraId: "cam-001",
+      severity: "high",
+      resolved: true,
+      durationMinutes: 12,
+    },
+    {
+      id: "op-inc-05",
+      time: "08:15",
+      timestamp: "2026-09-08T08:15:00",
+      type: "uniform_missing",
+      title: "Personal sin credencial visible",
+      description: "Reponedor en pasillo 3 detectado sin fotocheck visible durante labores matutinas de estantería.",
+      zone: "Pasillos & Sala de Ventas",
+      cameraId: "cam-004",
+      severity: "low",
+      resolved: true,
+    },
+  ],
+};
+
 // ─────────────────────────────────────────────────────────────
 // INSIGHTS & RECOMENDACIONES
 // ─────────────────────────────────────────────────────────────
@@ -1088,7 +1841,7 @@ export const INSIGHTS: Insight[] = [
     type: "positive",
     title: "Pico de tráfico identificado",
     description:
-      "El sábado 28/03 registró 1,820 personas — el mayor flujo de la semana. La zona de góndolas alcanzó densidad máxima entre las 15:00 y 17:00.",
+      "El sábado 05/09 registró 1,820 personas — el mayor flujo de la semana. La zona de góndolas alcanzó densidad máxima entre las 15:00 y 17:00.",
     metric: "+38% vs. promedio",
     recommendation:
       "Refuerza personal de piso los sábados en el rango 14:00–18:00 para mejorar la experiencia del cliente y reducir tiempos de espera.",
@@ -1099,7 +1852,7 @@ export const INSIGHTS: Insight[] = [
     type: "warning",
     title: "Patrón de caídas en pasillo 5",
     description:
-      "Se registraron 3 eventos de caída en 7 días, todos en Pasillos Centro. Hora más frecuente: 15:00–17:00, que coincide con el pico de afluencia.",
+      "Se registraron 3 eventos de caída en 7 días, todos en Pasillos Centro, en el rango 15:00–17:00 — coincide con el repunte de tráfico de la tarde tras el descanso del mediodía.",
     metric: "3 eventos / semana",
     recommendation:
       "Revisar el piso del pasillo 5 para detectar irregularidades. Aumentar la frecuencia de limpieza en horas pico. Considera señalización de piso mojado.",
@@ -1123,8 +1876,8 @@ export const INSIGHTS: Insight[] = [
     type: "info",
     title: "Lunes con menor afluencia",
     description:
-      "Los lunes registran consistentemente un 19% menos de clientes vs. el promedio semanal (912 personas el 02/03, 934 el 09/03, 978 el 30/03).",
-    metric: "-19% vs. promedio",
+      "Los lunes registran consistentemente un 27% menos de clientes vs. el promedio del último mes (912 personas el 10/08, 934 el 17/08, 978 el 07/09).",
+    metric: "-27% vs. promedio",
     recommendation:
       "Aprovecha los lunes para mantenimiento, reorganización de góndolas y capacitación de personal sin impactar la experiencia de compra.",
     source: "traffic",
@@ -1132,12 +1885,12 @@ export const INSIGHTS: Insight[] = [
   {
     id: "ins-005",
     type: "warning",
-    title: "Alertas de intrusión concentradas",
+    title: "Alertas de intrusión fuera del horario esperado",
     description:
-      "cam-003 (Bodega Principal) generó 2 alertas de intrusión esta semana, ambas en el rango 18:00–20:00, justo al cierre del módulo de acceso autorizado.",
+      "cam-003 (Bodega Principal) generó 2 alertas de intrusión hoy. Ambas ocurrieron durante el horario habitual de operación (mediodía-tarde), fuera de la ventana nocturna (18:00–06:00) que este módulo vigila por defecto.",
     metric: "2 alertas en bodega",
     recommendation:
-      "Verificar si hay personal con horas extra no registradas. Considera ampliar el horario de acceso autorizado de 18:00 a 20:00 o ajustar el módulo.",
+      "Verifica si corresponden a personal autorizado que ingresó sin registrar su acceso, o si hay un patrón diurno real que valga la pena cubrir ampliando el horario de vigilancia del módulo.",
     module: "intrusion",
     source: "alerts",
   },
@@ -1165,6 +1918,19 @@ export const INSIGHTS: Insight[] = [
     module: "people",
     source: "alerts",
   },
+  // NUEVO — conecta CONVERSION_7D con la narrativa de negocio: más tráfico
+  // no siempre significa más ventas si no se mide la conversión real.
+  {
+    id: "ins-008",
+    type: "info",
+    title: "Fin de semana: más tráfico, menor conversión",
+    description:
+      "El sábado y domingo concentran el mayor número de visitantes de la semana, pero la tasa de conversión estimada cae a 76–78%, frente a 85–86% de lunes y martes.",
+    metric: "-9 pts vs. entre semana",
+    recommendation:
+      "Refuerza personal de piso y señalización de precios los fines de semana para convertir el tráfico extra en ventas, en vez de asumir que más visitas siempre significan más ingreso.",
+    source: "traffic",
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -1182,7 +1948,7 @@ const AI_RESPONSES: { triggers: string[]; response: string }[] = [
   {
     triggers: ["campaña", "marketing", "publicidad", "promoción", "promo"],
     response:
-      "¡Muy buena observación! Si realizaste una campaña de marketing, el incremento del 38% en tráfico registrado el sábado 28/03 (1,820 personas) es completamente consistente con ese tipo de acción. Las campañas bien ejecutadas en supermercados de Cochabamba suelen generar picos de between 25–45% en el día de mayor impacto.\n\nTe recomiendo documentar las fechas de tus campañas para poder correlacionar automáticamente el impacto en los próximos reportes. ¿Fue una campaña en redes sociales, volanteo o radio?",
+      "¡Muy buena observación! Si realizaste una campaña de marketing, el incremento del 38% en tráfico registrado el sábado 05/09 (1,820 personas) es completamente consistente con ese tipo de acción. Las campañas bien ejecutadas en supermercados de Cochabamba suelen generar picos de between 25–45% en el día de mayor impacto.\n\nTe recomiendo documentar las fechas de tus campañas para poder correlacionar automáticamente el impacto en los próximos reportes. ¿Fue una campaña en redes sociales, volanteo o radio?",
   },
   {
     triggers: [
@@ -1195,32 +1961,39 @@ const AI_RESPONSES: { triggers: string[]; response: string }[] = [
       "mas personas",
     ],
     response:
-      "El mayor incremento registrado en los últimos 7 días fue el sábado 28/03 con 1,820 personas (+38% vs. el promedio semanal de 1,247). El segundo pico fue el domingo 29/03 con 1,654 personas.\n\nEstos patrones son típicos en supermercados bolivianos: inicio de quincena + fin de semana genera una combinación fuerte. Si el incremento fue mayor al esperado, factores como una campaña, un evento local en Cochabamba, o el cierre de un competidor podrían explicarlo.",
+      "El mayor incremento registrado en los últimos 7 días fue el sábado 05/09 con 1,820 personas (+38% vs. el promedio semanal). El segundo pico fue el domingo 06/09 con 1,654 personas.\n\nEstos patrones son típicos en supermercados bolivianos: inicio de quincena + fin de semana genera una combinación fuerte. Si el incremento fue mayor al esperado, factores como una campaña, un evento local en Cochabamba, o el cierre de un competidor podrían explicarlo.",
   },
   {
     triggers: ["caída", "caidas", "accidente", "persona en el suelo"],
     response:
-      "En los últimos 7 días se registraron 3 eventos de caída, todos en Pasillos Centro (cam-004). El patrón es claro: todas ocurrieron entre las 15:00 y 17:00, que coincide exactamente con el pico de afluencia.\n\nEsto sugiere que el problema puede ser una combinación de tráfico alto + condición del piso. Recomiendo: (1) inspección del pasillo 5, (2) señalización de piso y (3) limpieza más frecuente en ese rango horario.",
+      "En los últimos 7 días se registraron 3 eventos de caída, todos en Pasillos Centro (cam-004). El patrón es claro: todas ocurrieron entre las 15:00 y 17:00, que coincide con el repunte de tráfico de la tarde.\n\nEsto sugiere que el problema puede ser una combinación de tráfico alto + condición del piso. Recomiendo: (1) inspección del pasillo 5, (2) señalización de piso y (3) limpieza más frecuente en ese rango horario.",
   },
   {
     triggers: ["intrusion", "intrusión", "bodega", "acceso no autorizado"],
     response:
-      "Se detectaron 2 alertas de intrusión en Bodega Principal (cam-003) esta semana, ambas en el rango 18:00–20:00. Esto sugiere que puede haber personal trabajando horas extra sin registrar el acceso en el sistema.\n\nEl módulo está configurado para activarse desde las 18:00, pero si hay operaciones legítimas hasta las 20:00, te recomiendo ajustar el horario del módulo para evitar falsas alarmas y enfocarte en las alertas realmente críticas.",
+      "Se detectaron 2 alertas de intrusión en Bodega Principal (cam-003) hoy. Ambas ocurrieron durante el horario habitual de operación (mediodía-tarde), fuera de la ventana nocturna (18:00–06:00) que este módulo vigila por defecto.\n\nEsto sugiere que el motivo de disparo no es el esperado (acceso nocturno no autorizado). Revisa si corresponde a personal trabajando sin registrar su acceso, o si hay un patrón diurno real que valga la pena investigar y cubrir con el módulo.",
   },
   {
     triggers: ["lunes", "semana", "dia de menor", "bajo flujo"],
     response:
-      "Los lunes son consistentemente el día de menor tráfico: promedian un 19% menos que el resto de la semana. En lo que va de marzo: 912 personas (02/03), 934 (09/03), 901 (16/03), 945 (23/03), 978 (30/03).\n\nEste es el mejor día para: reorganización de góndolas, mantenimiento de cámaras, capacitación de personal y reposición de inventario sin interrumpir la experiencia de compra.",
+      "Los lunes son consistentemente el día de menor tráfico: promedian un 27% menos que el resto del mes. En las últimas 4 semanas: 912 personas (10/08), 934 (17/08), 901 (24/08), 945 (31/08), 978 (07/09).\n\nEste es el mejor día para: reorganización de góndolas, mantenimiento de cámaras, capacitación de personal y reposición de inventario sin interrumpir la experiencia de compra.",
   },
   {
     triggers: ["comparar", "mes anterior", "semana anterior", "tendencia"],
-    response:
-      "Comparando la semana actual (7,273 personas) vs. la anterior (7,720 personas), hay una variación de -5.8%. Sin embargo, si comparo el mismo sábado: 28/03 tuvo 1,820 vs. 21/03 que tuvo 1,689 (+7.8%).\n\nLa tendencia mensual de marzo 2026 muestra un crecimiento promedio de +4.2% semana a semana. El pico histórico del mes fue el sábado 28/03.",
+    response: `Comparando la semana actual (${currentWeekTotal().toLocaleString(
+      "es-BO"
+    )} personas) vs. la anterior (${previousWeekTotal().toLocaleString(
+      "es-BO"
+    )} personas), hay un cambio de ${getWeeklyChangePercent() >= 0 ? "+" : ""}${getWeeklyChangePercent()}%. Sin embargo, si comparo el mismo sábado: 05/09 tuvo 1,820 vs. 29/08 que tuvo 1,689 (+7.8%).\n\nLa tendencia de las últimas semanas muestra un crecimiento promedio cercano al +4.4% semana a semana. El pico histórico del período fue el sábado 05/09.`,
+  },
+  {
+    triggers: ["conversion", "conversión", "tasa de conversion", "ventas vs personas"],
+    response: `La tasa de conversión promedio de los últimos 7 días es de ${getAverageConversionRate()}%. El patrón más interesante: los fines de semana tienen más visitantes pero MENOR conversión (76–78%) que entre semana (85–86%).\n\nEsto significa que el sábado y domingo hay más gente "mirando" y proporcionalmente menos gente comprando. Vale la pena reforzar personal de piso y señalización de precios esos días para capturar mejor ese tráfico extra.`,
   },
   {
     triggers: ["recomendacion", "recomendación", "qué hago", "que hago", "consejo", "sugerencia"],
     response:
-      "Basándome en los datos actuales de SuperFamilia, estas son mis 3 recomendaciones principales:\n\n1. **Refuerza los sábados 14–18h**: Son las 4 horas con mayor densidad. Un cajero adicional y más personal en góndolas puede mejorar la experiencia.\n\n2. **Revisa cam-007**: Lleva más de 24h offline tras un evento de tampering. Es una zona ciega en administración.\n\n3. **Ajusta el horario del módulo de Intrusión en Bodega**: Las alertas del rango 18–20h parecen ser de personal autorizado, no intrusos.",
+      "Basándome en los datos actuales de SuperFamilia, estas son mis recomendaciones principales:\n\n1. **Refuerza los sábados 14–18h**: Son las horas con mayor densidad, aunque con menor conversión relativa — ahí está la oportunidad más grande.\n\n2. **Revisa cam-007**: Lleva más de 24h offline tras un evento de tampering. Es una zona ciega en administración.\n\n3. **Investiga las alertas diurnas de Intrusión en Bodega**: No encajan con el horario nocturno que el módulo vigila por defecto — podrían ser falsas alarmas o un patrón real nuevo.",
   },
 ];
 
@@ -1229,5 +2002,5 @@ export function getAIResponse(question: string): string {
   const match = AI_RESPONSES.find((r) => r.triggers.some((t) => q.includes(t)));
   if (match) return match.response;
 
-  return "Entiendo tu pregunta. Basándome en la actividad de SuperFamilia Mercados en el período actual, te puedo decir que los patrones de afluencia son consistentes con supermercados de Cochabamba en temporada normal.\n\nSi tienes un evento específico que quieres analizar (campaña, feriado, cambio de lay-out, cierre de competidor), compárteme el contexto y puedo ayudarte a correlacionarlo con los datos. Prueba preguntarme sobre: campañas, incrementos, caídas, intrusiones, el lunes o comparar períodos.";
+  return "Entiendo tu pregunta. Basándome en la actividad de SuperFamilia Mercados en el período actual, te puedo decir que los patrones de afluencia son consistentes con supermercados de Cochabamba en temporada normal.\n\nSi tienes un evento específico que quieres analizar (campaña, feriado, cambio de lay-out, cierre de competidor), compárteme el contexto y puedo ayudarte a correlacionarlo con los datos. Prueba preguntarme sobre: campañas, incrementos, caídas, intrusiones, conversión, el lunes o comparar períodos.";
 }

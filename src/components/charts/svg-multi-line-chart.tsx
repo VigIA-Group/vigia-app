@@ -1,36 +1,26 @@
 /**
- * SvgMultiLineChart — multiple line series on a single chart.
- * Works on both native and web (no Skia dependency).
+ * SvgMultiLineChart — Gráfico multilínea optimizado para VigIA.
+ * Implementa curvas suaves Monotone Cubic Spline, tooltips interactivos
+ * con paleta VigIA Navy y tipografía Plus Jakarta Sans.
  */
+import { useState } from "react";
 import { View } from "react-native";
-import Svg, { Circle, G, Line, Path, Text as SvgText } from "react-native-svg";
+import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from "react-native-svg";
+import { CHART_FONTS, VIGIA_COLORS, buildMonotoneSplinePath } from "./chart-theme";
 
 const VIEWBOX_W = 400;
-const PAD_LEFT = 40;
-const PAD_RIGHT = 12;
-const PAD_TOP = 16;
+const PAD_LEFT = 38;
+const PAD_RIGHT = 14;
+const PAD_TOP = 22;
 const PAD_BOTTOM = 32;
 
-function buildPath(pts: [number, number][]): string {
-  if (pts.length === 0) return "";
-  if (pts.length === 1) return `M ${pts[0][0]} ${pts[0][1]}`;
-  let d = `M ${pts[0][0]} ${pts[0][1]}`;
-  for (let i = 1; i < pts.length; i++) {
-    const prev = pts[i - 1];
-    const curr = pts[i];
-    const cpX = (prev[0] + curr[0]) / 2;
-    d += ` C ${cpX} ${prev[1]}, ${cpX} ${curr[1]}, ${curr[0]} ${curr[1]}`;
-  }
-  return d;
-}
-
-interface LineSeries {
+export interface LineSeries {
   yKey: string;
   color: string;
   label?: string;
 }
 
-interface SvgMultiLineChartProps<T extends Record<string, unknown>> {
+export interface SvgMultiLineChartProps<T extends Record<string, unknown>> {
   data: T[];
   xKey: keyof T;
   lines: LineSeries[];
@@ -44,17 +34,19 @@ export function SvgMultiLineChart<T extends Record<string, unknown>>({
   xKey,
   lines,
   height = 180,
-  labelColor = "#64748b",
-  gridColor = "#1e293b",
+  labelColor = VIGIA_COLORS.textLabelDark,
+  gridColor = VIGIA_COLORS.gridDark,
 }: SvgMultiLineChartProps<T>) {
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+
   const chartW = VIEWBOX_W - PAD_LEFT - PAD_RIGHT;
   const chartH = height - PAD_TOP - PAD_BOTTOM;
+  const baselineY = PAD_TOP + chartH;
 
   const allValues = lines.flatMap((l) => data.map((d) => Number(d[l.yKey] ?? 0)));
   const maxVal = Math.max(...allValues, 1);
 
   const xStep = data.length > 1 ? chartW / (data.length - 1) : chartW;
-
   const yTicks = [0, 0.25, 0.5, 0.75, 1];
 
   return (
@@ -65,7 +57,7 @@ export function SvgMultiLineChart<T extends Record<string, unknown>>({
         height={height}
         preserveAspectRatio="none"
       >
-        {/* Y grid lines */}
+        {/* Y grid lines (discrete & subtle) */}
         {yTicks.map((frac, i) => {
           const y = PAD_TOP + chartH * (1 - frac);
           return (
@@ -76,11 +68,18 @@ export function SvgMultiLineChart<T extends Record<string, unknown>>({
                 x2={VIEWBOX_W - PAD_RIGHT}
                 y2={y}
                 stroke={gridColor}
-                strokeWidth={1}
-                strokeDasharray={frac === 0 ? undefined : "4 3"}
+                strokeWidth={0.75}
+                strokeDasharray={frac === 0 ? undefined : "3 4"}
               />
               {frac > 0 && (
-                <SvgText x={PAD_LEFT - 5} y={y + 4} textAnchor="end" fontSize={9} fill={labelColor}>
+                <SvgText
+                  x={PAD_LEFT - 6}
+                  y={y + 3.5}
+                  textAnchor="end"
+                  fontSize={9}
+                  fontFamily={CHART_FONTS.regular}
+                  fill={labelColor}
+                >
                   {Math.round(maxVal * frac)}
                 </SvgText>
               )}
@@ -88,7 +87,20 @@ export function SvgMultiLineChart<T extends Record<string, unknown>>({
           );
         })}
 
-        {/* Lines */}
+        {/* Selected index guideline */}
+        {selectedIdx !== null && (
+          <Line
+            x1={PAD_LEFT + selectedIdx * xStep}
+            y1={PAD_TOP}
+            x2={PAD_LEFT + selectedIdx * xStep}
+            y2={baselineY}
+            stroke="rgba(255, 255, 255, 0.2)"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+          />
+        )}
+
+        {/* Series lines using Monotone Spline */}
         {lines.map((series) => {
           const pts: [number, number][] = data.map((d, i) => [
             PAD_LEFT + i * xStep,
@@ -97,32 +109,59 @@ export function SvgMultiLineChart<T extends Record<string, unknown>>({
           return (
             <G key={series.yKey}>
               <Path
-                d={buildPath(pts)}
+                d={buildMonotoneSplinePath(pts)}
                 stroke={series.color}
-                strokeWidth={2}
+                strokeWidth={2.2}
                 fill="none"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
-              {pts.map(([cx, cy], i) => (
-                <Circle key={i} cx={cx} cy={cy} r={2.5} fill={series.color} />
-              ))}
+              {pts.map(([cx, cy], i) => {
+                const isSelected = selectedIdx === i;
+                return (
+                  <Circle
+                    key={i}
+                    cx={cx}
+                    cy={cy}
+                    r={isSelected ? 4 : 2.5}
+                    fill={series.color}
+                    stroke={isSelected ? "#ffffff" : VIGIA_COLORS.navy}
+                    strokeWidth={isSelected ? 1.5 : 0.8}
+                  />
+                );
+              })}
             </G>
           );
         })}
 
-        {/* X labels from first line only */}
-        {data.map((d, i) => (
-          <SvgText
-            key={i}
-            x={PAD_LEFT + i * xStep}
-            y={height - PAD_BOTTOM + 14}
-            textAnchor="middle"
-            fontSize={9}
-            fill={labelColor}
-          >
-            {String(d[xKey])}
-          </SvgText>
-        ))}
+        {/* Touch targets and X labels */}
+        {data.map((d, i) => {
+          const cx = PAD_LEFT + i * xStep;
+          const isSelected = selectedIdx === i;
+
+          return (
+            <G key={i}>
+              <Rect
+                x={cx - 14}
+                y={PAD_TOP}
+                width={28}
+                height={chartH}
+                fill="transparent"
+                onPress={() => setSelectedIdx(isSelected ? null : i)}
+              />
+              <SvgText
+                x={cx}
+                y={height - PAD_BOTTOM + 16}
+                textAnchor="middle"
+                fontSize={9.5}
+                fontFamily={isSelected ? CHART_FONTS.bold : CHART_FONTS.regular}
+                fill={isSelected ? "#ffffff" : labelColor}
+              >
+                {String(d[xKey])}
+              </SvgText>
+            </G>
+          );
+        })}
       </Svg>
     </View>
   );
