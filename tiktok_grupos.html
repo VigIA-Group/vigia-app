@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA • TikTok 9:16 (El Engaño del Aforo Familiar)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-petroleo: #050e1d;
+        --bg-card: #081326;
+        --blue-vigia: #056efa;
+        --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.4);
+        --green-kpi: #10b981;
+        --text-white: #ffffff;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #02060d;
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-white);
+      }
+
+      .tiktok-canvas {
+        position: relative;
+        height: 100vh;
+        aspect-ratio: 9 / 16;
+        max-width: 100vw;
+        background: var(--bg-petroleo);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 100px rgba(0, 240, 255, 0.2);
+        cursor: pointer;
+      }
+
+      .video-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .video-element {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 40%;
+        transform: scale(1);
+        transition:
+          transform 9s cubic-bezier(0.16, 1, 0.3, 1),
+          filter 1.2s ease;
+      }
+
+      .video-element.panning {
+        transform: scale(1.15) translateY(-2%);
+      }
+
+      .video-element.blurred {
+        filter: blur(22px) brightness(0.26) saturate(1.25);
+      }
+
+      .cinematic-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.4) 0%,
+          transparent 30%,
+          transparent 60%,
+          rgba(5, 14, 29, 0.88) 100%
+        );
+        pointer-events: none;
+        transition:
+          background 0.8s ease,
+          backdrop-filter 0.8s ease;
+      }
+
+      .cinematic-vignette.dimmed {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.75) 0%,
+          rgba(5, 14, 29, 0.5) 35%,
+          rgba(5, 14, 29, 0.95) 100%
+        );
+        backdrop-filter: brightness(0.68);
+      }
+
+      .cinematic-vignette.darker {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.9) 0%,
+          rgba(5, 14, 29, 0.75) 45%,
+          rgba(5, 14, 29, 0.98) 100%
+        );
+        backdrop-filter: brightness(0.5);
+      }
+
+      .top-watermark {
+        position: absolute;
+        top: 40px;
+        left: 32px;
+        right: 32px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .top-watermark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .live-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5, 14, 29, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(14px);
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #e2e8f0;
+      }
+
+      .cluster-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--cyan-neon);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--cyan-neon);
+        animation: clusterPulse 1.4s infinite;
+      }
+
+      @keyframes clusterPulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+      }
+
+      .logo-img-mini {
+        height: 24px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5));
+      }
+
+      /* Floating Detection Chip on Top-Right */
+      .cluster-chip {
+        position: absolute;
+        top: 115px;
+        right: 32px;
+        z-index: 8;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 240, 255, 0.12);
+        border: 1.5px solid var(--cyan-neon);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 25px var(--cyan-glow);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .cluster-chip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .cluster-chip span {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #fff;
+      }
+
+      /* TYPOGRAPHY STAGE (Lifted Safely Above TikTok Overlay) */
+      .text-stage {
+        position: absolute;
+        left: 36px;
+        right: 36px;
+        bottom: 155px; /* Safe distance above TikTok description and sound bar */
+        z-index: 6;
+        pointer-events: none;
+      }
+
+      .scene-box {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        opacity: 0;
+        transform: translateY(35px);
+        filter: blur(8px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .scene-box.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0px);
+      }
+
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: flex-start;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        padding: 7px 16px;
+        border-radius: 30px;
+        backdrop-filter: blur(12px);
+      }
+
+      .tag-chip.danger {
+        color: #ff5a5a;
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+
+      .headline-big {
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1.12;
+        letter-spacing: -1.2px;
+        color: #ffffff;
+        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95);
+      }
+
+      .headline-big span.danger-word {
+        color: #ff4444;
+        text-shadow: 0 0 35px var(--danger-glow);
+      }
+
+      .headline-big span.cyan-word {
+        color: var(--cyan-neon);
+        text-shadow: 0 0 35px var(--cyan-glow);
+      }
+
+      .sub-headline {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #e2e8f0;
+        max-width: 340px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Dual Comparison Card in Scene 2 */
+      .cluster-compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .cluster-stat-box {
+        background: rgba(8, 19, 38, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 16px 14px;
+        backdrop-filter: blur(25px);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .cluster-stat-box.wrong {
+        border-color: rgba(239, 68, 68, 0.45);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .cluster-stat-box.correct {
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.08);
+      }
+
+      .stat-label {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      .stat-val {
+        font-size: 26px;
+        font-weight: 900;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .stat-val.wrong {
+        color: #ff5a5a;
+      }
+      .stat-val.correct {
+        color: #10b981;
+      }
+
+      .stat-foot {
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .stat-foot.wrong {
+        color: #ff8b8b;
+      }
+      .stat-foot.correct {
+        color: #6ee7b7;
+      }
+
+      /* REPORT OVERLAY: GROUP CLUSTERING AUDIT */
+      .report-overlay-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 8;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 26px 45px 26px; /* Safe distance above TikTok UI */
+        pointer-events: none;
+      }
+
+      .report-card {
+        background: rgba(8, 18, 34, 0.95);
+        border: 1.5px solid rgba(0, 240, 255, 0.4);
+        border-radius: 30px;
+        padding: 24px 20px;
+        backdrop-filter: blur(35px);
+        box-shadow:
+          0 30px 60px -15px rgba(0, 0, 0, 0.9),
+          0 0 50px rgba(0, 240, 255, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .report-card.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .report-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .report-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: rgba(0, 240, 255, 0.15);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--cyan-neon);
+      }
+
+      .report-title-text {
+        font-size: 16px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.2px;
+      }
+
+      .report-sub-text {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .report-badge-intel {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 240, 255, 0.35);
+      }
+
+      .kpi-dual-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .kpi-column {
+        background: rgba(5, 14, 29, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .kpi-caption {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      .kpi-number {
+        font-size: 24px;
+        font-weight: 900;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .kpi-number.cyan {
+        color: var(--cyan-neon);
+      }
+      .kpi-number.green {
+        color: var(--green-kpi);
+      }
+
+      /* Group Type Distribution Bars */
+      .group-breakdown-card {
+        background: rgba(5, 14, 29, 0.75);
+        border-radius: 18px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .group-breakdown-title {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .group-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .group-bar-track {
+        flex: 1;
+        height: 7px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .group-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+      }
+
+      .diagnostic-strip {
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        border-radius: 16px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: #d1fae5;
+      }
+
+      .diagnostic-strip strong {
+        color: #fff;
+      }
+
+      /* Outro Stage (Safe distance above TikTok UI) */
+      .outro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 12;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 40px 85px 40px;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .outro-stage.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .outro-logo-wrap {
+        margin-bottom: 24px;
+        filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.6));
+      }
+
+      .outro-logo-img {
+        height: 56px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .outro-main-text {
+        font-size: 40px;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+        color: #fff;
+        margin-bottom: 14px;
+      }
+
+      .outro-main-text span {
+        color: var(--cyan-neon);
+      }
+
+      .outro-sub-desc {
+        font-size: 16px;
+        color: #94a3b8;
+        line-height: 1.5;
+        max-width: 320px;
+        margin-bottom: 32px;
+      }
+
+      .cta-pill-button {
+        background: linear-gradient(135deg, #056efa 0%, #00f0ff 100%);
+        color: #050e1d;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 18px 40px;
+        border-radius: 40px;
+        box-shadow: 0 10px 35px var(--cyan-glow);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+      }
+
+      .timeline-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 20;
+      }
+
+      .timeline-strip-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--cyan-neon);
+        box-shadow: 0 0 10px var(--cyan-neon);
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tiktok-canvas" id="canvas">
+      <!-- Video Background (Web-ready H.264 Personas5) -->
+      <div class="video-layer">
+        <video id="videoElement" class="video-element" autoplay muted loop playsinline>
+          <source src="assets/videos/Personas5_web.mp4" type="video/mp4" />
+          <source src="assets/videos/Personas5.mp4" type="video/mp4" />
+        </video>
+        <div class="cinematic-vignette" id="vignette"></div>
+      </div>
+
+      <!-- Top Watermark -->
+      <div class="top-watermark" id="topWatermark">
+        <div class="live-chip">
+          <div class="cluster-dot"></div>
+          <span>Cámara 05 • Agrupación IA</span>
+        </div>
+        <img src="assets/images/logotipo-dark.png" alt="VigIA" class="logo-img-mini" />
+      </div>
+
+      <!-- Floating Cluster Detection Badge -->
+      <div class="cluster-chip" id="clusterBadge">
+        <span>👨‍👩‍👧‍👦 Grupo Familiar Detectado</span>
+      </div>
+
+      <!-- TYPOGRAPHY STAGE (Lifted Safely Above TikTok Description) -->
+      <div class="text-stage">
+        <!-- Scene 1: Hook (04.8s - 09.5s) -->
+        <div class="scene-box" id="scene1">
+          <div class="tag-chip danger">El Engaño del Conteo Ciego</div>
+          <h1 class="headline-big">
+            ENTRAN 400 PERSONAS. <br />
+            <span class="danger-word">FACTURAS SOLO 110.</span>
+          </h1>
+          <p class="sub-headline">
+            Crees que tu equipo no vende nada... pero te estás engañando solo.
+          </p>
+        </div>
+
+        <!-- Scene 2: The Twist (09.5s - 15.0s) -->
+        <div class="scene-box" id="scene2">
+          <div class="tag-chip">Unidades de Compra</div>
+          <h1 class="headline-big">
+            Una familia de cuatro <br />
+            <span class="cyan-word">paga 1 solo ticket.</span>
+          </h1>
+          <div class="cluster-compare-grid">
+            <div class="cluster-stat-box wrong">
+              <span class="stat-label">Conteo Ciego (Cabezas)</span>
+              <span class="stat-val wrong">27.5%</span>
+              <span class="stat-foot wrong">Falsa Alarma</span>
+            </div>
+            <div class="cluster-stat-box correct">
+              <span class="stat-label">Conversión Real (Grupos)</span>
+              <span class="stat-val correct">88.0%</span>
+              <span class="stat-foot correct">Éxito Rotundo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3: Clean Animated Report (15.0s - 22.0s) -->
+      <div class="report-overlay-stage">
+        <div class="report-card" id="reportCard">
+          <div class="report-header">
+            <div class="report-header-left">
+              <div class="report-icon-box">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="report-title-text">Agrupación de Compradores</div>
+                <div class="report-sub-text">Unidades de Compra vs Cabezas Brutas</div>
+              </div>
+            </div>
+            <div class="report-badge-intel">Algoritmo Cluster</div>
+          </div>
+
+          <div class="kpi-dual-row">
+            <div class="kpi-column">
+              <span class="kpi-caption">Cabezas Individuales</span>
+              <span class="kpi-number" style="color: #94a3b8">412 pers</span>
+            </div>
+            <div class="kpi-column">
+              <span class="kpi-caption">Unidades de Compra Reales</span>
+              <span class="kpi-number cyan">128 grupos</span>
+            </div>
+          </div>
+
+          <div class="group-breakdown-card">
+            <div class="group-breakdown-title">
+              <span>Distribución de Visitantes</span>
+              <span style="color: var(--cyan-neon)">72% Acompañados</span>
+            </div>
+            <div class="group-bar-row">
+              <span style="width: 75px; font-size: 10px">Parejas (2p)</span>
+              <div class="group-bar-track">
+                <div class="group-bar-fill" style="width: 44%; background: var(--cyan-neon)"></div>
+              </div>
+              <span style="color: var(--cyan-neon); font-size: 10px">44%</span>
+            </div>
+            <div class="group-bar-row">
+              <span style="width: 75px; font-size: 10px">Solitarios (1p)</span>
+              <div class="group-bar-track">
+                <div class="group-bar-fill" style="width: 28%; background: var(--blue-vigia)"></div>
+              </div>
+              <span style="color: #fff; font-size: 10px">28%</span>
+            </div>
+            <div class="group-bar-row">
+              <span style="width: 75px; font-size: 10px">Familias (3+)</span>
+              <div class="group-bar-track">
+                <div class="group-bar-fill" style="width: 28%; background: var(--green-kpi)"></div>
+              </div>
+              <span style="color: var(--green-kpi); font-size: 10px">28%</span>
+            </div>
+          </div>
+
+          <div class="diagnostic-strip">
+            <span style="font-size: 20px">💡</span>
+            <div>
+              Insight VigIA: <strong>Familias gastan +64%</strong> por ticket. Tu tasa real de
+              conversión de grupos es <strong>88.0%</strong> (no el 27% que creías).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4: Punchline & Outro (22.0s - 28.0s) -->
+      <div class="outro-stage" id="outroStage">
+        <div class="outro-logo-wrap">
+          <img src="assets/images/logotipo-dark.png" alt="VigIA" class="outro-logo-img" />
+        </div>
+        <h2 class="outro-main-text">
+          No cuentes cabezas. <br />
+          <span>Mide compradores.</span>
+        </h2>
+        <p class="outro-sub-desc">
+          VigIA agrupa familias en tiempo real para calcular tu verdadera tasa de conversión.
+        </p>
+        <a href="https://vigia.lat" class="cta-pill-button">
+          Audita tus Cámaras
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="timeline-strip">
+        <div class="timeline-strip-fill" id="timelineFill"></div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 28;
+      let currentTime = 0;
+      let isPlaying = true;
+      let lastTime = null;
+
+      const video = document.getElementById("videoElement");
+      const vignette = document.getElementById("vignette");
+      const topWatermark = document.getElementById("topWatermark");
+      const clusterBadge = document.getElementById("clusterBadge");
+      const scene1 = document.getElementById("scene1");
+      const scene2 = document.getElementById("scene2");
+      const reportCard = document.getElementById("reportCard");
+      const outroStage = document.getElementById("outroStage");
+      const timelineFill = document.getElementById("timelineFill");
+      const canvas = document.getElementById("canvas");
+
+      canvas.addEventListener("click", () => {
+        if (currentTime >= DURATION - 1) {
+          currentTime = 0;
+          if (video.duration) video.currentTime = 0;
+        }
+        isPlaying = !isPlaying;
+        if (isPlaying) video.play();
+        else video.pause();
+      });
+
+      function updateChoreography(time) {
+        if (time < 4.8) {
+          video.classList.remove("blurred");
+          video.classList.remove("panning");
+          vignette.classList.remove("dimmed");
+          vignette.classList.remove("darker");
+          topWatermark.classList.remove("visible");
+          clusterBadge.classList.remove("visible");
+          scene1.classList.remove("active");
+          scene2.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+        } else if (time >= 4.8 && time < 9.5) {
+          topWatermark.classList.add("visible");
+          clusterBadge.classList.add("visible");
+          video.classList.add("panning");
+          vignette.classList.add("dimmed");
+          vignette.classList.remove("darker");
+          scene1.classList.add("active");
+          scene2.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        } else if (time >= 9.5 && time < 15.0) {
+          scene1.classList.remove("active");
+          vignette.classList.remove("dimmed");
+          vignette.classList.add("darker");
+          scene2.classList.add("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        } else if (time >= 15.0 && time < 22.0) {
+          scene2.classList.remove("active");
+          video.classList.add("blurred");
+          reportCard.classList.add("active");
+          outroStage.classList.remove("active");
+        } else {
+          reportCard.classList.remove("active");
+          outroStage.classList.add("active");
+        }
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (isPlaying) {
+          currentTime += delta;
+          if (currentTime >= DURATION) {
+            currentTime = 0;
+            if (video.duration) video.currentTime = 0;
+          }
+
+          if (video.duration) {
+            const expectedVideoTime = currentTime % video.duration;
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.5) {
+              video.currentTime = expectedVideoTime;
+            }
+          }
+
+          const pct = (currentTime / DURATION) * 100;
+          timelineFill.style.width = `${pct}%`;
+          updateChoreography(currentTime);
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        video.play().catch(() => {});
+        requestAnimationFrame(loop);
+      });
+    </script>
+  </body>
+</html>

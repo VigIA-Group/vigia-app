@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA • TikTok 9:16 (El Mostrador Fantasma)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-petroleo: #050e1d;
+        --bg-card: #081326;
+        --blue-vigia: #056efa;
+        --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.4);
+        --amber-warn: #f59e0b;
+        --text-white: #ffffff;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #02060d;
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-white);
+      }
+
+      .tiktok-canvas {
+        position: relative;
+        height: 100vh;
+        aspect-ratio: 9 / 16;
+        max-width: 100vw;
+        background: var(--bg-petroleo);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 100px rgba(239, 68, 68, 0.2);
+        cursor: pointer;
+      }
+
+      .video-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .video-element {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 35%;
+        transform: scale(1);
+        transition:
+          transform 9s cubic-bezier(0.16, 1, 0.3, 1),
+          filter 1.2s ease;
+      }
+
+      .video-element.panning {
+        transform: scale(1.15) translateY(-2%);
+      }
+
+      .video-element.blurred {
+        filter: blur(22px) brightness(0.25) saturate(1.25);
+      }
+
+      .cinematic-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.4) 0%,
+          transparent 30%,
+          transparent 60%,
+          rgba(5, 14, 29, 0.88) 100%
+        );
+        pointer-events: none;
+        transition:
+          background 0.8s ease,
+          backdrop-filter 0.8s ease;
+      }
+
+      .cinematic-vignette.dimmed {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.75) 0%,
+          rgba(5, 14, 29, 0.5) 35%,
+          rgba(5, 14, 29, 0.95) 100%
+        );
+        backdrop-filter: brightness(0.68);
+      }
+
+      .cinematic-vignette.darker {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.9) 0%,
+          rgba(5, 14, 29, 0.75) 45%,
+          rgba(5, 14, 29, 0.98) 100%
+        );
+        backdrop-filter: brightness(0.5);
+      }
+
+      .top-watermark {
+        position: absolute;
+        top: 40px;
+        left: 32px;
+        right: 32px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .top-watermark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .live-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5, 14, 29, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(14px);
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #e2e8f0;
+      }
+
+      .alert-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--danger);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--danger);
+        animation: alertBlink 1.2s infinite;
+      }
+
+      @keyframes alertBlink {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.3;
+          transform: scale(0.75);
+        }
+      }
+
+      .logo-img-mini {
+        height: 24px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 0 12px rgba(5, 110, 250, 0.5));
+      }
+
+      /* Floating Status Chip on Top-Right */
+      .unattended-chip {
+        position: absolute;
+        top: 115px;
+        right: 32px;
+        z-index: 8;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1.5px solid var(--danger);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 25px var(--danger-glow);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .unattended-chip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .unattended-chip span {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #ff8b8b;
+      }
+
+      /* TYPOGRAPHY STAGE (Lifted Safely Above TikTok Overlay) */
+      .text-stage {
+        position: absolute;
+        left: 36px;
+        right: 36px;
+        bottom: 155px; /* Safe distance above TikTok description and sound bar */
+        z-index: 6;
+        pointer-events: none;
+      }
+
+      .scene-box {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        opacity: 0;
+        transform: translateY(35px);
+        filter: blur(8px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .scene-box.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0px);
+      }
+
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: flex-start;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #ff6b6b;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        padding: 7px 16px;
+        border-radius: 30px;
+        backdrop-filter: blur(12px);
+      }
+
+      .headline-big {
+        font-size: 46px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -1.2px;
+        color: #ffffff;
+        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95);
+      }
+
+      .headline-big span.danger-word {
+        color: #ff4444;
+        text-shadow: 0 0 35px var(--danger-glow);
+      }
+
+      .headline-big span.blue-word {
+        color: var(--blue-vigia);
+        text-shadow: 0 0 35px var(--blue-glow);
+      }
+
+      .sub-headline {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #e2e8f0;
+        max-width: 340px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Wait Timer Pill in Scene 2 */
+      .timer-alert-card {
+        background: rgba(10, 22, 40, 0.92);
+        border: 1.5px solid rgba(239, 68, 68, 0.5);
+        border-radius: 20px;
+        padding: 16px 20px;
+        backdrop-filter: blur(25px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 8px;
+      }
+
+      .timer-big-num {
+        font-size: 34px;
+        font-weight: 900;
+        color: #ff4444;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
+
+      .timer-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .timer-label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+      }
+
+      .timer-sub {
+        font-size: 13px;
+        font-weight: 800;
+        color: #ff8b8b;
+      }
+
+      /* REPORT OVERLAY: UNATTENDED COUNTER AUDIT */
+      .report-overlay-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 8;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 26px 45px 26px; /* Safe distance above TikTok UI */
+        pointer-events: none;
+      }
+
+      .report-card {
+        background: rgba(8, 18, 34, 0.95);
+        border: 1.5px solid rgba(239, 68, 68, 0.45);
+        border-radius: 30px;
+        padding: 24px 20px;
+        backdrop-filter: blur(35px);
+        box-shadow:
+          0 30px 60px -15px rgba(0, 0, 0, 0.9),
+          0 0 50px rgba(239, 68, 68, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .report-card.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .report-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .report-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--danger);
+      }
+
+      .report-title-text {
+        font-size: 16px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.2px;
+      }
+
+      .report-sub-text {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .report-badge-alert {
+        font-size: 11px;
+        font-weight: 800;
+        color: #ff7070;
+        background: rgba(239, 68, 68, 0.15);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+      }
+
+      .kpi-dual-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .kpi-column {
+        background: rgba(5, 14, 29, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .kpi-column.danger {
+        border-color: rgba(239, 68, 68, 0.4);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .kpi-caption {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      .kpi-number {
+        font-size: 24px;
+        font-weight: 900;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .kpi-number.danger {
+        color: #ff4444;
+      }
+
+      /* Event Timeline Log Box */
+      .incident-log-card {
+        background: rgba(5, 14, 29, 0.75);
+        border-radius: 18px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .incident-log-title {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+      }
+
+      .log-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #e2e8f0;
+      }
+
+      .log-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--danger);
+        box-shadow: 0 0 8px var(--danger);
+      }
+
+      /* Telegram / WhatsApp Alert Notification Strip */
+      .auto-alert-strip {
+        background: rgba(5, 110, 250, 0.12);
+        border: 1px solid rgba(5, 110, 250, 0.35);
+        border-radius: 16px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: #e2e8f0;
+      }
+
+      .auto-alert-strip strong {
+        color: #fff;
+      }
+
+      /* Outro Stage (Safe distance above TikTok UI) */
+      .outro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 12;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 40px 85px 40px;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .outro-stage.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .outro-logo-wrap {
+        margin-bottom: 24px;
+        filter: drop-shadow(0 0 35px rgba(5, 110, 250, 0.6));
+      }
+
+      .outro-logo-img {
+        height: 56px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .outro-main-text {
+        font-size: 40px;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+        color: #fff;
+        margin-bottom: 14px;
+      }
+
+      .outro-main-text span {
+        color: var(--blue-vigia);
+      }
+
+      .outro-sub-desc {
+        font-size: 16px;
+        color: #94a3b8;
+        line-height: 1.5;
+        max-width: 320px;
+        margin-bottom: 32px;
+      }
+
+      .cta-pill-button {
+        background: var(--blue-vigia);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 18px 40px;
+        border-radius: 40px;
+        box-shadow: 0 10px 35px var(--blue-glow);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .timeline-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 20;
+      }
+
+      .timeline-strip-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--danger);
+        box-shadow: 0 0 10px var(--danger);
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tiktok-canvas" id="canvas">
+      <!-- Video Background (Web-ready H.264 Personas4) -->
+      <div class="video-layer">
+        <video id="videoElement" class="video-element" autoplay muted loop playsinline>
+          <source src="assets/videos/Personas4_web.mp4" type="video/mp4" />
+          <source src="assets/videos/Personas4.mp4" type="video/mp4" />
+        </video>
+        <div class="cinematic-vignette" id="vignette"></div>
+      </div>
+
+      <!-- Top Watermark -->
+      <div class="top-watermark" id="topWatermark">
+        <div class="live-chip">
+          <div class="alert-dot"></div>
+          <span>Cámara 04 • Cajas & Atención</span>
+        </div>
+        <img src="assets/images/logotipo-dark.png" alt="VigIA" class="logo-img-mini" />
+      </div>
+
+      <!-- Floating Unattended Alert Badge -->
+      <div class="unattended-chip" id="alertBadge">
+        <span>⚠️ Mostrador Desatendido</span>
+      </div>
+
+      <!-- TYPOGRAPHY STAGE (Lifted Above TikTok Description) -->
+      <div class="text-stage">
+        <!-- Scene 1: Hook (04.8s - 09.5s) -->
+        <div class="scene-box" id="scene1">
+          <div class="tag-chip">Fuga de Clientes</div>
+          <h1 class="headline-big">
+            TU CLIENTE LLEGÓ <br />
+            <span class="danger-word">Y NO HABÍA NADIE.</span>
+          </h1>
+          <p class="sub-headline">Estuvo 4 minutos parado esperando que alguien lo atienda.</p>
+        </div>
+
+        <!-- Scene 2: The Twist (09.5s - 15.0s) -->
+        <div class="scene-box" id="scene2">
+          <div class="tag-chip">Pérdida por Desinterés</div>
+          <h1 class="headline-big">
+            Dinero en la mano... <br />
+            <span class="blue-word">y mostrador vacío.</span>
+          </h1>
+          <div class="timer-alert-card">
+            <div class="timer-big-num">4m 12s</div>
+            <div class="timer-meta">
+              <span class="timer-label">Tiempo de Espera sin Empleado</span>
+              <span class="timer-sub">Tolerancia normal: menos de 90 segundos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3: Clean Animated Report (15.0s - 22.0s) -->
+      <div class="report-overlay-stage">
+        <div class="report-card" id="reportCard">
+          <div class="report-header">
+            <div class="report-header-left">
+              <div class="report-icon-box">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="report-title-text">Auditoría de Mostrador</div>
+                <div class="report-sub-text">Detección de Personal Ausente con IA</div>
+              </div>
+            </div>
+            <div class="report-badge-alert">8 Alertas Hoy</div>
+          </div>
+
+          <div class="kpi-dual-row">
+            <div class="kpi-column danger">
+              <span class="kpi-caption">Incidentes de Ausencia</span>
+              <span class="kpi-number danger">8 eventos</span>
+            </div>
+            <div class="kpi-column">
+              <span class="kpi-caption">Tiempo Máximo sin Personal</span>
+              <span class="kpi-number" style="color: #f59e0b">6m 45s</span>
+            </div>
+          </div>
+
+          <div class="incident-log-card">
+            <div class="incident-log-title">Bitácora de Cámaras en Vivo</div>
+            <div class="log-item">
+              <div class="log-dot"></div>
+              <span
+                ><strong>17:22 hrs:</strong> Cliente esperando en Mostrador 2 (Ausencia: 4m
+                12s).</span
+              >
+            </div>
+            <div class="log-item">
+              <div class="log-dot"></div>
+              <span
+                ><strong>15:40 hrs:</strong> Caja 1 desatendida por 5m 18s en hora de
+                almuerzo.</span
+              >
+            </div>
+          </div>
+
+          <div class="auto-alert-strip">
+            <span style="font-size: 20px">📲</span>
+            <div>
+              Alerta VigIA al encargado: <strong>Notificación inmediata</strong> al minuto 2 de
+              espera para evitar el abandono de compra.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4: Punchline & Outro (22.0s - 28.0s) -->
+      <div class="outro-stage" id="outroStage">
+        <div class="outro-logo-wrap">
+          <img src="assets/images/logotipo-dark.png" alt="VigIA" class="outro-logo-img" />
+        </div>
+        <h2 class="outro-main-text">
+          No dejes que el desinterés <br />
+          <span>queme tus ventas.</span>
+        </h2>
+        <p class="outro-sub-desc">
+          VigIA detecta mostradores vacíos y alerta a tu equipo en tiempo real.
+        </p>
+        <a href="https://vigia.lat" class="cta-pill-button">
+          Audita tus Cámaras
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="timeline-strip">
+        <div class="timeline-strip-fill" id="timelineFill"></div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 28;
+      let currentTime = 0;
+      let isPlaying = true;
+      let lastTime = null;
+
+      const video = document.getElementById("videoElement");
+      const vignette = document.getElementById("vignette");
+      const topWatermark = document.getElementById("topWatermark");
+      const alertBadge = document.getElementById("alertBadge");
+      const scene1 = document.getElementById("scene1");
+      const scene2 = document.getElementById("scene2");
+      const reportCard = document.getElementById("reportCard");
+      const outroStage = document.getElementById("outroStage");
+      const timelineFill = document.getElementById("timelineFill");
+      const canvas = document.getElementById("canvas");
+
+      canvas.addEventListener("click", () => {
+        if (currentTime >= DURATION - 1) {
+          currentTime = 0;
+          if (video.duration) video.currentTime = 0;
+        }
+        isPlaying = !isPlaying;
+        if (isPlaying) video.play();
+        else video.pause();
+      });
+
+      function updateChoreography(time) {
+        if (time < 4.8) {
+          video.classList.remove("blurred");
+          video.classList.remove("panning");
+          vignette.classList.remove("dimmed");
+          vignette.classList.remove("darker");
+          topWatermark.classList.remove("visible");
+          alertBadge.classList.remove("visible");
+          scene1.classList.remove("active");
+          scene2.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+        } else if (time >= 4.8 && time < 9.5) {
+          topWatermark.classList.add("visible");
+          alertBadge.classList.add("visible");
+          video.classList.add("panning");
+          vignette.classList.add("dimmed");
+          vignette.classList.remove("darker");
+          scene1.classList.add("active");
+          scene2.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        } else if (time >= 9.5 && time < 15.0) {
+          scene1.classList.remove("active");
+          vignette.classList.remove("dimmed");
+          vignette.classList.add("darker");
+          scene2.classList.add("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        } else if (time >= 15.0 && time < 22.0) {
+          scene2.classList.remove("active");
+          video.classList.add("blurred");
+          reportCard.classList.add("active");
+          outroStage.classList.remove("active");
+        } else {
+          reportCard.classList.remove("active");
+          outroStage.classList.add("active");
+        }
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (isPlaying) {
+          currentTime += delta;
+          if (currentTime >= DURATION) {
+            currentTime = 0;
+            if (video.duration) video.currentTime = 0;
+          }
+
+          if (video.duration) {
+            const expectedVideoTime = currentTime % video.duration;
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.5) {
+              video.currentTime = expectedVideoTime;
+            }
+          }
+
+          const pct = (currentTime / DURATION) * 100;
+          timelineFill.style.width = `${pct}%`;
+          updateChoreography(currentTime);
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        video.play().catch(() => {});
+        requestAnimationFrame(loop);
+      });
+    </script>
+  </body>
+</html>

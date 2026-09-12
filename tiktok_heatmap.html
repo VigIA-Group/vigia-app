@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA • TikTok 9:16 (El Misterio de la Zona Muerta)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-petroleo: #050e1d;
+        --bg-card: #081326;
+        --blue-vigia: #056efa;
+        --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.4);
+        --text-white: #ffffff;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #02060d;
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-white);
+      }
+
+      /* 9:16 Vertical Stage */
+      .tiktok-canvas {
+        position: relative;
+        height: 100vh;
+        aspect-ratio: 9 / 16;
+        max-width: 100vw;
+        background: var(--bg-petroleo);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 100px rgba(0, 240, 255, 0.18);
+        cursor: pointer;
+      }
+
+      /* Video Layer with Ken Burns Motion */
+      .video-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .video-element {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 25%;
+        transform: scale(1);
+        transition:
+          transform 9s cubic-bezier(0.16, 1, 0.3, 1),
+          filter 1.2s ease;
+      }
+
+      .video-element.panning {
+        transform: scale(1.15) translateY(-3%);
+      }
+
+      .video-element.blurred {
+        filter: blur(20px) brightness(0.28) saturate(1.2);
+      }
+
+      /* Asymmetric Vignette: Leaves the top video viewable and darkens the bottom */
+      .cinematic-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.35) 0%,
+          transparent 30%,
+          rgba(5, 14, 29, 0.4) 55%,
+          rgba(5, 14, 29, 0.95) 100%
+        );
+        pointer-events: none;
+        transition:
+          background 0.8s ease,
+          backdrop-filter 0.8s ease;
+      }
+
+      .cinematic-vignette.dimmed {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.5) 0%,
+          rgba(5, 14, 29, 0.2) 35%,
+          rgba(5, 14, 29, 0.85) 65%,
+          rgba(5, 14, 29, 0.98) 100%
+        );
+        backdrop-filter: brightness(0.75);
+      }
+
+      .cinematic-vignette.darker {
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.85) 0%,
+          rgba(5, 14, 29, 0.7) 45%,
+          rgba(5, 14, 29, 0.98) 100%
+        );
+        backdrop-filter: brightness(0.5);
+      }
+
+      /* Minimal Top Watermark */
+      .top-watermark {
+        position: absolute;
+        top: 40px;
+        left: 32px;
+        right: 32px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .top-watermark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .live-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5, 14, 29, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(14px);
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #e2e8f0;
+      }
+
+      .radar-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--cyan-neon);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--cyan-neon);
+        animation: pulseRadar 1.4s infinite;
+      }
+
+      @keyframes pulseRadar {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.3;
+          transform: scale(0.75);
+        }
+      }
+
+      .logo-img-mini {
+        height: 24px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5));
+      }
+
+      /* Tactical Heatmap Marker (Anchored on top of aisle) */
+      .heat-radar-badge {
+        position: absolute;
+        top: 115px;
+        left: 32px;
+        z-index: 8;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(8, 19, 38, 0.85);
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .heat-radar-badge.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .heat-radar-badge .badge-icon {
+        font-size: 14px;
+      }
+
+      .heat-radar-badge .badge-text {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #ff7070;
+      }
+
+      /* ASYMMETRIC LOWER-THIRD TYPOGRAPHY (Lifted above TikTok UI overlay) */
+      .lower-third-stage {
+        position: absolute;
+        left: 32px;
+        right: 32px;
+        bottom: 160px; /* Safe distance above TikTok username, description and sound bar */
+        z-index: 6;
+        pointer-events: none;
+      }
+
+      .scene-lower {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        opacity: 0;
+        transform: translateY(35px);
+        filter: blur(8px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .scene-lower.active {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0px);
+      }
+
+      /* Accent Bar Hook */
+      .hook-accent-box {
+        border-left: 4px solid var(--cyan-neon);
+        padding-left: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .hook-kicker {
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--cyan-neon);
+      }
+
+      .hook-headline {
+        font-size: 46px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -1.2px;
+        color: #ffffff;
+        text-shadow: 0 4px 22px rgba(0, 0, 0, 0.95);
+      }
+
+      .hook-headline span.danger-word {
+        color: #ff4444;
+        text-shadow: 0 0 30px var(--danger-glow);
+      }
+
+      .hook-headline span.cyan-word {
+        color: var(--cyan-neon);
+        text-shadow: 0 0 30px var(--cyan-glow);
+      }
+
+      .hook-subtext {
+        font-size: 18px;
+        font-weight: 600;
+        color: #cbd5e1;
+        line-height: 1.45;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        max-width: 340px;
+      }
+
+      /* Dual Contrast Pills in Scene 2 */
+      .dwell-contrast-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .dwell-card {
+        background: rgba(8, 19, 38, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 14px 16px;
+        backdrop-filter: blur(20px);
+      }
+
+      .dwell-card.hot {
+        border-color: rgba(0, 240, 255, 0.35);
+      }
+
+      .dwell-card.cold {
+        border-color: rgba(239, 68, 68, 0.4);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .dwell-title {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+      }
+
+      .dwell-time {
+        font-size: 28px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .dwell-time.hot {
+        color: var(--cyan-neon);
+      }
+      .dwell-time.cold {
+        color: #ff4444;
+      }
+
+      .dwell-note {
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 3px;
+      }
+
+      .dwell-note.hot {
+        color: #8be4ff;
+      }
+      .dwell-note.cold {
+        color: #ff8b8b;
+      }
+
+      /* MODERN BOTTOM SHEET REPORT (Distinct from Video 1, lifted for TikTok UI) */
+      .sheet-report-stage {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        pointer-events: none;
+        transform: translateY(100%);
+        transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .sheet-report-stage.active {
+        transform: translateY(0);
+      }
+
+      .sheet-card {
+        background: rgba(6, 16, 32, 0.96);
+        border-top: 2px solid var(--cyan-neon);
+        border-radius: 36px 36px 0 0;
+        padding: 24px 26px 85px 26px; /* Generous bottom padding to clear TikTok bottom bar */
+        backdrop-filter: blur(40px);
+        box-shadow:
+          0 -20px 60px rgba(0, 0, 0, 0.9),
+          0 0 40px rgba(0, 240, 255, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .sheet-handle {
+        width: 44px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        align-self: center;
+        margin-bottom: 2px;
+      }
+
+      .sheet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .sheet-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .sheet-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--cyan-neon);
+      }
+
+      .sheet-title {
+        font-size: 17px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.2px;
+      }
+
+      .sheet-sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .sheet-badge {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Tactical Heatmap 4-Aisle Grid */
+      .aisle-matrix-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .aisle-item {
+        background: rgba(5, 14, 29, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .aisle-item.hot {
+        border-left: 3px solid var(--cyan-neon);
+      }
+
+      .aisle-item.cold {
+        border-left: 3px solid var(--danger);
+        background: rgba(239, 68, 68, 0.06);
+      }
+
+      .aisle-name-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+
+      .aisle-heat-bar {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .aisle-heat-fill {
+        height: 100%;
+        border-radius: 3px;
+      }
+
+      .aisle-heat-fill.hot {
+        background: linear-gradient(90deg, #056efa, #00f0ff);
+        box-shadow: 0 0 8px var(--cyan-glow);
+      }
+
+      .aisle-heat-fill.cold {
+        background: var(--danger);
+        box-shadow: 0 0 8px var(--danger-glow);
+      }
+
+      .aisle-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 900;
+        color: #fff;
+      }
+
+      .aisle-stats span.danger {
+        color: #ff4444;
+      }
+      .aisle-stats span.cyan {
+        color: var(--cyan-neon);
+      }
+
+      /* Tactical Recommendation Strip */
+      .tactical-advice-box {
+        background: rgba(0, 240, 255, 0.08);
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        border-radius: 16px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: #e2e8f0;
+      }
+
+      .tactical-advice-box strong {
+        color: #fff;
+      }
+
+      /* Outro Stage (Safe distance above TikTok UI) */
+      .outro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 12;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 40px 85px 40px;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .outro-stage.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .outro-logo-wrap {
+        margin-bottom: 24px;
+        filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.6));
+      }
+
+      .outro-logo-img {
+        height: 56px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .outro-main-text {
+        font-size: 40px;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+        color: #fff;
+        margin-bottom: 14px;
+      }
+
+      .outro-main-text span {
+        color: var(--cyan-neon);
+      }
+
+      .outro-sub-desc {
+        font-size: 16px;
+        color: #94a3b8;
+        line-height: 1.5;
+        max-width: 320px;
+        margin-bottom: 32px;
+      }
+
+      .cta-pill-button {
+        background: linear-gradient(135deg, #056efa 0%, #00f0ff 100%);
+        color: #050e1d;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 18px 40px;
+        border-radius: 40px;
+        box-shadow: 0 10px 35px var(--cyan-glow);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+      }
+
+      .timeline-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 20;
+      }
+
+      .timeline-strip-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--cyan-neon);
+        box-shadow: 0 0 10px var(--cyan-neon);
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tiktok-canvas" id="canvas">
+      <!-- Video Background (Web-ready H.264 Personas2) -->
+      <div class="video-layer">
+        <video id="videoElement" class="video-element" autoplay muted loop playsinline>
+          <source src="assets/videos/Personas2_web.mp4" type="video/mp4" />
+          <source src="assets/videos/Personas2.mp4" type="video/mp4" />
+        </video>
+        <div class="cinematic-vignette" id="vignette"></div>
+      </div>
+
+      <!-- Top Watermark -->
+      <div class="top-watermark" id="topWatermark">
+        <div class="live-chip">
+          <div class="radar-dot"></div>
+          <span>Cámara 02 • Pasillo Central</span>
+        </div>
+        <img src="assets/images/logotipo-dark.png" alt="VigIA" class="logo-img-mini" />
+      </div>
+
+      <!-- Floating Tactical Badge over Aisle -->
+      <div class="heat-radar-badge" id="heatBadge">
+        <span class="badge-icon">❄️</span>
+        <span class="badge-text">Zona Fría Detectada</span>
+      </div>
+
+      <!-- LOWER-THIRD ASYMMETRIC TYPOGRAPHY (Distinct from Video 1) -->
+      <div class="lower-third-stage">
+        <!-- Scene 1: Hook (04.8s - 09.5s) -->
+        <div class="scene-lower" id="scene1">
+          <div class="hook-accent-box">
+            <div class="hook-kicker">Punto Ciego de Merchandising</div>
+            <h1 class="hook-headline">
+              El 68% de tus clientes <br />
+              <span class="danger-word">NUNCA ENTRA</span> aquí.
+            </h1>
+            <p class="hook-subtext">Y pusiste en estos estantes tus productos con mayor margen.</p>
+          </div>
+        </div>
+
+        <!-- Scene 2: The Twist (09.5s - 15.0s) -->
+        <div class="scene-lower" id="scene2">
+          <div class="hook-accent-box">
+            <div class="hook-kicker">Tiempo de Permanencia</div>
+            <h1 class="hook-headline">
+              Inventario muerto <br />
+              <span class="cyan-word">sin darte cuenta.</span>
+            </h1>
+          </div>
+
+          <div class="dwell-contrast-grid">
+            <div class="dwell-card hot">
+              <div class="dwell-title">Pasillo Principal</div>
+              <div class="dwell-time hot">4m 15s</div>
+              <div class="dwell-note hot">🔥 82% tráfico activo</div>
+            </div>
+            <div class="dwell-card cold">
+              <div class="dwell-title">Pasillo 4 (Gourmet)</div>
+              <div class="dwell-time cold">38 seg</div>
+              <div class="dwell-note cold">❄️ Zona muerta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3: MODERN BOTTOM SHEET REPORT (15.0s - 22.0s) -->
+      <div class="sheet-report-stage" id="sheetReport">
+        <div class="sheet-card">
+          <div class="sheet-handle"></div>
+
+          <div class="sheet-header">
+            <div class="sheet-title-group">
+              <div class="sheet-icon-box">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                  <line x1="8" y1="2" x2="8" y2="18"></line>
+                  <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="sheet-title">Auditoría de Mapas de Calor</div>
+                <div class="sheet-sub">Distribución de Tráfico por Pasillos</div>
+              </div>
+            </div>
+            <div class="sheet-badge">En Vivo</div>
+          </div>
+
+          <!-- 4-Aisle Tactical Matrix -->
+          <div class="aisle-matrix-grid">
+            <div class="aisle-item hot">
+              <div class="aisle-name-row">
+                <span>Pasillo 1 (Entrada)</span>
+                <span>94%</span>
+              </div>
+              <div class="aisle-heat-bar">
+                <div class="aisle-heat-fill hot" style="width: 94%"></div>
+              </div>
+              <div class="aisle-stats">
+                <span class="cyan">5m 02s</span>
+                <span style="color: #94a3b8; font-size: 10px">Muy Alto</span>
+              </div>
+            </div>
+
+            <div class="aisle-item hot">
+              <div class="aisle-name-row">
+                <span>Pasillo 2 (Snacks)</span>
+                <span>82%</span>
+              </div>
+              <div class="aisle-heat-bar">
+                <div class="aisle-heat-fill hot" style="width: 82%"></div>
+              </div>
+              <div class="aisle-stats">
+                <span class="cyan">4m 15s</span>
+                <span style="color: #94a3b8; font-size: 10px">Alto</span>
+              </div>
+            </div>
+
+            <div class="aisle-item">
+              <div class="aisle-name-row">
+                <span>Pasillo 3 (Lácteos)</span>
+                <span>61%</span>
+              </div>
+              <div class="aisle-heat-bar">
+                <div class="aisle-heat-fill hot" style="width: 61%"></div>
+              </div>
+              <div class="aisle-stats">
+                <span>2m 40s</span>
+                <span style="color: #94a3b8; font-size: 10px">Medio</span>
+              </div>
+            </div>
+
+            <div class="aisle-item cold">
+              <div class="aisle-name-row">
+                <span style="color: #ff7070">Pasillo 4 (Gourmet)</span>
+                <span style="color: #ff7070">18%</span>
+              </div>
+              <div class="aisle-heat-bar">
+                <div class="aisle-heat-fill cold" style="width: 18%"></div>
+              </div>
+              <div class="aisle-stats">
+                <span class="danger">38 seg</span>
+                <span style="color: #ff7070; font-size: 10px">Zona Fría</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tactical-advice-box">
+            <span style="font-size: 20px">💡</span>
+            <div>
+              Diagnóstico VigIA: <strong>Mover cabecera de góndola</strong> a Pasillo 2. Rescate
+              estimado de ventas: <strong>+24% en categoría gourmet</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4: Punchline & Outro (22.0s - 28.0s) -->
+      <div class="outro-stage" id="outroStage">
+        <div class="outro-logo-wrap">
+          <img src="assets/images/logotipo-dark.png" alt="VigIA" class="outro-logo-img" />
+        </div>
+        <h2 class="outro-main-text">
+          Tus pasillos tienen <br />
+          <span>zonas ciegas.</span>
+        </h2>
+        <p class="outro-sub-desc">
+          VigIA detecta dónde se detienen tus clientes y qué áreas nunca visitan.
+        </p>
+        <a href="https://vigia.lat" class="cta-pill-button">
+          Solicita el Sistema
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="timeline-strip">
+        <div class="timeline-strip-fill" id="timelineFill"></div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 28;
+      let currentTime = 0;
+      let isPlaying = true;
+      let lastTime = null;
+
+      const video = document.getElementById("videoElement");
+      const vignette = document.getElementById("vignette");
+      const topWatermark = document.getElementById("topWatermark");
+      const heatBadge = document.getElementById("heatBadge");
+      const scene1 = document.getElementById("scene1");
+      const scene2 = document.getElementById("scene2");
+      const sheetReport = document.getElementById("sheetReport");
+      const outroStage = document.getElementById("outroStage");
+      const timelineFill = document.getElementById("timelineFill");
+      const canvas = document.getElementById("canvas");
+
+      canvas.addEventListener("click", () => {
+        if (currentTime >= DURATION - 1) {
+          currentTime = 0;
+          if (video.duration) video.currentTime = 0;
+        }
+        isPlaying = !isPlaying;
+        if (isPlaying) video.play();
+        else video.pause();
+      });
+
+      function updateChoreography(time) {
+        // 0.0s - 04.8s: Raw CCTV Video
+        if (time < 4.8) {
+          video.classList.remove("blurred");
+          video.classList.remove("panning");
+          vignette.classList.remove("dimmed");
+          vignette.classList.remove("darker");
+          topWatermark.classList.remove("visible");
+          heatBadge.classList.remove("visible");
+          scene1.classList.remove("active");
+          scene2.classList.remove("active");
+          sheetReport.classList.remove("active");
+          outroStage.classList.remove("active");
+        }
+        // 04.8s - 09.5s: Lower-Third Hook & Floating Heat Badge
+        else if (time >= 4.8 && time < 9.5) {
+          topWatermark.classList.add("visible");
+          heatBadge.classList.add("visible");
+          video.classList.add("panning");
+          vignette.classList.add("dimmed");
+          vignette.classList.remove("darker");
+          scene1.classList.add("active");
+          scene2.classList.remove("active");
+          sheetReport.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        }
+        // 09.5s - 15.0s: The Twist & Dwell Grid
+        else if (time >= 9.5 && time < 15.0) {
+          scene1.classList.remove("active");
+          heatBadge.classList.remove("visible");
+          vignette.classList.remove("dimmed");
+          vignette.classList.add("darker");
+          scene2.classList.add("active");
+          sheetReport.classList.remove("active");
+          outroStage.classList.remove("active");
+          video.classList.remove("blurred");
+        }
+        // 15.0s - 22.0s: Animated Bottom Sheet Report
+        else if (time >= 15.0 && time < 22.0) {
+          scene2.classList.remove("active");
+          video.classList.add("blurred");
+          sheetReport.classList.add("active");
+          outroStage.classList.remove("active");
+        }
+        // 22.0s - 28.0s: Outro & Logo
+        else {
+          sheetReport.classList.remove("active");
+          outroStage.classList.add("active");
+        }
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (isPlaying) {
+          currentTime += delta;
+          if (currentTime >= DURATION) {
+            currentTime = 0;
+            if (video.duration) video.currentTime = 0;
+          }
+
+          if (video.duration) {
+            const expectedVideoTime = currentTime % video.duration;
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.5) {
+              video.currentTime = expectedVideoTime;
+            }
+          }
+
+          const pct = (currentTime / DURATION) * 100;
+          timelineFill.style.width = `${pct}%`;
+          updateChoreography(currentTime);
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        video.play().catch(() => {});
+        requestAnimationFrame(loop);
+      });
+    </script>
+  </body>
+</html>

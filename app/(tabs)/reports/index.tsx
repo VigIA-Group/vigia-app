@@ -13,6 +13,11 @@ import { OperationsKpiSummary } from "@/src/components/charts/operations-kpi-sum
 import { UniformComplianceCard } from "@/src/components/charts/uniform-compliance-card";
 import { StoreOpeningPunctualityCard } from "@/src/components/charts/store-opening-punctuality-card";
 import { OperationalIncidentsFeed } from "@/src/components/charts/operational-incidents-feed";
+import { ProductionKpiSummary } from "@/src/components/charts/production-kpi-summary";
+import { ProductionThroughputChart } from "@/src/components/charts/production-throughput-chart";
+import { ProductionQualityControlCard } from "@/src/components/charts/production-quality-control-card";
+import { ProductVarietyBreakdownCard } from "@/src/components/charts/product-variety-breakdown-card";
+import { ProductionDowntimeTimeline } from "@/src/components/charts/production-downtime-timeline";
 import { InsightCard } from "@/src/components/insight-card";
 import { PageContainer } from "@/src/components/page-container";
 import { ReportChatSheet } from "@/src/components/report-chat-sheet";
@@ -41,6 +46,7 @@ import {
   BarChart2,
   Bell,
   Briefcase,
+  Factory,
   Filter,
   GitCompareArrows,
   Map,
@@ -53,7 +59,7 @@ import { Platform, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
 
-type ReportTab = "traffic" | "operations" | "alerts" | "modules" | "heatmaps";
+type ReportTab = "traffic" | "production" | "operations" | "alerts" | "modules" | "heatmaps";
 type Period = "today" | "7d" | "30d";
 type TrafficSubTab = "all" | "occupancy" | "trends" | "breakdown";
 
@@ -66,6 +72,7 @@ const TRAFFIC_SUB_TABS: { id: TrafficSubTab; label: string }[] = [
 
 const TABS: { id: ReportTab; label: string; Icon: typeof BarChart2 }[] = [
   { id: "traffic", label: "Tráfico", Icon: Users },
+  { id: "production", label: "Producción", Icon: Factory },
   { id: "operations", label: "Operaciones", Icon: Briefcase },
   { id: "alerts", label: "Alertas", Icon: Bell },
   { id: "modules", label: "Módulos", Icon: ShieldAlert },
@@ -1067,6 +1074,30 @@ export default function ReportsScreen() {
                   <DailyTrafficTable />
                 </YStack>
               )}
+            </YStack>
+          )}
+
+          {/* ══ PRODUCCIÓN & MANUFACTURA DE ALIMENTOS ══ */}
+          {activeTab === "production" && (
+            <YStack gap={14}>
+              {/* Tarjetas KPI Ejecutivas de Producción */}
+              <ProductionKpiSummary />
+
+              {/* Gráfico de Throughput y Ritmo Horario Continuo */}
+              <ProductionThroughputChart />
+
+              {/* Fila 3: Control de Calidad Visual (Quemadas) & Desglose por Variedad */}
+              <XStack gap={14} flexDirection={isDesktop ? "row" : "column"} alignItems="stretch">
+                <View flex={1}>
+                  <ProductionQualityControlCard />
+                </View>
+                <View flex={1}>
+                  <ProductVarietyBreakdownCard />
+                </View>
+              </XStack>
+
+              {/* Fila 4: Bitácora Cronológica de Paradas de Línea */}
+              <ProductionDowntimeTimeline />
             </YStack>
           )}
 

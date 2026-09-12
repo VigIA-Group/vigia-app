@@ -1818,6 +1818,315 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// VERTICAL DE PRODUCCIÓN Y MANUFACTURA DE ALIMENTOS
+// Planta Central de Panadería, Empanadas & Rotisería
+// ─────────────────────────────────────────────────────────────
+
+export interface ProductionHourlyPoint {
+  hour: string;
+  hourNum: number;
+  produced: number;
+  target: number;
+  defective: number;
+  burned: number;
+  downtimeMinutes: number;
+  activeOvens: number;
+}
+
+export interface ProductVarietyMetric {
+  id: string;
+  name: string;
+  shortName: string;
+  produced: number;
+  percentage: number;
+  defective: number;
+  defectRate: number;
+  targetRate: number;
+  color: string;
+  unitPriceBs: number;
+}
+
+export interface QualityDefectMetric {
+  id: string;
+  type: "burned" | "broken_crust" | "deformed" | "underbaked";
+  label: string;
+  count: number;
+  percentageOfDefects: number;
+  color: string;
+  severity: "high" | "medium" | "low";
+  description: string;
+  cameraSource: string;
+  suspectedCause: string;
+}
+
+export interface ProductionDowntimeEvent {
+  id: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  reason: string;
+  line: string;
+  cameraId: string;
+  impactUnitsLost: number;
+  resolved: boolean;
+  category: "mechanical" | "operational" | "cleaning";
+}
+
+export interface ProductionSummaryData {
+  plantName: string;
+  lineName: string;
+  totalProduced: number;
+  targetTotal: number;
+  qualityConformityRate: number;
+  defectiveTotal: number;
+  burnedTotal: number;
+  uptimeRate: number;
+  downtimeMinutesTotal: number;
+  downtimeEventsCount: number;
+  scrapCostEstimatedBs: number;
+  scrapCostEstimatedUsd: number;
+  averagePph: number;
+  peakHour: string;
+  hourlyProduction: ProductionHourlyPoint[];
+  varieties: ProductVarietyMetric[];
+  defects: QualityDefectMetric[];
+  downtimeLog: ProductionDowntimeEvent[];
+}
+
+export const PRODUCTION_METRICS: ProductionSummaryData = {
+  plantName: "Planta Central Panadería & Alimentos",
+  lineName: "Línea 1 — Horneo & Salida Continua (cam-003)",
+  totalProduced: 4850,
+  targetTotal: 4500,
+  qualityConformityRate: 96.8,
+  defectiveTotal: 156,
+  burnedTotal: 84,
+  uptimeRate: 94.2,
+  downtimeMinutesTotal: 38,
+  downtimeEventsCount: 2,
+  scrapCostEstimatedBs: 1170,
+  scrapCostEstimatedUsd: 169,
+  averagePph: 485,
+  peakHour: "11:00 – 12:00",
+  hourlyProduction: [
+    {
+      hour: "06:00",
+      hourNum: 6,
+      produced: 310,
+      target: 400,
+      defective: 6,
+      burned: 2,
+      downtimeMinutes: 0,
+      activeOvens: 2,
+    },
+    {
+      hour: "07:00",
+      hourNum: 7,
+      produced: 480,
+      target: 500,
+      defective: 12,
+      burned: 6,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "08:00",
+      hourNum: 8,
+      produced: 340,
+      target: 500,
+      defective: 18,
+      burned: 10,
+      downtimeMinutes: 22,
+      activeOvens: 2,
+    },
+    {
+      hour: "09:00",
+      hourNum: 9,
+      produced: 510,
+      target: 500,
+      defective: 14,
+      burned: 8,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "10:00",
+      hourNum: 10,
+      produced: 590,
+      target: 500,
+      defective: 28,
+      burned: 18,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "11:00",
+      hourNum: 11,
+      produced: 630,
+      target: 500,
+      defective: 26,
+      burned: 16,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "12:00",
+      hourNum: 12,
+      produced: 370,
+      target: 500,
+      defective: 11,
+      burned: 6,
+      downtimeMinutes: 16,
+      activeOvens: 2,
+    },
+    {
+      hour: "13:00",
+      hourNum: 13,
+      produced: 540,
+      target: 500,
+      defective: 15,
+      burned: 7,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "14:00",
+      hourNum: 14,
+      produced: 560,
+      target: 500,
+      defective: 14,
+      burned: 6,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+    {
+      hour: "15:00",
+      hourNum: 15,
+      produced: 520,
+      target: 500,
+      defective: 12,
+      burned: 5,
+      downtimeMinutes: 0,
+      activeOvens: 3,
+    },
+  ],
+  varieties: [
+    {
+      id: "var-carne",
+      name: "Empanada de Carne Criolla",
+      shortName: "Carne Criolla",
+      produced: 1840,
+      percentage: 37.9,
+      defective: 32,
+      defectRate: 1.7,
+      targetRate: 2.0,
+      color: "#056EFA",
+      unitPriceBs: 7.5,
+    },
+    {
+      id: "var-pollo",
+      name: "Empanada de Pollo al Horno",
+      shortName: "Pollo Horno",
+      produced: 1320,
+      percentage: 27.2,
+      defective: 36,
+      defectRate: 2.7,
+      targetRate: 2.5,
+      color: "#34d399",
+      unitPriceBs: 7.5,
+    },
+    {
+      id: "var-queso",
+      name: "Empanada de Queso & Cebolla",
+      shortName: "Queso & Cebolla",
+      produced: 1140,
+      percentage: 23.5,
+      defective: 64,
+      defectRate: 5.6,
+      targetRate: 3.0,
+      color: "#fbbf24",
+      unitPriceBs: 7.0,
+    },
+    {
+      id: "var-saltena",
+      name: "Salteña Tradicional",
+      shortName: "Salteña",
+      produced: 550,
+      percentage: 11.4,
+      defective: 24,
+      defectRate: 4.4,
+      targetRate: 3.5,
+      color: "#a78bfa",
+      unitPriceBs: 8.5,
+    },
+  ],
+  defects: [
+    {
+      id: "def-burned",
+      type: "burned",
+      label: "Empanadas Quemadas / Sobre-tostadas",
+      count: 84,
+      percentageOfDefects: 53.8,
+      color: "#f87171",
+      severity: "high",
+      description: "Tostado excesivo superior por encima de umbral L* (colorimetría oscura > 38%). Producto no comercializable.",
+      cameraSource: "cam-003 (Salida Horno 2)",
+      suspectedCause: "Termocupla descalibrada en Horno 2 entre 10:15 y 11:20 (+18°C sobre consigna).",
+    },
+    {
+      id: "def-broken",
+      type: "broken_crust",
+      label: "Repulgue Roto / Fuga de Relleno",
+      count: 48,
+      percentageOfDefects: 30.8,
+      color: "#fb923c",
+      severity: "medium",
+      description: "Apertura perimetral del sellado con derrame de relleno en bandeja de cocción.",
+      cameraSource: "cam-003 (Entrada Cinta)",
+      suspectedCause: "Presión insuficiente en mesa de cerrado manual durante el turno matutino.",
+    },
+    {
+      id: "def-deformed",
+      type: "deformed",
+      label: "Tamaño Irregular / Deforme",
+      count: 24,
+      percentageOfDefects: 15.4,
+      color: "#fbbf24",
+      severity: "low",
+      description: "Desviación volumétrica superior al ±15% del estándar nominal (120g ± 10g).",
+      cameraSource: "cam-003 (Pesaje & Salida)",
+      suspectedCause: "Desgaste en cuchilla de dosificado de masa en cortadora #1.",
+    },
+  ],
+  downtimeLog: [
+    {
+      id: "dt-01",
+      startTime: "08:45",
+      endTime: "09:07",
+      durationMinutes: 22,
+      reason: "Atasco en tolva de dosificación de relleno con parada automática de cinta",
+      line: "Línea 1 — Cinta Salida Horno 2",
+      cameraId: "cam-003",
+      impactUnitsLost: 180,
+      resolved: true,
+      category: "mechanical",
+    },
+    {
+      id: "dt-02",
+      startTime: "12:15",
+      endTime: "12:31",
+      durationMinutes: 16,
+      reason: "Limpieza preventiva de residuos y recambio de latas de teflón",
+      line: "Línea 1 — Horno Rotativo Principal",
+      cameraId: "cam-003",
+      impactUnitsLost: 130,
+      resolved: true,
+      category: "cleaning",
+    },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
 // INSIGHTS & RECOMENDACIONES
 // ─────────────────────────────────────────────────────────────
 
