@@ -4,10 +4,7 @@
  */
 import { PRODUCTION_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  Flame,
-  TrendingUp,
-} from "lucide-react-native";
+import { Flame, TrendingUp } from "lucide-react-native";
 import { useId, useState } from "react";
 import { GestureResponderEvent, Platform, View as RNView } from "react-native";
 import Svg, {
@@ -114,7 +111,8 @@ export function ProductionThroughputChart() {
             </Text>
           </XStack>
           <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-            Conteo de empanadas por cámara cenital (cam-003) en cinta transportadora vs. Meta horaria
+            Conteo de empanadas por cámara cenital (cam-003) en cinta transportadora vs. Meta
+            horaria
           </Text>
         </YStack>
 
@@ -214,7 +212,12 @@ export function ProductionThroughputChart() {
           <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
             Pico Productivo
           </Text>
-          <Text fontSize={16} fontWeight="800" color={VIGIA_COLORS.emeraldSuccess} fontFamily="$mono">
+          <Text
+            fontSize={16}
+            fontWeight="800"
+            color={VIGIA_COLORS.emeraldSuccess}
+            fontFamily="$mono"
+          >
             630 pzas (11:00)
           </Text>
         </YStack>
@@ -513,7 +516,12 @@ export function ProductionThroughputChart() {
               paddingVertical={4}
               borderRadius={6}
             >
-              <Text fontSize={12} fontWeight="800" color={VIGIA_COLORS.blueVibrant} fontFamily="$mono">
+              <Text
+                fontSize={12}
+                fontWeight="800"
+                color={VIGIA_COLORS.blueVibrant}
+                fontFamily="$mono"
+              >
                 {selectedPoint.hour}
               </Text>
             </View>
@@ -532,8 +540,14 @@ export function ProductionThroughputChart() {
               <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
                 Quemadas detectadas
               </Text>
-              <Text fontSize={13} fontWeight="700" color={VIGIA_COLORS.redDanger} fontFamily="$mono">
-                {selectedPoint.burned} pzas ({((selectedPoint.burned / selectedPoint.produced) * 100).toFixed(1)}%)
+              <Text
+                fontSize={13}
+                fontWeight="700"
+                color={VIGIA_COLORS.redDanger}
+                fontFamily="$mono"
+              >
+                {selectedPoint.burned} pzas (
+                {((selectedPoint.burned / selectedPoint.produced) * 100).toFixed(1)}%)
               </Text>
             </YStack>
 
@@ -542,7 +556,12 @@ export function ProductionThroughputChart() {
                 <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
                   Parada de cinta
                 </Text>
-                <Text fontSize={13} fontWeight="700" color={VIGIA_COLORS.amberWarning} fontFamily="$mono">
+                <Text
+                  fontSize={13}
+                  fontWeight="700"
+                  color={VIGIA_COLORS.amberWarning}
+                  fontFamily="$mono"
+                >
                   {selectedPoint.downtimeMinutes} min detenida
                 </Text>
               </YStack>
@@ -566,8 +585,9 @@ export function ProductionThroughputChart() {
           <Text fontWeight="700" color={colors.text} fontFamily="$body">
             Alerta de Horneo (Horno 2):
           </Text>{" "}
-          El incremento de empanadas quemadas (18 pzas a las 10:00 y 16 pzas a las 11:00) coincide con una
-          desviación de +18°C en la termocupla de salida. Se aconseja calibrar antes del turno tarde.
+          El incremento de empanadas quemadas (18 pzas a las 10:00 y 16 pzas a las 11:00) coincide
+          con una desviación de +18°C en la termocupla de salida. Se aconseja calibrar antes del
+          turno tarde.
         </Text>
       </XStack>
     </YStack>

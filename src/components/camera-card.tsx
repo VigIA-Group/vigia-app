@@ -2,12 +2,12 @@ import type { Camera } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { VideoView, useVideoPlayer } from "expo-video";
 import {
-    Camera as CameraIcon,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    ShieldAlert,
-    Users,
+  Camera as CameraIcon,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { MotiView } from "moti";
 import { Text, View, XStack, YStack } from "tamagui";

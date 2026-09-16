@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA • TikTok 9:16 (Control de Calidad & Conteo de Pizzas)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-petroleo: #050e1d;
+        --bg-card: #081326;
+        --blue-vigia: #056efa;
+        --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.5);
+        --amber-gold: #f59e0b;
+        --amber-glow: rgba(245, 158, 11, 0.45);
+        --orange-oven: #ff6b00;
+        --green-kpi: #10b981;
+        --green-glow: rgba(16, 185, 129, 0.4);
+        --text-white: #ffffff;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #02060d;
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-white);
+      }
+
+      .tiktok-canvas {
+        position: relative;
+        height: 100vh;
+        aspect-ratio: 9 / 16;
+        max-width: 100vw;
+        background: var(--bg-petroleo);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 100px rgba(255, 107, 0, 0.2);
+        cursor: pointer;
+      }
+
+      /* Background and Canvas Simulation */
+      .oven-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 35%, #15100b 0%, #0a1424 55%, #030812 100%);
+      }
+
+      .video-pizza {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 35%;
+        opacity: 0;
+        transition:
+          opacity 0.8s ease,
+          filter 1.2s ease;
+      }
+
+      .video-pizza.visible {
+        opacity: 1;
+      }
+
+      .video-pizza.blurred {
+        filter: blur(20px) brightness(0.25) saturate(1.3);
+      }
+
+      /* Inspection Canvas */
+      .pizza-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+      }
+
+      .pizza-canvas.visible {
+        opacity: 1;
+      }
+
+      /* Ambient Heat Glow & Vignette */
+      .oven-glow {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        background: radial-gradient(circle at 50% 45%, rgba(255, 107, 0, 0.18) 0%, transparent 60%);
+        pointer-events: none;
+        transition: opacity 0.8s ease;
+      }
+
+      .cinematic-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        background: linear-gradient(
+          180deg,
+          rgba(3, 8, 18, 0.35) 0%,
+          transparent 20%,
+          transparent 75%,
+          rgba(3, 8, 18, 0.7) 100%
+        );
+        pointer-events: none;
+        transition:
+          background 0.6s ease,
+          backdrop-filter 0.6s ease;
+      }
+
+      .cinematic-vignette.darker {
+        background: rgba(3, 8, 18, 0.84);
+        backdrop-filter: brightness(0.35);
+      }
+
+      /* Top Watermark */
+      .top-watermark {
+        position: absolute;
+        top: 40px;
+        left: 28px;
+        right: 28px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .top-watermark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .kitchen-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(8, 19, 38, 0.85);
+        border: 1px solid rgba(255, 107, 0, 0.4);
+        padding: 7px 14px;
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+      }
+
+      .kitchen-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--orange-oven);
+        box-shadow: 0 0 10px var(--orange-oven);
+        animation: pulseAnim 1.4s infinite;
+      }
+
+      @keyframes pulseAnim {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.4);
+          opacity: 0.5;
+        }
+      }
+
+      .kitchen-title {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #fbd38d;
+      }
+
+      .live-counter-chip {
+        background: rgba(8, 19, 38, 0.85);
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        padding: 7px 14px;
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--cyan-neon);
+      }
+
+      /* SCENE LAYERS (Centered in middle of screen) */
+      .scene-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 28px;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .scene-stage.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* SCENE 1: HOOK FIRST - High Impact Text */
+      .scene-hook {
+        justify-content: center;
+        padding-bottom: 0;
+      }
+
+      .badge-alert {
+        align-self: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1.5px solid var(--danger);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #ff7b7b;
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+        margin-bottom: 18px;
+        backdrop-filter: blur(12px);
+      }
+
+      .headline-pizza {
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -1.2px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9);
+      }
+
+      .headline-pizza span.fire {
+        color: #ff7b25;
+        text-shadow: 0 0 35px rgba(255, 123, 37, 0.6);
+      }
+
+      .headline-pizza span.cyan {
+        color: var(--cyan-neon);
+        text-shadow: 0 0 35px var(--cyan-glow);
+      }
+
+      .headline-pizza span.danger {
+        color: #ff4444;
+        text-shadow: 0 0 35px var(--danger-glow);
+      }
+
+      .sub-pizza {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #e2e8f0;
+        max-width: 350px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+      }
+
+      /* SCENE 2: LIVE METRICS HUD (Overlay during visual inspection) */
+      .hud-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        background: rgba(8, 19, 38, 0.92);
+        border: 1px solid rgba(255, 107, 0, 0.4);
+        border-radius: 20px;
+        padding: 14px 12px;
+        backdrop-filter: blur(25px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        margin-top: 14px;
+      }
+
+      .hud-stat-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 3px;
+      }
+
+      .hud-stat-col:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .hud-stat-val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 19px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1;
+      }
+
+      .hud-stat-val.good {
+        color: var(--green-kpi);
+      }
+      .hud-stat-val.bad {
+        color: var(--danger);
+      }
+      .hud-stat-val.warn {
+        color: var(--amber-gold);
+      }
+
+      .hud-stat-lbl {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      /* SCENE 3: QC DEFECTS COMPARISON (Quemada vs Desplazado vs Diámetro) */
+      .defects-sheet {
+        background: rgba(8, 19, 38, 0.94);
+        border: 1.5px solid rgba(239, 68, 68, 0.45);
+        border-radius: 24px;
+        padding: 18px;
+        backdrop-filter: blur(25px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .defect-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(14, 27, 49, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 10px 14px;
+        border-radius: 14px;
+      }
+
+      .defect-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .defect-tag {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 4px 8px;
+        border-radius: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .tag-burned {
+        background: rgba(239, 68, 68, 0.25);
+        color: #ffa3a3;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+      }
+
+      .tag-size {
+        background: rgba(245, 158, 11, 0.25);
+        color: #fde68a;
+        border: 1px solid rgba(245, 158, 11, 0.5);
+      }
+
+      .tag-toppings {
+        background: rgba(0, 240, 255, 0.2);
+        color: #a5f3fc;
+        border: 1px solid rgba(0, 240, 255, 0.4);
+      }
+
+      .defect-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .defect-metric {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        color: #ff8b8b;
+      }
+
+      /* SCENE 4: VIGIA AUDIT REPORT CARD */
+      .report-card-pizza {
+        background: rgba(8, 18, 36, 0.96);
+        border: 1.5px solid rgba(5, 110, 250, 0.45);
+        border-radius: 28px;
+        padding: 22px 18px;
+        backdrop-filter: blur(35px);
+        box-shadow:
+          0 30px 60px -15px rgba(0, 0, 0, 0.9),
+          0 0 45px rgba(5, 110, 250, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .report-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 12px;
+      }
+
+      .report-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-icon-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--orange-oven), var(--blue-vigia));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+
+      .report-title-grp {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .report-main-title {
+        font-size: 19px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.3px;
+      }
+
+      .report-sub-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .report-kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .kpi-tile {
+        background: rgba(14, 28, 52, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 10px 8px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .kpi-val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 28px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .kpi-val.green {
+        color: var(--green-kpi);
+      }
+      .kpi-val.amber {
+        color: var(--amber-gold);
+      }
+      .kpi-val.cyan {
+        color: var(--cyan-neon);
+      }
+
+      .kpi-lbl {
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      /* Distribution bar */
+      .dist-bar-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .dist-bar-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+      }
+
+      .dist-bar {
+        height: 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        display: flex;
+      }
+
+      .dist-slice-optima {
+        width: 91.4%;
+        background: var(--green-kpi);
+      }
+      .dist-slice-burned {
+        width: 4.8%;
+        background: var(--danger);
+      }
+      .dist-slice-size {
+        width: 2.3%;
+        background: var(--amber-gold);
+      }
+      .dist-slice-toppings {
+        width: 1.5%;
+        background: var(--cyan-neon);
+      }
+
+      .dist-legend {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .legend-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+
+      /* SCENE 5: OUTRO & CTA */
+      .outro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0 32px 75px 32px;
+        background: radial-gradient(
+          circle at 50% 45%,
+          rgba(255, 107, 0, 0.15) 0%,
+          rgba(5, 14, 29, 0.96) 65%,
+          #030812 100%
+        );
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.95);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: center;
+      }
+
+      .outro-stage.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: scale(1);
+      }
+
+      .outro-logo {
+        height: 48px;
+        object-fit: contain;
+        margin-bottom: 24px;
+        filter: drop-shadow(0 0 25px rgba(5, 110, 250, 0.6));
+      }
+
+      .outro-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 107, 0, 0.15);
+        border: 1px solid rgba(255, 107, 0, 0.4);
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #fbd38d;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 14px;
+      }
+
+      .outro-title {
+        font-size: 34px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.8px;
+        margin-bottom: 12px;
+      }
+
+      .outro-sub {
+        font-size: 16px;
+        font-weight: 500;
+        color: #94a3b8;
+        max-width: 310px;
+        margin-bottom: 28px;
+        line-height: 1.45;
+      }
+
+      .cta-button-pizza {
+        background: linear-gradient(135deg, #ff6b00 0%, #ff8800 50%, #056efa 100%);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 800;
+        padding: 16px 36px;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow:
+          0 10px 30px rgba(255, 107, 0, 0.4),
+          0 0 35px rgba(5, 110, 250, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.2s ease;
+        letter-spacing: 0.3px;
+      }
+
+      .cta-button-pizza:active {
+        transform: scale(0.96);
+      }
+
+      /* Timeline Indicator */
+      .timeline-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.12);
+        z-index: 20;
+      }
+
+      .timeline-strip-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #ff6b00, #056efa, #00f0ff);
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tiktok-canvas" id="canvas">
+      <!-- Background Layer (Oven / Conveyor / Video) -->
+      <div class="oven-layer">
+        <video id="videoElement" class="video-pizza" playsinline muted loop>
+          <source src="assets/videos/Pizzas_web.mp4" type="video/mp4" />
+          <source src="assets/videos/Pizzas.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <!-- Pizza Inspection Canvas (Thermal & Optical 360° QC) -->
+      <canvas id="pizzaCanvas" class="pizza-canvas visible"></canvas>
+
+      <div class="oven-glow" id="ovenGlow"></div>
+      <div class="cinematic-vignette" id="vignette"></div>
+
+      <!-- Top Watermark & HUD -->
+      <div class="top-watermark" id="topWatermark">
+        <div class="kitchen-chip">
+          <div class="kitchen-pulse"></div>
+          <span class="kitchen-title">HORNO CONTINUO • CINTA 2</span>
+        </div>
+        <div class="live-counter-chip">
+          <span>QC:</span>
+          <span id="counterLive">342 pzas/h</span>
+        </div>
+      </div>
+
+      <!-- SCENE 1 (0.0s - 2.5s clean, 2.5s - 6.8s hook text): HOOK -->
+      <div class="scene-stage scene-hook" id="sceneHook">
+        <div class="badge-alert">
+          <span>⚠️ Control de Calidad en Alimentos</span>
+        </div>
+        <h1 class="headline-pizza">
+          ¿EL <span class="fire">14% DE TU PRODUCCIÓN</span> SALE CON
+          <span class="danger">ERRORES?</span>
+        </h1>
+        <p class="sub-pizza">
+          Bordes quemados, tamaño irregular o ingredientes mal distribuidos. ¿Sabes cuánta merma
+          pierdes por turno?
+        </p>
+      </div>
+
+      <!-- SCENE 2 (6.8s - 12.0s): CONTEO & INSPECCIÓN ÓPTICA 360° -->
+      <div class="scene-stage" id="sceneInspection">
+        <div
+          class="badge-alert"
+          style="
+            background: rgba(0, 240, 255, 0.2);
+            border-color: var(--cyan-neon);
+            color: #a5f3fc;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+          "
+        >
+          <span>👁️ Auditoría Óptica en Línea</span>
+        </div>
+        <h2 class="headline-pizza" style="font-size: 38px">
+          AUDITA CADA UNIDAD <span class="cyan">EN SEGUNDOS</span>
+        </h2>
+        <p class="sub-pizza">
+          Visión artificial mide diámetro, nivel de horneado y distribución de ingredientes en
+          milisegundos.
+        </p>
+
+        <div class="hud-stats-grid">
+          <div class="hud-stat-col">
+            <div class="hud-stat-val good" id="hudDiam">31.8 cm</div>
+            <div class="hud-stat-lbl">Diámetro</div>
+          </div>
+          <div class="hud-stat-col">
+            <div class="hud-stat-val good" id="hudBake">Óptimo</div>
+            <div class="hud-stat-lbl">Cocción</div>
+          </div>
+          <div class="hud-stat-col">
+            <div class="hud-stat-val good" id="hudTopping">95%</div>
+            <div class="hud-stat-lbl">Toppings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 3 (10.5s - 16.0s): DETECCIÓN DE DEFECTOS EN TIEMPO REAL -->
+      <div class="scene-stage" id="sceneDefects">
+        <div class="badge-alert">
+          <span>🚨 Alerta de Defecto Detectado</span>
+        </div>
+        <h2 class="headline-pizza" style="font-size: 38px">
+          DESCARTA ANTES DE <span class="danger">ENTREGAR</span>
+        </h2>
+        <p class="sub-pizza">
+          Si llega quemada o deforme al cliente, pierdes la pizza, el cliente y la reseña en
+          delivery.
+        </p>
+
+        <div class="defects-sheet">
+          <div class="defect-row">
+            <div class="defect-left">
+              <span class="defect-tag tag-burned">Quemada</span>
+              <span class="defect-name">Sobre-tostado borde</span>
+            </div>
+            <span class="defect-metric">42% char (Rechazo)</span>
+          </div>
+          <div class="defect-row">
+            <div class="defect-left">
+              <span class="defect-tag tag-size">Deforme</span>
+              <span class="defect-name">Diámetro insuficiente</span>
+            </div>
+            <span class="defect-metric">26.2 cm (Min: 30 cm)</span>
+          </div>
+          <div class="defect-row">
+            <div class="defect-left">
+              <span class="defect-tag tag-toppings">Topping</span>
+              <span class="defect-name">Orégano / Queso corrido</span>
+            </div>
+            <span class="defect-metric">Desvío asimétrico</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 4 (16.0s - 22.5s): VIGIA AUDIT REPORT CARD -->
+      <div class="scene-stage" id="sceneReport">
+        <div class="report-card-pizza">
+          <div class="report-top">
+            <div class="report-brand">
+              <div class="brand-icon-box">🍕</div>
+              <div class="report-title-grp">
+                <span class="report-main-title">Auditoría de Calidad • Horno 2</span>
+                <span class="report-sub-title">Línea Continua • Turno Noche</span>
+              </div>
+            </div>
+            <span
+              style="
+                font-family: &quot;JetBrains Mono&quot;;
+                font-size: 13px;
+                font-weight: 800;
+                color: var(--cyan-neon);
+              "
+              >EN VIVO</span
+            >
+          </div>
+
+          <div class="report-kpi-row">
+            <div class="kpi-tile">
+              <span class="kpi-val green">1,420</span>
+              <span class="kpi-lbl">Conformes</span>
+            </div>
+            <div class="kpi-tile">
+              <span class="kpi-val amber">8.6%</span>
+              <span class="kpi-lbl">Tasa Merma</span>
+            </div>
+            <div class="kpi-tile">
+              <span class="kpi-val cyan">97.4%</span>
+              <span class="kpi-lbl">Calibre OK</span>
+            </div>
+          </div>
+
+          <div class="dist-bar-wrap">
+            <div class="dist-bar-header">
+              <span>Distribución de Producción (1,554 pizzas)</span>
+              <span style="color: var(--green-kpi)">91.4% Aptas</span>
+            </div>
+            <div class="dist-bar">
+              <div class="dist-slice-optima"></div>
+              <div class="dist-slice-burned"></div>
+              <div class="dist-slice-size"></div>
+              <div class="dist-slice-toppings"></div>
+            </div>
+            <div class="dist-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background: var(--green-kpi)"></div>
+                <span>Óptima (1,420)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: var(--danger)"></div>
+                <span>Quemadas (75)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: var(--amber-gold)"></div>
+                <span>Chicas (36)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background: var(--cyan-neon)"></div>
+                <span>Toppings (23)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 5 (22.5s - 28.0s): OUTRO & CTA -->
+      <div class="outro-stage" id="outroStage">
+        <img
+          src="assets/images/logotipo-dark.png"
+          alt="VigIA Logo"
+          class="outro-logo"
+          onerror="this.style.display = 'none'"
+        />
+        <div class="outro-badge">Control Óptico Inteligente</div>
+        <h2 class="outro-title">
+          Estandariza tu receta.<br />
+          <span style="color: var(--orange-oven)">Cero quejas de clientes.</span>
+        </h2>
+        <p class="outro-sub">
+          Convierte cualquier cámara en tu inspector de calidad más rápido y preciso.
+        </p>
+        <a href="https://vigia.lat" target="_blank" class="cta-button-pizza">
+          <span>Audita tu Cocina</span>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Progress Timeline -->
+      <div class="timeline-strip">
+        <div class="timeline-strip-fill" id="timelineFill"></div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 28;
+      let currentTime = 0;
+      let isPlaying = true;
+      let lastTime = null;
+
+      const video = document.getElementById("videoElement");
+      const vignette = document.getElementById("vignette");
+      const topWatermark = document.getElementById("topWatermark");
+      const sceneHook = document.getElementById("sceneHook");
+      const sceneInspection = document.getElementById("sceneInspection");
+      const sceneDefects = document.getElementById("sceneDefects");
+      const sceneReport = document.getElementById("sceneReport");
+      const outroStage = document.getElementById("outroStage");
+      const timelineFill = document.getElementById("timelineFill");
+      const canvas = document.getElementById("canvas");
+      const pizzaCanvas = document.getElementById("pizzaCanvas");
+      const ctx = pizzaCanvas.getContext("2d");
+
+      // Dynamic HUD stats
+      const hudDiam = document.getElementById("hudDiam");
+      const hudBake = document.getElementById("hudBake");
+      const hudTopping = document.getElementById("hudTopping");
+      const counterLive = document.getElementById("counterLive");
+
+      function resizeCanvas() {
+        const rect = pizzaCanvas.getBoundingClientRect();
+        pizzaCanvas.width = rect.width * window.devicePixelRatio;
+        pizzaCanvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      /* Pizza Animation & Optical HUD Simulator */
+      let pizzaTravel = 0;
+      function renderPizzaInspection(time) {
+        const w = pizzaCanvas.width / window.devicePixelRatio;
+        const h = pizzaCanvas.height / window.devicePixelRatio;
+        ctx.clearRect(0, 0, w, h);
+
+        if (time < 3.8 || time > 22.5) return;
+
+        const beltY = h * 0.38;
+        const beltH = 140;
+
+        // Draw Conveyor belt background
+        ctx.fillStyle = "rgba(12, 18, 30, 0.75)";
+        ctx.fillRect(0, beltY - 30, w, beltH + 60);
+
+        // Conveyor metal mesh pattern
+        ctx.strokeStyle = "rgba(255, 107, 0, 0.15)";
+        ctx.lineWidth = 1;
+        for (let x = (pizzaTravel * 2) % 20; x < w; x += 20) {
+          ctx.beginPath();
+          ctx.moveTo(x, beltY - 30);
+          ctx.lineTo(x, beltY + beltH + 30);
+          ctx.stroke();
+        }
+
+        // Conveyor borders
+        ctx.strokeStyle = "rgba(255, 107, 0, 0.4)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, beltY - 30);
+        ctx.lineTo(w, beltY - 30);
+        ctx.moveTo(0, beltY + beltH + 30);
+        ctx.lineTo(w, beltY + beltH + 30);
+        ctx.stroke();
+
+        // Inspection Ring / Optical Scanner Center
+        const scanCenterX = w * 0.5;
+        const scanCenterY = beltY + beltH * 0.5;
+        const scanRadius = 78;
+
+        // Advance pizzas
+        pizzaTravel += 1.8;
+
+        const spacing = 190;
+        const pizzaCount = Math.ceil(w / spacing) + 2;
+
+        for (let i = -1; i < pizzaCount; i++) {
+          const px = i * spacing + (pizzaTravel % spacing);
+          const py = scanCenterY;
+          const pizzaIndex = Math.floor((pizzaTravel + px) / spacing);
+
+          // Decide state of this pizza
+          const isDefective = (time >= 10.5 && time < 16.0) || pizzaIndex % 3 === 1;
+          const defectType =
+            pizzaIndex % 3 === 1 ? "burned" : pizzaIndex % 3 === 2 ? "small" : "toppings";
+
+          const pRadius = isDefective && defectType === "small" ? 44 : 58;
+
+          // Draw Pizza Base Crust
+          ctx.beginPath();
+          ctx.arc(px, py, pRadius, 0, Math.PI * 2);
+          ctx.fillStyle = isDefective && defectType === "burned" ? "#8B3A14" : "#E29B42"; // Dark crust if burned
+          ctx.fill();
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = isDefective && defectType === "burned" ? "#4A1B05" : "#C47726";
+          ctx.stroke();
+
+          // Pizza Cheese Layer
+          ctx.beginPath();
+          ctx.arc(px, py, pRadius - 8, 0, Math.PI * 2);
+          ctx.fillStyle = isDefective && defectType === "burned" ? "#B37A2C" : "#F6D365";
+          ctx.fill();
+
+          // Pepperoni / Toppings
+          const pepperoniCount = isDefective && defectType === "toppings" ? 4 : 7;
+          for (let p = 0; p < pepperoniCount; p++) {
+            const angle = p * ((Math.PI * 2) / pepperoniCount) + 0.3;
+            const dist =
+              isDefective && defectType === "toppings"
+                ? pRadius * 0.35 + p * 5 // Slanted/shifted
+                : pRadius * 0.52;
+            const pepX =
+              px + Math.cos(angle) * dist + (isDefective && defectType === "toppings" ? 14 : 0);
+            const pepY = py + Math.sin(angle) * dist;
+
+            ctx.beginPath();
+            ctx.arc(pepX, pepY, isDefective && defectType === "burned" ? 8 : 9, 0, Math.PI * 2);
+            ctx.fillStyle = isDefective && defectType === "burned" ? "#54120A" : "#D9381E";
+            ctx.fill();
+            ctx.strokeStyle = "#8A1C0B";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+
+          // Green Oregano specks
+          ctx.fillStyle =
+            isDefective && defectType === "toppings"
+              ? "rgba(46, 125, 50, 0.4)"
+              : "rgba(46, 125, 50, 0.85)";
+          for (let o = 0; o < 12; o++) {
+            const ox = px + Math.sin(o * 9) * (pRadius * 0.65);
+            const oy = py + Math.cos(o * 13) * (pRadius * 0.65);
+            ctx.fillRect(ox, oy, 2.5, 2.5);
+          }
+
+          // When Pizza is under scanner center
+          const distToCenter = Math.abs(px - scanCenterX);
+          if (distToCenter < 60) {
+            // Bounding Box
+            ctx.strokeStyle = isDefective ? "#EF4444" : "#10B981";
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(px - pRadius - 8, py - pRadius - 8, pRadius * 2 + 16, pRadius * 2 + 16);
+
+            // Real-time badge
+            ctx.fillStyle = isDefective ? "rgba(239, 68, 68, 0.95)" : "rgba(16, 185, 129, 0.95)";
+            ctx.fillRect(px - 48, py - pRadius - 28, 96, 18);
+            ctx.fillStyle = "#FFF";
+            ctx.font = "bold 9px 'JetBrains Mono', monospace";
+            ctx.textAlign = "center";
+
+            let textBadge = "CONFORME ✓";
+            if (isDefective) {
+              textBadge =
+                defectType === "burned"
+                  ? "QUEMADA (42%)"
+                  : defectType === "small"
+                    ? "CHICA (26cm)"
+                    : "TOPPING CORRIDO";
+            }
+            ctx.fillText(textBadge, px, py - pRadius - 15);
+            ctx.textAlign = "start";
+
+            // Update HUD values smoothly
+            if (time >= 4.8 && time < 10.5) {
+              hudDiam.innerText = isDefective ? "26.2 cm" : "31.8 cm";
+              hudDiam.className = isDefective ? "hud-stat-val bad" : "hud-stat-val good";
+              hudBake.innerText = isDefective ? "Alerta" : "Óptimo";
+              hudBake.className = isDefective ? "hud-stat-val bad" : "hud-stat-val good";
+              hudTopping.innerText = isDefective ? "52%" : "95%";
+              hudTopping.className = isDefective ? "hud-stat-val bad" : "hud-stat-val good";
+            }
+          }
+        }
+
+        // Optical Circular Laser Ring
+        ctx.beginPath();
+        ctx.arc(scanCenterX, scanCenterY, scanRadius, 0, Math.PI * 2);
+        ctx.strokeStyle =
+          time >= 10.5 && time < 16.0 ? "rgba(239, 68, 68, 0.85)" : "rgba(0, 240, 255, 0.85)";
+        ctx.lineWidth = 3;
+        ctx.shadowColor =
+          time >= 10.5 && time < 16.0 ? "rgba(239, 68, 68, 0.9)" : "rgba(0, 240, 255, 0.9)";
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Crosshair laser lines
+        ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(scanCenterX - scanRadius - 15, scanCenterY);
+        ctx.lineTo(scanCenterX + scanRadius + 15, scanCenterY);
+        ctx.moveTo(scanCenterX, scanCenterY - scanRadius - 15);
+        ctx.lineTo(scanCenterX, scanCenterY + scanRadius + 15);
+        ctx.stroke();
+
+        // Top Scanner Label
+        ctx.fillStyle = "rgba(8, 19, 38, 0.9)";
+        ctx.fillRect(scanCenterX - 65, scanCenterY - scanRadius - 20, 130, 18);
+        ctx.strokeStyle = time >= 10.5 && time < 16.0 ? "#EF4444" : "#00F0FF";
+        ctx.strokeRect(scanCenterX - 65, scanCenterY - scanRadius - 20, 130, 18);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "bold 9px 'JetBrains Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          time >= 10.5 && time < 16.0 ? "QC • RECHAZO DETECTADO" : "VIGIA QC • 360° SCAN",
+          scanCenterX,
+          scanCenterY - scanRadius - 8
+        );
+        ctx.textAlign = "start";
+      }
+
+      /* Animation Loop */
+      function updateTimeline(now) {
+        if (!lastTime) lastTime = now;
+        const delta = (now - lastTime) / 1000;
+        lastTime = now;
+
+        if (isPlaying) {
+          currentTime += delta;
+          if (currentTime >= DURATION) {
+            currentTime = 0;
+          }
+        }
+
+        // Sync real video in continuous loop
+        if (video) {
+          if (video.duration) {
+            const expectedVideoTime = currentTime % video.duration;
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.4) {
+              video.currentTime = expectedVideoTime;
+            }
+          }
+          if (isPlaying && video.paused) {
+            video.play().catch(() => {});
+          }
+        }
+
+        // Update progress bar
+        const progressPercent = (currentTime / DURATION) * 100;
+        timelineFill.style.width = `${progressPercent}%`;
+
+        // Draw canvas simulation
+        renderPizzaInspection(currentTime);
+
+        // State Transitions
+        // State Transitions
+        // 0.0s - 3.5s: Clean Video / Optical Detection Scan only (No text cards, space for native TikTok SEO text)
+        if (currentTime < 3.5) {
+          vignette.className = "cinematic-vignette";
+          topWatermark.classList.remove("visible");
+          sceneHook.classList.remove("active");
+          sceneInspection.classList.remove("active");
+          sceneDefects.classList.remove("active");
+          sceneReport.classList.remove("active");
+          outroStage.classList.remove("active");
+          if (video) video.classList.add("visible");
+        }
+        // Scene 1: Hook (3.5s - 7.5s) - Darkened for High Legibility
+        else if (currentTime >= 3.5 && currentTime < 7.5) {
+          vignette.className = "cinematic-vignette darker";
+          topWatermark.classList.add("visible");
+          sceneHook.classList.add("active");
+          sceneInspection.classList.remove("active");
+          sceneDefects.classList.remove("active");
+          sceneReport.classList.remove("active");
+          outroStage.classList.remove("active");
+          if (video) video.classList.remove("blurred");
+        }
+        // Scene 2: Conteo & Inspección (7.5s - 12.5s) - Darkened
+        else if (currentTime >= 7.5 && currentTime < 12.5) {
+          vignette.className = "cinematic-vignette darker";
+          topWatermark.classList.add("visible");
+          sceneHook.classList.remove("active");
+          sceneInspection.classList.add("active");
+          sceneDefects.classList.remove("active");
+          sceneReport.classList.remove("active");
+          outroStage.classList.remove("active");
+          if (video) video.classList.add("visible");
+        }
+        // Scene 3: Detección de Defectos (12.5s - 17.5s) - Darkened
+        else if (currentTime >= 12.5 && currentTime < 17.5) {
+          vignette.className = "cinematic-vignette darker";
+          topWatermark.classList.add("visible");
+          sceneHook.classList.remove("active");
+          sceneInspection.classList.remove("active");
+          sceneDefects.classList.add("active");
+          sceneReport.classList.remove("active");
+          outroStage.classList.remove("active");
+        }
+        // Scene 4: Report Card VigIA (17.5s - 23.5s)
+        else if (currentTime >= 17.5 && currentTime < 23.5) {
+          vignette.className = "cinematic-vignette darker";
+          topWatermark.classList.add("visible");
+          sceneHook.classList.remove("active");
+          sceneInspection.classList.remove("active");
+          sceneDefects.classList.remove("active");
+          sceneReport.classList.add("active");
+          outroStage.classList.remove("active");
+          if (video) video.classList.add("blurred");
+        }
+        // Scene 5: Outro & CTA (23.5s - 28.0s)
+        else {
+          vignette.className = "cinematic-vignette darker";
+          topWatermark.classList.remove("visible");
+          sceneHook.classList.remove("active");
+          sceneInspection.classList.remove("active");
+          sceneDefects.classList.remove("active");
+          sceneReport.classList.remove("active");
+          outroStage.classList.add("active");
+        }
+
+        requestAnimationFrame(updateTimeline);
+      }
+
+      // Interactive Tap to Pause/Play
+      canvas.addEventListener("click", (e) => {
+        if (e.target.closest(".cta-button-pizza")) return;
+        isPlaying = !isPlaying;
+        if (video) {
+          if (isPlaying) video.play().catch(() => {});
+          else video.pause();
+        }
+      });
+
+      // Start video & animation loop
+      if (video) {
+        video.addEventListener("ended", () => {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        });
+        video.play().catch(() => {
+          console.log("Auto-play blocked or no video file yet. Canvas simulation active.");
+        });
+      }
+      requestAnimationFrame(updateTimeline);
+    </script>
+  </body>
+</html>

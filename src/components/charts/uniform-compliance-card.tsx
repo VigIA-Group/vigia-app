@@ -3,12 +3,7 @@
  */
 import { OPERATIONS_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  AlertTriangle,
-  Camera,
-  CheckCircle2,
-  Shirt,
-} from "lucide-react-native";
+import { AlertTriangle, Camera, CheckCircle2, Shirt } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
 
@@ -51,9 +46,7 @@ export function UniformComplianceCard() {
         {/* Global Badge */}
         <View
           backgroundColor={
-            uniformComplianceRate >= 95
-              ? "rgba(52, 211, 153, 0.15)"
-              : "rgba(251, 191, 36, 0.15)"
+            uniformComplianceRate >= 95 ? "rgba(52, 211, 153, 0.15)" : "rgba(251, 191, 36, 0.15)"
           }
           paddingHorizontal={10}
           paddingVertical={5}
@@ -63,9 +56,7 @@ export function UniformComplianceCard() {
             fontSize={12}
             fontWeight="800"
             color={
-              uniformComplianceRate >= 95
-                ? VIGIA_COLORS.emeraldSuccess
-                : VIGIA_COLORS.amberWarning
+              uniformComplianceRate >= 95 ? VIGIA_COLORS.emeraldSuccess : VIGIA_COLORS.amberWarning
             }
             fontFamily="$mono"
           >
@@ -199,7 +190,12 @@ export function UniformComplianceCard() {
                     gap={5}
                   >
                     <AlertTriangle size={11} color={VIGIA_COLORS.amberWarning} />
-                    <Text fontSize={9.5} color={VIGIA_COLORS.amberWarning} fontFamily="$body" fontWeight="600">
+                    <Text
+                      fontSize={9.5}
+                      color={VIGIA_COLORS.amberWarning}
+                      fontFamily="$body"
+                      fontWeight="600"
+                    >
                       Alerta: {zc.criticalMissing}
                     </Text>
                   </XStack>
@@ -226,7 +222,8 @@ export function UniformComplianceCard() {
             Atención prioritaria en Panadería & Charcutería (cam-005)
           </Text>
           <Text fontSize={10.5} color={colors.textSec} fontFamily="$body" lineHeight={15}>
-            Se detectaron 4 manipulaciones de alimentos sin cofia protectora reglamentaria en horario matutino. La línea de cajas mantiene un 97.5% de cumplimiento óptimo.
+            Se detectaron 4 manipulaciones de alimentos sin cofia protectora reglamentaria en
+            horario matutino. La línea de cajas mantiene un 97.5% de cumplimiento óptimo.
           </Text>
         </YStack>
       </XStack>

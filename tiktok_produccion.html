@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA • TikTok 9:16 (Control de Producción & Botellas)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-petroleo: #050e1d;
+        --bg-card: #081326;
+        --blue-vigia: #056efa;
+        --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
+        --danger: #ef4444;
+        --danger-glow: rgba(239, 68, 68, 0.45);
+        --green-kpi: #10b981;
+        --green-glow: rgba(16, 185, 129, 0.4);
+        --amber-warn: #f59e0b;
+        --text-white: #ffffff;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #02060d;
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-white);
+      }
+
+      .tiktok-canvas {
+        position: relative;
+        height: 100vh;
+        aspect-ratio: 9 / 16;
+        max-width: 100vw;
+        background: var(--bg-petroleo);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 100px rgba(5, 110, 250, 0.25);
+        cursor: pointer;
+      }
+
+      /* Production Background & Conveyor Simulator */
+      .conveyor-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 30%, #0a1b36 0%, #050e1d 70%, #02060d 100%);
+      }
+
+      .video-production {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 40%;
+        opacity: 0;
+        transition:
+          opacity 0.8s ease,
+          filter 1.2s ease;
+      }
+
+      .video-production.visible {
+        opacity: 1;
+      }
+
+      .video-production.blurred {
+        filter: blur(22px) brightness(0.25) saturate(1.3);
+      }
+
+      /* Conveyor Belt Canvas Simulation (High-tech Laser Inspection) */
+      .inspection-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+      }
+
+      .inspection-canvas.visible {
+        opacity: 1;
+      }
+
+      .cinematic-vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 14, 29, 0.35) 0%,
+          transparent 20%,
+          transparent 75%,
+          rgba(5, 14, 29, 0.7) 100%
+        );
+        pointer-events: none;
+        transition:
+          background 0.6s ease,
+          backdrop-filter 0.6s ease;
+      }
+
+      .cinematic-vignette.darker {
+        background: rgba(4, 11, 24, 0.82);
+        backdrop-filter: brightness(0.35);
+      }
+
+      /* Top Watermark */
+      .top-watermark {
+        position: absolute;
+        top: 40px;
+        left: 32px;
+        right: 32px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .top-watermark.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .factory-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5, 14, 29, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(14px);
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #e2e8f0;
+      }
+
+      .factory-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--cyan-neon);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--cyan-neon);
+        animation: factoryPulse 1.2s infinite;
+      }
+
+      @keyframes factoryPulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+      }
+
+      .logo-img-mini {
+        height: 24px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 0 12px rgba(5, 110, 250, 0.5));
+      }
+
+      /* Floating Production Speed Gauge */
+      .speed-hud-chip {
+        position: absolute;
+        top: 115px;
+        right: 32px;
+        z-index: 8;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(8, 19, 38, 0.9);
+        border: 1.5px solid var(--cyan-neon);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 25px var(--cyan-glow);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .speed-hud-chip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .speed-hud-chip span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: var(--cyan-neon);
+      }
+
+      /* SCENE 1: HOOK FIRST (Centered & Massive) */
+      .hook-intro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 32px;
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(8px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .hook-intro-stage.active {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0px);
+      }
+
+      .hook-kicker-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--amber-warn);
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        padding: 6px 16px;
+        border-radius: 30px;
+        backdrop-filter: blur(12px);
+        margin-bottom: 16px;
+      }
+
+      .hook-massive-title {
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1.08;
+        letter-spacing: -1.2px;
+        color: #ffffff;
+        text-align: center;
+        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95);
+        margin-bottom: 16px;
+      }
+
+      .hook-massive-title span.number-highlight {
+        color: var(--cyan-neon);
+        text-shadow: 0 0 35px var(--cyan-glow);
+      }
+
+      .hook-massive-title span.danger-highlight {
+        color: #ff4444;
+        text-shadow: 0 0 35px var(--danger-glow);
+      }
+
+      .hook-intro-sub {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #cbd5e1;
+        max-width: 360px;
+        text-align: center;
+        margin: 0 auto;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      }
+
+      /* SCENE 2 & 3: PRODUCTION & DOWNTIME STAGE (Centered in middle) */
+      .text-stage-production {
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 28px;
+        pointer-events: none;
+      }
+
+      .scene-prod-box {
+        position: absolute;
+        left: 28px;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%) translateY(30px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 14px;
+        opacity: 0;
+        filter: blur(8px);
+        transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .scene-prod-box.active {
+        opacity: 1;
+        transform: translateY(-50%);
+        filter: blur(0px);
+      }
+
+      .prod-tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        padding: 6px 16px;
+        border-radius: 30px;
+        backdrop-filter: blur(12px);
+      }
+
+      .prod-tag-chip.danger {
+        color: #ff5a5a;
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+
+      .headline-prod {
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1.08;
+        letter-spacing: -1.2px;
+        color: #ffffff;
+        text-align: center;
+        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95);
+      }
+
+      .headline-prod span.danger {
+        color: #ff4444;
+        text-shadow: 0 0 35px var(--danger-glow);
+      }
+
+      .headline-prod span.cyan {
+        color: var(--cyan-neon);
+        text-shadow: 0 0 35px var(--cyan-glow);
+      }
+
+      .sub-prod {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #e2e8f0;
+        max-width: 360px;
+        text-align: center;
+        margin: 0 auto;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Downtime Impact Box in Scene 3 */
+      .downtime-impact-box {
+        background: rgba(10, 22, 40, 0.94);
+        border: 1.5px solid rgba(239, 68, 68, 0.55);
+        border-radius: 20px;
+        padding: 16px 20px;
+        backdrop-filter: blur(25px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        align-self: center;
+        margin-top: 6px;
+      }
+
+      .downtime-big-time {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 34px;
+        font-weight: 900;
+        color: #ff4444;
+        line-height: 1;
+      }
+
+      .downtime-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .downtime-label {
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+      }
+
+      .downtime-sub {
+        font-size: 13px;
+        font-weight: 800;
+        color: #ff8b8b;
+      }
+
+      /* REPORT OVERLAY: PRODUCTION & OEE AUDIT */
+      .report-overlay-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 8;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 26px 45px 26px; /* Safe distance above TikTok UI */
+        pointer-events: none;
+      }
+
+      .report-card {
+        background: rgba(8, 18, 34, 0.95);
+        border: 1.5px solid rgba(5, 110, 250, 0.45);
+        border-radius: 30px;
+        padding: 24px 20px;
+        backdrop-filter: blur(35px);
+        box-shadow:
+          0 30px 60px -15px rgba(0, 0, 0, 0.9),
+          0 0 50px rgba(5, 110, 250, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .report-card.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .report-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .report-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: rgba(0, 240, 255, 0.15);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--cyan-neon);
+      }
+
+      .report-title-text {
+        font-size: 19px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.3px;
+      }
+
+      .report-sub-text {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .report-badge-status {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 240, 255, 0.35);
+      }
+
+      .kpi-triple-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+
+      .kpi-column {
+        background: rgba(5, 14, 29, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        text-align: center;
+      }
+
+      .kpi-column.danger {
+        border-color: rgba(239, 68, 68, 0.4);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .kpi-caption {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      .kpi-number {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 28px;
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .kpi-number.green {
+        color: var(--green-kpi);
+      }
+      .kpi-number.danger {
+        color: #ff4444;
+      }
+      .kpi-number.cyan {
+        color: var(--cyan-neon);
+      }
+
+      /* Throughput Curve with Downtime Shading */
+      .throughput-chart-card {
+        background: rgba(5, 14, 29, 0.75);
+        border-radius: 18px;
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .throughput-header {
+        display: flex;
+        justify-content: space-between;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .svg-production-curve {
+        width: 100%;
+        height: 60px;
+        overflow: visible;
+      }
+
+      .diagnostic-strip {
+        background: rgba(5, 110, 250, 0.12);
+        border: 1px solid rgba(5, 110, 250, 0.35);
+        border-radius: 16px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #e2e8f0;
+      }
+
+      .diagnostic-strip strong {
+        color: #fff;
+      }
+
+      /* Outro Stage (Safe distance above TikTok UI) */
+      .outro-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 12;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0 40px 85px 40px;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .outro-stage.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .outro-logo-wrap {
+        margin-bottom: 24px;
+        filter: drop-shadow(0 0 35px rgba(5, 110, 250, 0.6));
+      }
+
+      .outro-logo-img {
+        height: 56px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .outro-main-text {
+        font-size: 40px;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+        color: #fff;
+        margin-bottom: 14px;
+      }
+
+      .outro-main-text span {
+        color: var(--cyan-neon);
+      }
+
+      .outro-sub-desc {
+        font-size: 16px;
+        color: #94a3b8;
+        line-height: 1.5;
+        max-width: 320px;
+        margin-bottom: 32px;
+      }
+
+      .cta-pill-button {
+        background: linear-gradient(135deg, #056efa 0%, #00f0ff 100%);
+        color: #050e1d;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 18px 40px;
+        border-radius: 40px;
+        box-shadow: 0 10px 35px var(--cyan-glow);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+      }
+
+      .timeline-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 20;
+      }
+
+      .timeline-strip-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--cyan-neon);
+        box-shadow: 0 0 10px var(--cyan-neon);
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tiktok-canvas" id="canvas">
+      <!-- Conveyor & Video Layer -->
+      <div class="conveyor-layer">
+        <video id="videoElement" class="video-production" autoplay muted loop playsinline>
+          <source
+            src="https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Fbotellas.mp4?alt=media&token=e6843ee7-d172-464e-82d3-c9bbcf0e757e"
+            type="video/mp4"
+          />
+        </video>
+        <canvas id="inspectionCanvas" class="inspection-canvas"></canvas>
+        <div class="cinematic-vignette" id="vignette"></div>
+      </div>
+
+      <!-- Top Watermark -->
+      <div class="top-watermark" id="topWatermark">
+        <div class="factory-chip">
+          <div class="factory-dot"></div>
+          <span>LÍNEA 02 • ENVASADO & INSPECCIÓN</span>
+        </div>
+        <img src="assets/images/logotipo-dark.png" alt="VigIA" class="logo-img-mini" />
+      </div>
+
+      <!-- Speed HUD Gauge on Upper Right -->
+      <div class="speed-hud-chip" id="speedBadge">
+        <span>⚡ 120 PPM • 8,420 B/H</span>
+      </div>
+
+      <!-- SCENE 1: GENERALIZED PRODUCTION HOOK (Centered & Universal) -->
+      <div class="hook-intro-stage" id="sceneHook">
+        <div class="hook-kicker-tag">Auditoría Industrial & OEE</div>
+        <h1 class="hook-massive-title">
+          ¿CREES QUE PRODUCES <br />
+          <span class="number-highlight">10,000 UNIDADES</span> <br />
+          POR TURNO?
+        </h1>
+        <p class="hook-intro-sub">
+          Al final del día solo empacas 8,200. <br />
+          ¿Dónde desaparecieron las <strong style="color: #ff4444">1,800 restantes</strong>?
+        </p>
+      </div>
+
+      <!-- SCENE 2 & 3: PRODUCTION & DOWNTIME (Centered in middle) -->
+      <div class="text-stage-production">
+        <!-- Scene 2: Live Optical Inspection (07.5s - 12.5s) -->
+        <div class="scene-prod-box" id="sceneProd">
+          <div class="prod-tag-chip">Conteo & Inspección Óptica 24/7</div>
+          <h1 class="headline-prod">
+            CONTEO EXACTO <br />
+            <span class="cyan">UNIDAD POR UNIDAD.</span>
+          </h1>
+          <p class="sub-prod">
+            Detección instantánea de productos defectuosos, mal sellados y mermas antes del empaque.
+          </p>
+        </div>
+
+        <!-- Scene 3: Line Downtime Event (12.5s - 17.5s) -->
+        <div class="scene-prod-box" id="sceneDowntime">
+          <div class="prod-tag-chip danger">Parada de Línea Detectada</div>
+          <h1 class="headline-prod">
+            LÍNEA DETENIDA: <br />
+            <span class="danger">24 MINUTOS.</span>
+          </h1>
+          <div class="downtime-impact-box">
+            <div class="downtime-big-time">-2,880</div>
+            <div class="downtime-meta">
+              <span class="downtime-label">Unidades No Producidas</span>
+              <span class="downtime-sub">Pérdida neta de turno: -$1,450 USD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 4: CLEAN ANIMATED REPORT (16.0s - 22.5s) -->
+      <div class="report-overlay-stage">
+        <div class="report-card" id="reportCard">
+          <div class="report-header">
+            <div class="report-header-left">
+              <div class="report-icon-box">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <div class="report-title-text">VigIA Factory • Rendimiento & OEE</div>
+                <div class="report-sub-text">Auditoría de Envasado con Visión Artificial</div>
+              </div>
+            </div>
+            <div class="report-badge-status">Turno Mañana</div>
+          </div>
+
+          <div class="kpi-triple-row">
+            <div class="kpi-column">
+              <span class="kpi-caption">Unidades Óptimas</span>
+              <span class="kpi-number green">8,420</span>
+            </div>
+            <div class="kpi-column danger">
+              <span class="kpi-caption">Mermas / Defectos</span>
+              <span class="kpi-number danger">218 pzas</span>
+            </div>
+            <div class="kpi-column">
+              <span class="kpi-caption">Disponibilidad OEE</span>
+              <span class="kpi-number cyan">89.2%</span>
+            </div>
+          </div>
+
+          <!-- Throughput Line Chart with Downtime Band -->
+          <div class="throughput-chart-card">
+            <div class="throughput-header">
+              <span>Ritmo de Envasado Horario</span>
+              <span style="color: #ff7070">Parada a las 11:30 (24m)</span>
+            </div>
+            <svg class="svg-production-curve" viewBox="0 0 280 50">
+              <!-- Downtime Shading Band -->
+              <rect x="150" y="0" width="38" height="50" fill="rgba(239, 68, 68, 0.22)" rx="4" />
+              <text x="154" y="28" font-size="8" fill="#FF8B8B" font-weight="800">STOP</text>
+              <!-- Target line -->
+              <line
+                x1="10"
+                y1="14"
+                x2="270"
+                y2="14"
+                stroke="rgba(255,255,255,0.2)"
+                stroke-width="1.5"
+                stroke-dasharray="3 3"
+              />
+              <!-- Production spline -->
+              <path
+                d="M 10 16 Q 80 14, 145 15 L 155 46 L 185 46 L 195 16 Q 235 15, 270 14"
+                fill="none"
+                stroke="#00F0FF"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <circle cx="155" cy="46" r="4" fill="#EF4444" stroke="#FFF" stroke-width="1.5" />
+            </svg>
+          </div>
+
+          <div class="diagnostic-strip">
+            <span style="font-size: 20px">⚙️</span>
+            <div>
+              Diagnóstico VigIA: <strong>Atasco en estación de tapado</strong>. Alerta automática
+              enviada a Mantenimiento en 45 segundos.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 5: PUNCHLINE & OUTRO (22.5s - 28.0s) -->
+      <div class="outro-stage" id="outroStage">
+        <div class="outro-logo-wrap">
+          <img src="assets/images/logotipo-dark.png" alt="VigIA" class="outro-logo-img" />
+        </div>
+        <h2 class="outro-main-text">
+          No cuentes al final. <br />
+          <span>Audita en tiempo real.</span>
+        </h2>
+        <p class="outro-sub-desc">
+          VigIA transforma tus cámaras en inspectores de calidad y OEE las 24 horas.
+        </p>
+        <a href="https://vigia.lat" class="cta-pill-button">
+          Audita tu Planta
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="timeline-strip">
+        <div class="timeline-strip-fill" id="timelineFill"></div>
+      </div>
+    </div>
+
+    <script>
+      const DURATION = 28;
+      let currentTime = 0;
+      let isPlaying = true;
+      let lastTime = null;
+
+      const video = document.getElementById("videoElement");
+      const vignette = document.getElementById("vignette");
+      const topWatermark = document.getElementById("topWatermark");
+      const speedBadge = document.getElementById("speedBadge");
+      const sceneHook = document.getElementById("sceneHook");
+      const sceneProd = document.getElementById("sceneProd");
+      const sceneDowntime = document.getElementById("sceneDowntime");
+      const reportCard = document.getElementById("reportCard");
+      const outroStage = document.getElementById("outroStage");
+      const timelineFill = document.getElementById("timelineFill");
+      const canvas = document.getElementById("canvas");
+      const inspectionCanvas = document.getElementById("inspectionCanvas");
+      const ctx = inspectionCanvas.getContext("2d");
+
+      function resizeCanvas() {
+        const rect = inspectionCanvas.getBoundingClientRect();
+        inspectionCanvas.width = rect.width * window.devicePixelRatio;
+        inspectionCanvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      /* Bottle Conveyor Simulation Engine */
+      let bottleOffset = 0;
+      function renderBottles(time, isDowntime) {
+        const w = inspectionCanvas.width / window.devicePixelRatio;
+        const h = inspectionCanvas.height / window.devicePixelRatio;
+        ctx.clearRect(0, 0, w, h);
+
+        if (time < 3.5 || time > 22.5) return;
+
+        const beltY = h * 0.48;
+        const beltH = 120;
+
+        // Draw Conveyor belt background
+        ctx.fillStyle = "rgba(10, 22, 40, 0.7)";
+        ctx.fillRect(0, beltY, w, beltH);
+
+        // Belt track lines
+        ctx.strokeStyle = "rgba(5, 110, 250, 0.25)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, beltY);
+        ctx.lineTo(w, beltY);
+        ctx.moveTo(0, beltY + beltH);
+        ctx.lineTo(w, beltY + beltH);
+        ctx.stroke();
+
+        // Optical Laser Scan Line
+        const laserX = w * 0.52;
+        ctx.beginPath();
+        ctx.strokeStyle = isDowntime ? "#EF4444" : "#00F0FF";
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = isDowntime ? "rgba(239, 68, 68, 0.8)" : "rgba(0, 240, 255, 0.8)";
+        ctx.shadowBlur = 12;
+        ctx.moveTo(laserX, beltY - 20);
+        ctx.lineTo(laserX, beltY + beltH + 20);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Optical barrier tag
+        ctx.fillStyle = isDowntime ? "rgba(239, 68, 68, 0.85)" : "rgba(8, 19, 38, 0.9)";
+        ctx.fillRect(laserX - 60, beltY - 25, 120, 20);
+        ctx.strokeStyle = isDowntime ? "#EF4444" : "#00F0FF";
+        ctx.strokeRect(laserX - 60, beltY - 25, 120, 20);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "bold 9px 'JetBrains Mono', monospace";
+        ctx.fillText(
+          isDowntime ? "STOP • CINTA PARADA" : "LASER QC • ACTIVE",
+          laserX - 52,
+          beltY - 12
+        );
+
+        // Advance bottles if not downtime
+        if (!isDowntime) {
+          bottleOffset += 4.5;
+        }
+
+        const spacing = 72;
+        const numBottles = Math.ceil(w / spacing) + 3;
+
+        for (let i = -1; i < numBottles; i++) {
+          const bx = i * spacing + (bottleOffset % spacing);
+          const by = beltY + 25;
+          const bottleIndex = Math.floor((bottleOffset + bx) / spacing);
+          const isDefect = bottleIndex % 7 === 0; // Periodic defect bottle
+
+          // Draw Bottle Shape
+          ctx.fillStyle = isDefect ? "rgba(239, 68, 68, 0.6)" : "rgba(0, 240, 255, 0.5)";
+          ctx.strokeStyle = isDefect ? "#EF4444" : "#00F0FF";
+          ctx.lineWidth = 2;
+
+          // Bottle body
+          ctx.fillRect(bx, by + 20, 28, 55);
+          ctx.strokeRect(bx, by + 20, 28, 55);
+
+          // Bottle neck
+          ctx.fillRect(bx + 8, by, 12, 20);
+          ctx.strokeRect(bx + 8, by, 12, 20);
+
+          // Bottle cap
+          ctx.fillStyle = isDefect ? "#FF4444" : "#FFF";
+          ctx.fillRect(bx + 6, by - 5, 16, 5);
+
+          // Optical Detection Bounding Box around scanned bottle
+          if (Math.abs(bx - laserX) < 36) {
+            ctx.strokeStyle = isDefect ? "#EF4444" : "#10B981";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(bx - 4, by - 12, 36, 92);
+
+            // Inspection Badge
+            ctx.fillStyle = isDefect ? "rgba(239, 68, 68, 0.95)" : "rgba(16, 185, 129, 0.95)";
+            ctx.fillRect(bx - 18, by + 86, 68, 16);
+            ctx.fillStyle = "#FFF";
+            ctx.font = "bold 8px Plus Jakarta Sans, sans-serif";
+            ctx.fillText(isDefect ? "RECHAZO: TAPA" : "CONFORME ✓", bx - 14, by + 98);
+          }
+        }
+      }
+
+      canvas.addEventListener("click", () => {
+        if (currentTime >= DURATION - 1) {
+          currentTime = 0;
+          if (video.duration) video.currentTime = 0;
+        }
+        isPlaying = !isPlaying;
+        if (isPlaying) video.play();
+        else video.pause();
+      });
+
+      function updateChoreography(time) {
+        // 0.0s - 03.5s: RAW VIDEO ALONE (Clean MP4, no text, no watermark, no bottles)
+        if (time < 3.5) {
+          sceneHook.classList.remove("active");
+          topWatermark.classList.remove("visible");
+          speedBadge.classList.remove("visible");
+          inspectionCanvas.classList.remove("visible");
+          video.classList.add("visible");
+          video.classList.remove("blurred");
+          sceneProd.classList.remove("active");
+          sceneDowntime.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          vignette.classList.remove("darker");
+        }
+        // 03.5s - 08.0s: Universal Production Hook (Centered, Dark Background for Legibility)
+        else if (time >= 3.5 && time < 8.0) {
+          sceneHook.classList.add("active");
+          topWatermark.classList.add("visible");
+          speedBadge.classList.add("visible");
+          inspectionCanvas.classList.remove("visible");
+          video.classList.add("visible");
+          video.classList.remove("blurred");
+          sceneProd.classList.remove("active");
+          sceneDowntime.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          vignette.classList.add("darker");
+        }
+        // 08.0s - 13.0s: Real-time Inspection & QC Detection (Darkened for text readability)
+        else if (time >= 8.0 && time < 13.0) {
+          sceneHook.classList.remove("active");
+          topWatermark.classList.add("visible");
+          speedBadge.classList.add("visible");
+          inspectionCanvas.classList.add("visible");
+          video.classList.add("visible");
+          video.classList.remove("blurred");
+          sceneProd.classList.add("active");
+          sceneDowntime.classList.remove("active");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          vignette.classList.add("darker");
+        }
+        // 13.0s - 17.5s: Line Downtime & Stop Event (Red strobe & Dark overlay)
+        else if (time >= 13.0 && time < 17.5) {
+          sceneHook.classList.remove("active");
+          sceneProd.classList.remove("active");
+          sceneDowntime.classList.add("active");
+          inspectionCanvas.classList.add("visible");
+          reportCard.classList.remove("active");
+          outroStage.classList.remove("active");
+          vignette.classList.add("darker");
+        }
+        // 17.5s - 23.5s: Clean Animated Report (Centered & Larger Fonts)
+        else if (time >= 17.5 && time < 23.5) {
+          sceneDowntime.classList.remove("active");
+          inspectionCanvas.classList.remove("visible");
+          video.classList.add("blurred");
+          vignette.classList.add("darker");
+          reportCard.classList.add("active");
+          outroStage.classList.remove("active");
+        }
+        // 23.5s - 28.0s: Outro & CTA
+        else {
+          reportCard.classList.remove("active");
+          outroStage.classList.add("active");
+          vignette.classList.add("darker");
+        }
+      }
+
+      function loop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (isPlaying) {
+          currentTime += delta;
+          if (currentTime >= DURATION) currentTime = 0;
+          if (video && video.duration) {
+            const expectedVideoTime = currentTime % video.duration;
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.4) {
+              video.currentTime = expectedVideoTime;
+            }
+            if (isPlaying && video.paused) {
+              video.play().catch(() => {});
+            }
+          }
+
+          const isDowntime = currentTime >= 12.5 && currentTime < 17.5;
+          renderBottles(currentTime, isDowntime);
+
+          const pct = (currentTime / DURATION) * 100;
+          timelineFill.style.width = `${pct}%`;
+          updateChoreography(currentTime);
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        if (video) {
+          video.addEventListener("ended", () => {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          });
+          video.play().catch(() => {});
+        }
+        requestAnimationFrame(loop);
+      });
+    </script>
+  </body>
+</html>

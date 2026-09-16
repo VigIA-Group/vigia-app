@@ -87,7 +87,8 @@ export function buildMonotoneSplinePath(pts: [number, number][]): string {
     } else {
       const dx1 = dxs[i - 1];
       const dx2 = dxs[i];
-      tangents[i] = (3 * (dx1 + dx2)) / ((2 * dx1 + dx2) / slopes[i - 1] + (dx1 + 2 * dx2) / slopes[i]);
+      tangents[i] =
+        (3 * (dx1 + dx2)) / ((2 * dx1 + dx2) / slopes[i - 1] + (dx1 + 2 * dx2) / slopes[i]);
     }
   }
 

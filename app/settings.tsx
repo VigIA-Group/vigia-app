@@ -1,24 +1,24 @@
 import {
-    CAMERAS,
-    MODULE_SCHEDULES,
-    ModuleSchedule,
-    getCameraById,
-    getModuleById,
+  CAMERAS,
+  MODULE_SCHEDULES,
+  ModuleSchedule,
+  getCameraById,
+  getModuleById,
 } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { router } from "expo-router";
 import {
-    Camera,
-    ChevronDown,
-    ChevronRight,
-    Clock,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    Settings,
-    ShieldAlert,
-    Users,
-    X,
+  Camera,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  Settings,
+  ShieldAlert,
+  Users,
+  X,
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Switch } from "react-native";

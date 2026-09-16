@@ -3,10 +3,7 @@
  */
 import { PRODUCTION_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  PieChart,
-  ShoppingBag,
-} from "lucide-react-native";
+import { PieChart, ShoppingBag } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
 
@@ -91,7 +88,9 @@ export function ProductVarietyBreakdownCard() {
 
                 <XStack alignItems="center" gap={8}>
                   <View
-                    backgroundColor={isWarning ? "rgba(251, 191, 36, 0.15)" : "rgba(52, 211, 153, 0.12)"}
+                    backgroundColor={
+                      isWarning ? "rgba(251, 191, 36, 0.15)" : "rgba(52, 211, 153, 0.12)"
+                    }
                     paddingHorizontal={6}
                     paddingVertical={2}
                     borderRadius={5}
@@ -113,7 +112,12 @@ export function ProductVarietyBreakdownCard() {
               </XStack>
 
               {/* Barra de Progreso del Volumen */}
-              <View height={6} borderRadius={3} backgroundColor={colors.borderSoft} overflow="hidden">
+              <View
+                height={6}
+                borderRadius={3}
+                backgroundColor={colors.borderSoft}
+                overflow="hidden"
+              >
                 <View
                   width={`${v.percentage}%`}
                   height="100%"
@@ -124,11 +128,21 @@ export function ProductVarietyBreakdownCard() {
 
               <XStack justifyContent="space-between" alignItems="center">
                 <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
-                  Participación: <Text fontWeight="700" color={colors.text} fontFamily="$mono">{v.percentage}%</Text> · Valor despacho:{" "}
-                  <Text fontWeight="700" color={colors.text} fontFamily="$mono">{revenueBs.toLocaleString("es-BO")} Bs</Text>
+                  Participación:{" "}
+                  <Text fontWeight="700" color={colors.text} fontFamily="$mono">
+                    {v.percentage}%
+                  </Text>{" "}
+                  · Valor despacho:{" "}
+                  <Text fontWeight="700" color={colors.text} fontFamily="$mono">
+                    {revenueBs.toLocaleString("es-BO")} Bs
+                  </Text>
                 </Text>
 
-                <Text fontSize={10} color={isWarning ? VIGIA_COLORS.amberWarning : colors.textLabel} fontFamily="$body">
+                <Text
+                  fontSize={10}
+                  color={isWarning ? VIGIA_COLORS.amberWarning : colors.textLabel}
+                  fontFamily="$body"
+                >
                   {v.defective} descartadas (máx {v.targetRate}%)
                 </Text>
               </XStack>
@@ -156,7 +170,8 @@ export function ProductVarietyBreakdownCard() {
               Valor Comercial Lote Conforme
             </Text>
             <Text fontSize={14} fontWeight="800" color={colors.text} fontFamily="$mono">
-              {totalRevenueBs.toLocaleString("es-BO")} Bs (~${Math.round(totalRevenueBs / 6.96).toLocaleString("es-BO")} USD)
+              {totalRevenueBs.toLocaleString("es-BO")} Bs (~$
+              {Math.round(totalRevenueBs / 6.96).toLocaleString("es-BO")} USD)
             </Text>
           </YStack>
         </XStack>

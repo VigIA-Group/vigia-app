@@ -3,19 +3,17 @@
  */
 import { OPERATIONS_METRICS, OperationalIncident } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  Camera,
-  Clock,
-  ShieldAlert,
-  Shirt,
-  Smartphone,
-  Users,
-} from "lucide-react-native";
+import { Camera, Clock, ShieldAlert, Shirt, Smartphone, Users } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
 
-type IncidentFilter = "all" | "uniform_missing" | "phone_distraction" | "unattended_checkout" | "late_opening";
+type IncidentFilter =
+  | "all"
+  | "uniform_missing"
+  | "phone_distraction"
+  | "unattended_checkout"
+  | "late_opening";
 
 export function OperationalIncidentsFeed() {
   const colors = useColors();

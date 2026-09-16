@@ -81,9 +81,7 @@ export function BidirectionalTrafficChart() {
   const netAreaD = buildMonotoneAreaPath(netPts, baselineY);
 
   const selectedPoint = data[selectedIdx ?? 4];
-  const deltaSelected = selectedPoint
-    ? selectedPoint.entries - selectedPoint.exits
-    : 0;
+  const deltaSelected = selectedPoint ? selectedPoint.entries - selectedPoint.exits : 0;
 
   // Pointer tracking
   const handlePointer = (clientX: number) => {
@@ -142,16 +140,32 @@ export function BidirectionalTrafficChart() {
         {/* Legend */}
         <XStack gap={12} alignItems="center">
           <XStack alignItems="center" gap={4}>
-            <View width={12} height={3} borderRadius={2} backgroundColor={VIGIA_COLORS.blueVibrant} />
-            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">Entradas</Text>
+            <View
+              width={12}
+              height={3}
+              borderRadius={2}
+              backgroundColor={VIGIA_COLORS.blueVibrant}
+            />
+            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+              Entradas
+            </Text>
           </XStack>
           <XStack alignItems="center" gap={4}>
-            <View width={12} height={3} borderRadius={2} backgroundColor={VIGIA_COLORS.emeraldSuccess} />
-            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">Salidas</Text>
+            <View
+              width={12}
+              height={3}
+              borderRadius={2}
+              backgroundColor={VIGIA_COLORS.emeraldSuccess}
+            />
+            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+              Salidas
+            </Text>
           </XStack>
           <XStack alignItems="center" gap={4}>
             <View width={12} height={3} borderRadius={2} backgroundColor={VIGIA_COLORS.blueCyan} />
-            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">En Tienda</Text>
+            <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+              En Tienda
+            </Text>
           </XStack>
         </XStack>
       </XStack>
@@ -226,7 +240,7 @@ export function BidirectionalTrafficChart() {
           ? {
               onPointerMove: (e: any) => {
                 const rect = e.currentTarget?.getBoundingClientRect?.();
-                const x = rect ? e.clientX - rect.left : e.nativeEvent?.offsetX ?? 0;
+                const x = rect ? e.clientX - rect.left : (e.nativeEvent?.offsetX ?? 0);
                 handlePointer(x);
               },
             }
@@ -236,11 +250,7 @@ export function BidirectionalTrafficChart() {
               },
             })}
       >
-        <Svg
-          viewBox={`0 0 ${viewBoxW} ${height}`}
-          width="100%"
-          height={height}
-        >
+        <Svg viewBox={`0 0 ${viewBoxW} ${height}`} width="100%" height={height}>
           <Defs>
             <LinearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0%" stopColor={VIGIA_COLORS.blueCyan} stopOpacity={0.25} />
@@ -390,14 +400,15 @@ export function BidirectionalTrafficChart() {
         >
           <XStack alignItems="center" gap={8}>
             <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-              Franja de las <Text fontWeight="700" color={colors.text}>{selectedPoint.hour}:00 h</Text>
+              Franja de las{" "}
+              <Text fontWeight="700" color={colors.text}>
+                {selectedPoint.hour}:00 h
+              </Text>
             </Text>
 
             <View
               backgroundColor={
-                deltaSelected >= 0
-                  ? "rgba(5, 110, 250, 0.12)"
-                  : "rgba(52, 211, 153, 0.12)"
+                deltaSelected >= 0 ? "rgba(5, 110, 250, 0.12)" : "rgba(52, 211, 153, 0.12)"
               }
               paddingHorizontal={8}
               paddingVertical={3}
@@ -412,7 +423,9 @@ export function BidirectionalTrafficChart() {
                 <Text
                   fontSize={10}
                   fontWeight="700"
-                  color={deltaSelected >= 0 ? VIGIA_COLORS.blueVibrant : VIGIA_COLORS.emeraldSuccess}
+                  color={
+                    deltaSelected >= 0 ? VIGIA_COLORS.blueVibrant : VIGIA_COLORS.emeraldSuccess
+                  }
                   fontFamily="$mono"
                 >
                   {deltaSelected >= 0 ? `+${deltaSelected}` : deltaSelected} pers (neto)
@@ -423,19 +436,34 @@ export function BidirectionalTrafficChart() {
 
           <XStack gap={16}>
             <XStack alignItems="center" gap={4}>
-              <View width={7} height={7} borderRadius={3.5} backgroundColor={VIGIA_COLORS.blueVibrant} />
+              <View
+                width={7}
+                height={7}
+                borderRadius={3.5}
+                backgroundColor={VIGIA_COLORS.blueVibrant}
+              />
               <Text fontSize={12} color={colors.text} fontFamily="$mono">
                 +{selectedPoint.entries} ent.
               </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={7} height={7} borderRadius={3.5} backgroundColor={VIGIA_COLORS.emeraldSuccess} />
+              <View
+                width={7}
+                height={7}
+                borderRadius={3.5}
+                backgroundColor={VIGIA_COLORS.emeraldSuccess}
+              />
               <Text fontSize={12} color={colors.text} fontFamily="$mono">
                 -{selectedPoint.exits} sal.
               </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={7} height={7} borderRadius={3.5} backgroundColor={VIGIA_COLORS.blueCyan} />
+              <View
+                width={7}
+                height={7}
+                borderRadius={3.5}
+                backgroundColor={VIGIA_COLORS.blueCyan}
+              />
               <Text fontSize={12} fontWeight="700" color={VIGIA_COLORS.blueCyan} fontFamily="$mono">
                 {selectedPoint.netOccupancy} en sala
               </Text>

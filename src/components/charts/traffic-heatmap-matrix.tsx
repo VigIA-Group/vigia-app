@@ -97,9 +97,7 @@ export function TrafficHeatmapMatrix() {
             height={30}
             borderRadius={8}
             backgroundColor={
-              matrixMode === "staffing"
-                ? "rgba(52, 211, 153, 0.15)"
-                : "rgba(251, 191, 36, 0.15)"
+              matrixMode === "staffing" ? "rgba(52, 211, 153, 0.15)" : "rgba(251, 191, 36, 0.15)"
             }
             alignItems="center"
             justifyContent="center"
@@ -175,20 +173,51 @@ export function TrafficHeatmapMatrix() {
         {matrixMode === "traffic" ? (
           <XStack gap={10} alignItems="center" flexWrap="wrap">
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor="rgba(10, 76, 232, 0.2)" />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">Bajo (&lt;70)</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor="rgba(10, 76, 232, 0.2)"
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                Bajo (&lt;70)
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor="rgba(5, 110, 250, 0.5)" />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">Medio (70-130)</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor="rgba(5, 110, 250, 0.5)"
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                Medio (70-130)
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor={VIGIA_COLORS.blueVibrant} />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">Alto (130-180)</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor={VIGIA_COLORS.blueVibrant}
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                Alto (130-180)
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor={VIGIA_COLORS.amberWarning} />
-              <Text fontSize={10} color={VIGIA_COLORS.amberWarning} fontFamily="$body" fontWeight="700">
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor={VIGIA_COLORS.amberWarning}
+              />
+              <Text
+                fontSize={10}
+                color={VIGIA_COLORS.amberWarning}
+                fontFamily="$body"
+                fontWeight="700"
+              >
                 Pico (&gt;180)
               </Text>
             </XStack>
@@ -196,20 +225,51 @@ export function TrafficHeatmapMatrix() {
         ) : (
           <XStack gap={10} alignItems="center" flexWrap="wrap">
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor="rgba(52, 211, 153, 0.25)" />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">1 Caja</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor="rgba(52, 211, 153, 0.25)"
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                1 Caja
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor={VIGIA_COLORS.blueVibrant} />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">2 Cajas</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor={VIGIA_COLORS.blueVibrant}
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                2 Cajas
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor={VIGIA_COLORS.amberWarning} />
-              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">3 Cajas</Text>
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor={VIGIA_COLORS.amberWarning}
+              />
+              <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                3 Cajas
+              </Text>
             </XStack>
             <XStack alignItems="center" gap={4}>
-              <View width={10} height={10} borderRadius={2} backgroundColor={VIGIA_COLORS.redDanger} />
-              <Text fontSize={10} color={VIGIA_COLORS.redDanger} fontFamily="$body" fontWeight="700">
+              <View
+                width={10}
+                height={10}
+                borderRadius={2}
+                backgroundColor={VIGIA_COLORS.redDanger}
+              />
+              <Text
+                fontSize={10}
+                color={VIGIA_COLORS.redDanger}
+                fontFamily="$body"
+                fontWeight="700"
+              >
                 4 Cajas (Refuerzo)
               </Text>
             </XStack>

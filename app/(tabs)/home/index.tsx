@@ -195,11 +195,7 @@ export default function HomeScreen() {
         padding={16}
       >
         <XStack justifyContent="space-between" alignItems="center" marginBottom={24}>
-          <Text
-            fontSize={isDesktop ? 14 : 13}
-            color={colors.textLabel}
-            fontFamily="$body"
-          >
+          <Text fontSize={isDesktop ? 14 : 13} color={colors.textLabel} fontFamily="$body">
             Personas detectadas — últimos 7 días
           </Text>
           <Text
@@ -208,7 +204,8 @@ export default function HomeScreen() {
             color={getWeeklyChangePercent() >= 0 ? "#34d399" : "#f87171"}
             fontFamily="$mono"
           >
-            {getWeeklyChangePercent() >= 0 ? "+" : ""}{getWeeklyChangePercent()}% vs. semana anterior
+            {getWeeklyChangePercent() >= 0 ? "+" : ""}
+            {getWeeklyChangePercent()}% vs. semana anterior
           </Text>
         </XStack>
         <XStack alignItems="flex-end" gap={6} height={64}>

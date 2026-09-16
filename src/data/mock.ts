@@ -1571,7 +1571,12 @@ export interface OperationalIncident {
   id: string;
   time: string;
   timestamp: string;
-  type: "uniform_missing" | "late_opening" | "phone_distraction" | "unattended_checkout" | "unauthorized_area";
+  type:
+    | "uniform_missing"
+    | "late_opening"
+    | "phone_distraction"
+    | "unattended_checkout"
+    | "unauthorized_area";
   title: string;
   description: string;
   zone: string;
@@ -1757,7 +1762,8 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
       timestamp: "2026-09-08T14:32:00",
       type: "phone_distraction",
       title: "Uso indebido de celular en Caja 3",
-      description: "Operador de caja manipuló teléfono móvil durante 3.2 min con cliente esperando en cinta transportadora.",
+      description:
+        "Operador de caja manipuló teléfono móvil durante 3.2 min con cliente esperando en cinta transportadora.",
       zone: "Línea de Cajas",
       cameraId: "cam-002",
       severity: "medium",
@@ -1770,7 +1776,8 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
       timestamp: "2026-09-08T12:15:00",
       type: "unattended_checkout",
       title: "Caja 2 desatendida con cola activa",
-      description: "Puesto de cobro desatendido durante 4.5 min con 3 clientes formados. Requirió llamada de supervisor.",
+      description:
+        "Puesto de cobro desatendido durante 4.5 min con 3 clientes formados. Requirió llamada de supervisor.",
       zone: "Línea de Cajas",
       cameraId: "cam-002",
       severity: "high",
@@ -1783,7 +1790,8 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
       timestamp: "2026-09-08T10:40:00",
       type: "uniform_missing",
       title: "Manipulación de alimentos sin cofia",
-      description: "Personal en área de horneado ingresó sin cofia ni barbijo reglamentario. Riesgo de contaminación cruzada.",
+      description:
+        "Personal en área de horneado ingresó sin cofia ni barbijo reglamentario. Riesgo de contaminación cruzada.",
       zone: "Panadería & Charcutería",
       cameraId: "cam-005",
       severity: "medium",
@@ -1795,7 +1803,8 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
       timestamp: "2026-09-08T08:42:00",
       type: "late_opening",
       title: "Apertura de sucursal con 12 min de retraso",
-      description: "Cortina metálica principal levantada a las 08:42 h frente a hora programada (08:30 h). 6 clientes esperaban afuera.",
+      description:
+        "Cortina metálica principal levantada a las 08:42 h frente a hora programada (08:30 h). 6 clientes esperaban afuera.",
       zone: "Entrada Principal",
       cameraId: "cam-001",
       severity: "high",
@@ -1808,7 +1817,8 @@ export const OPERATIONS_METRICS: OperationsSummaryData = {
       timestamp: "2026-09-08T08:15:00",
       type: "uniform_missing",
       title: "Personal sin credencial visible",
-      description: "Reponedor en pasillo 3 detectado sin fotocheck visible durante labores matutinas de estantería.",
+      description:
+        "Reponedor en pasillo 3 detectado sin fotocheck visible durante labores matutinas de estantería.",
       zone: "Pasillos & Sala de Ventas",
       cameraId: "cam-004",
       severity: "low",
@@ -2069,9 +2079,11 @@ export const PRODUCTION_METRICS: ProductionSummaryData = {
       percentageOfDefects: 53.8,
       color: "#f87171",
       severity: "high",
-      description: "Tostado excesivo superior por encima de umbral L* (colorimetría oscura > 38%). Producto no comercializable.",
+      description:
+        "Tostado excesivo superior por encima de umbral L* (colorimetría oscura > 38%). Producto no comercializable.",
       cameraSource: "cam-003 (Salida Horno 2)",
-      suspectedCause: "Termocupla descalibrada en Horno 2 entre 10:15 y 11:20 (+18°C sobre consigna).",
+      suspectedCause:
+        "Termocupla descalibrada en Horno 2 entre 10:15 y 11:20 (+18°C sobre consigna).",
     },
     {
       id: "def-broken",

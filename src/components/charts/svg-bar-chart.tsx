@@ -85,7 +85,7 @@ export function SvgBarChart<T extends Record<string, unknown>>({
         ? {
             onPointerMove: (e: any) => {
               const rect = e.currentTarget?.getBoundingClientRect?.();
-              const x = rect ? e.clientX - rect.left : e.nativeEvent?.offsetX ?? 0;
+              const x = rect ? e.clientX - rect.left : (e.nativeEvent?.offsetX ?? 0);
               handlePointer(x);
             },
             onPointerLeave: () => {
@@ -98,11 +98,7 @@ export function SvgBarChart<T extends Record<string, unknown>>({
             },
           })}
     >
-      <Svg
-        viewBox={`0 0 ${viewBoxW} ${height}`}
-        width="100%"
-        height={height}
-      >
+      <Svg viewBox={`0 0 ${viewBoxW} ${height}`} width="100%" height={height}>
         <Defs>
           <LinearGradient id={barGradId} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0%" stopColor={color} stopOpacity={1} />

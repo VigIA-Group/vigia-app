@@ -1,11 +1,11 @@
 import type { ModuleId } from "@/src/data/mock";
 import {
-    Camera,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    ShieldAlert,
-    Users,
+  Camera,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { Text, XStack } from "tamagui";
 

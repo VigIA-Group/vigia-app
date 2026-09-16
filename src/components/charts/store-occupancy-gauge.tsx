@@ -5,23 +5,23 @@
 import { STORE_CAPACITY_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import {
-    Activity,
-    AlertTriangle,
-    Camera,
-    CheckCircle2,
-    Gauge,
-    Layers,
-    TrendingUp,
-    Users,
+  Activity,
+  AlertTriangle,
+  Camera,
+  CheckCircle2,
+  Gauge,
+  Layers,
+  TrendingUp,
+  Users,
 } from "lucide-react-native";
 import Svg, {
-    Circle,
-    Defs,
-    Line,
-    LinearGradient,
-    Path,
-    Stop,
-    Text as SvgText,
+  Circle,
+  Defs,
+  Line,
+  LinearGradient,
+  Path,
+  Stop,
+  Text as SvgText,
 } from "react-native-svg";
 import { Text, View, XStack, YStack } from "tamagui";
 import { CHART_FONTS, VIGIA_COLORS } from "./chart-theme";

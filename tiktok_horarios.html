@@ -107,23 +107,13 @@
       }
 
       .cinematic-vignette.dimmed {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.75) 0%,
-          rgba(5, 14, 29, 0.5) 35%,
-          rgba(5, 14, 29, 0.95) 100%
-        );
-        backdrop-filter: brightness(0.68);
+        background: rgba(5, 14, 29, 0.78);
+        backdrop-filter: brightness(0.42);
       }
 
       .cinematic-vignette.darker {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.9) 0%,
-          rgba(5, 14, 29, 0.75) 45%,
-          rgba(5, 14, 29, 0.98) 100%
-        );
-        backdrop-filter: brightness(0.5);
+        background: rgba(5, 14, 29, 0.88);
+        backdrop-filter: brightness(0.35);
       }
 
       .top-watermark {
@@ -224,28 +214,33 @@
         color: #fcd34d;
       }
 
-      /* TYPOGRAPHY STAGE (Safe Margin Above TikTok Description) */
+      /* CENTERED TEXT STAGE (Safe space for TikTok subtitles & description) */
       .text-stage {
         position: absolute;
-        left: 36px;
-        right: 36px;
-        bottom: 155px; /* Clear TikTok UI overlay */
+        left: 28px;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%);
         z-index: 6;
         pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
 
       .scene-box {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: 14px;
         opacity: 0;
-        transform: translateY(35px);
+        transform: translateY(30px);
         filter: blur(8px);
         transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        position: relative;
+        width: 100%;
       }
 
       .scene-box.active {
@@ -258,7 +253,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        align-self: flex-start;
+        align-self: center;
         font-size: 13px;
         font-weight: 800;
         text-transform: uppercase;
@@ -353,7 +348,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0 26px 45px 26px; /* Safe distance above TikTok UI */
+        align-items: center;
+        padding: 0 24px;
         pointer-events: none;
       }
 
@@ -392,8 +388,8 @@
       }
 
       .report-icon-box {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 14px;
         background: rgba(5, 110, 250, 0.15);
         border: 1px solid rgba(5, 110, 250, 0.35);
@@ -404,20 +400,20 @@
       }
 
       .report-title-text {
-        font-size: 16px;
-        font-weight: 800;
+        font-size: 19px;
+        font-weight: 900;
         color: #fff;
         letter-spacing: -0.2px;
       }
 
       .report-sub-text {
-        font-size: 11px;
+        font-size: 13px;
         color: var(--text-muted);
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .report-badge-date {
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 800;
         color: var(--blue-vigia);
         background: rgba(5, 110, 250, 0.12);
@@ -440,7 +436,7 @@
       .matrix-title-row {
         display: flex;
         justify-content: space-between;
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 800;
         text-transform: uppercase;
         color: var(--text-muted);
@@ -460,19 +456,19 @@
       }
 
       .day-header {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         color: var(--text-muted);
       }
 
       .heat-cell {
         width: 100%;
-        height: 24px;
+        height: 26px;
         border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 9px;
+        font-size: 11px;
         font-weight: 800;
         color: #fff;
       }
@@ -513,7 +509,7 @@
       }
 
       .kpi-caption {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -521,10 +517,11 @@
       }
 
       .kpi-number {
-        font-size: 22px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 30px;
         font-weight: 900;
         color: #fff;
-        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
       }
 
       .kpi-number.amber {
@@ -542,7 +539,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 12px;
+        font-size: 14px;
         line-height: 1.35;
         color: #e2e8f0;
       }
@@ -865,7 +862,8 @@
       });
 
       function updateChoreography(time) {
-        if (time < 4.8) {
+        // 0.0s - 3.5s: Clean Video (No text cards, space for native TikTok SEO text)
+        if (time < 3.5) {
           video.classList.remove("blurred");
           video.classList.remove("panning");
           vignette.classList.remove("dimmed");
@@ -876,20 +874,18 @@
           scene2.classList.remove("active");
           reportCard.classList.remove("active");
           outroStage.classList.remove("active");
-        } else if (time >= 4.8 && time < 9.5) {
+        } else if (time >= 3.5 && time < 8.0) {
           topWatermark.classList.add("visible");
           peakBadge.classList.add("visible");
           video.classList.add("panning");
-          vignette.classList.add("dimmed");
-          vignette.classList.remove("darker");
+          vignette.classList.add("darker");
           scene1.classList.add("active");
           scene2.classList.remove("active");
           reportCard.classList.remove("active");
           outroStage.classList.remove("active");
           video.classList.remove("blurred");
-        } else if (time >= 9.5 && time < 15.0) {
+        } else if (time >= 8.0 && time < 15.0) {
           scene1.classList.remove("active");
-          vignette.classList.remove("dimmed");
           vignette.classList.add("darker");
           scene2.classList.add("active");
           reportCard.classList.remove("active");
@@ -898,10 +894,12 @@
         } else if (time >= 15.0 && time < 22.0) {
           scene2.classList.remove("active");
           video.classList.add("blurred");
+          vignette.classList.add("darker");
           reportCard.classList.add("active");
           outroStage.classList.remove("active");
         } else {
           reportCard.classList.remove("active");
+          vignette.classList.add("darker");
           outroStage.classList.add("active");
         }
       }
@@ -925,6 +923,10 @@
             }
           }
 
+          if (isPlaying && video.paused) {
+            video.play().catch(() => {});
+          }
+
           const pct = (currentTime / DURATION) * 100;
           timelineFill.style.width = `${pct}%`;
           updateChoreography(currentTime);
@@ -932,6 +934,11 @@
 
         requestAnimationFrame(loop);
       }
+
+      video.addEventListener("ended", () => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      });
 
       window.addEventListener("DOMContentLoaded", () => {
         video.play().catch(() => {});

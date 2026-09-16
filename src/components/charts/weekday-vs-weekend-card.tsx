@@ -5,13 +5,13 @@
 import { getWeekdayVsWeekendStats } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import {
-    CalendarRange,
-    Clock,
-    Lightbulb,
-    ShoppingCart,
-    TrendingDown,
-    TrendingUp,
-    Users,
+  CalendarRange,
+  Clock,
+  Lightbulb,
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+  Users,
 } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";

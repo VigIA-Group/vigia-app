@@ -109,24 +109,13 @@
       }
 
       .cinematic-vignette.dimmed {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.5) 0%,
-          rgba(5, 14, 29, 0.2) 35%,
-          rgba(5, 14, 29, 0.85) 65%,
-          rgba(5, 14, 29, 0.98) 100%
-        );
-        backdrop-filter: brightness(0.75);
+        background: rgba(5, 14, 29, 0.78);
+        backdrop-filter: brightness(0.42);
       }
 
       .cinematic-vignette.darker {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.85) 0%,
-          rgba(5, 14, 29, 0.7) 45%,
-          rgba(5, 14, 29, 0.98) 100%
-        );
-        backdrop-filter: brightness(0.5);
+        background: rgba(5, 14, 29, 0.88);
+        backdrop-filter: brightness(0.35);
       }
 
       /* Minimal Top Watermark */
@@ -232,28 +221,33 @@
         color: #ff7070;
       }
 
-      /* ASYMMETRIC LOWER-THIRD TYPOGRAPHY (Lifted above TikTok UI overlay) */
+      /* CENTERED STAGE (Leaving bottom safe space for TikTok subtitles & description) */
       .lower-third-stage {
         position: absolute;
-        left: 32px;
-        right: 32px;
-        bottom: 160px; /* Safe distance above TikTok username, description and sound bar */
+        left: 28px;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%);
         z-index: 6;
         pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
 
       .scene-lower {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: 14px;
         opacity: 0;
-        transform: translateY(35px);
+        transform: translateY(30px);
         filter: blur(8px);
         transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        position: relative;
+        width: 100%;
       }
 
       .scene-lower.active {
@@ -264,10 +258,12 @@
 
       /* Accent Bar Hook */
       .hook-accent-box {
-        border-left: 4px solid var(--cyan-neon);
-        padding-left: 18px;
+        border-top: 3px solid var(--cyan-neon);
+        padding-top: 12px;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: 6px;
       }
 
@@ -368,34 +364,39 @@
         color: #ff8b8b;
       }
 
-      /* MODERN BOTTOM SHEET REPORT (Distinct from Video 1, lifted for TikTok UI) */
+      /* CENTERED REPORT CARD (Safe from TikTok bottom UI) */
       .sheet-report-stage {
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         z-index: 10;
         pointer-events: none;
-        transform: translateY(100%);
-        transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 24px;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .sheet-report-stage.active {
+        opacity: 1;
         transform: translateY(0);
       }
 
       .sheet-card {
+        width: 100%;
         background: rgba(6, 16, 32, 0.96);
-        border-top: 2px solid var(--cyan-neon);
-        border-radius: 36px 36px 0 0;
-        padding: 24px 26px 85px 26px; /* Generous bottom padding to clear TikTok bottom bar */
+        border: 1.5px solid rgba(0, 240, 255, 0.4);
+        border-radius: 28px;
+        padding: 22px 20px;
         backdrop-filter: blur(40px);
         box-shadow:
-          0 -20px 60px rgba(0, 0, 0, 0.9),
+          0 30px 60px rgba(0, 0, 0, 0.9),
           0 0 40px rgba(0, 240, 255, 0.2);
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 14px;
       }
 
       .sheet-handle {
@@ -432,20 +433,22 @@
       }
 
       .sheet-title {
-        font-size: 17px;
+        font-size: 19px;
         font-weight: 900;
         color: #fff;
-        letter-spacing: -0.2px;
+        letter-spacing: -0.3px;
       }
 
       .sheet-sub {
-        font-size: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         color: var(--text-muted);
         font-weight: 600;
       }
 
       .sheet-badge {
-        font-size: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         font-weight: 800;
         color: var(--cyan-neon);
         background: rgba(0, 240, 255, 0.12);
@@ -485,7 +488,8 @@
       .aisle-name-row {
         display: flex;
         justify-content: space-between;
-        font-size: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         font-weight: 800;
         color: var(--text-muted);
         text-transform: uppercase;
@@ -516,7 +520,8 @@
       .aisle-stats {
         display: flex;
         justify-content: space-between;
-        font-size: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 15px;
         font-weight: 900;
         color: #fff;
       }
@@ -537,8 +542,8 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 12px;
-        line-height: 1.35;
+        font-size: 14px;
+        line-height: 1.4;
         color: #e2e8f0;
       }
 
@@ -744,7 +749,7 @@
               </div>
               <div class="aisle-stats">
                 <span class="cyan">5m 02s</span>
-                <span style="color: #94a3b8; font-size: 10px">Muy Alto</span>
+                <span style="color: #94a3b8; font-size: 12px; font-weight: 700">Muy Alto</span>
               </div>
             </div>
 
@@ -758,7 +763,7 @@
               </div>
               <div class="aisle-stats">
                 <span class="cyan">4m 15s</span>
-                <span style="color: #94a3b8; font-size: 10px">Alto</span>
+                <span style="color: #94a3b8; font-size: 12px; font-weight: 700">Alto</span>
               </div>
             </div>
 
@@ -772,7 +777,7 @@
               </div>
               <div class="aisle-stats">
                 <span>2m 40s</span>
-                <span style="color: #94a3b8; font-size: 10px">Medio</span>
+                <span style="color: #94a3b8; font-size: 12px; font-weight: 700">Medio</span>
               </div>
             </div>
 
@@ -786,7 +791,7 @@
               </div>
               <div class="aisle-stats">
                 <span class="danger">38 seg</span>
-                <span style="color: #ff7070; font-size: 10px">Zona Fría</span>
+                <span style="color: #ff7070; font-size: 12px; font-weight: 700">Zona Fría</span>
               </div>
             </div>
           </div>
@@ -862,8 +867,8 @@
       });
 
       function updateChoreography(time) {
-        // 0.0s - 04.8s: Raw CCTV Video
-        if (time < 4.8) {
+        // 0.0s - 3.5s: Raw CCTV Video & Clean Heatmap (No text cards, space for native TikTok SEO text)
+        if (time < 3.5) {
           video.classList.remove("blurred");
           video.classList.remove("panning");
           vignette.classList.remove("dimmed");
@@ -875,8 +880,8 @@
           sheetReport.classList.remove("active");
           outroStage.classList.remove("active");
         }
-        // 04.8s - 09.5s: Lower-Third Hook & Floating Heat Badge
-        else if (time >= 4.8 && time < 9.5) {
+        // 03.5s - 08.0s: Centered Hook & Floating Heat Badge (Darkened for Legibility)
+        else if (time >= 3.5 && time < 8.0) {
           topWatermark.classList.add("visible");
           heatBadge.classList.add("visible");
           video.classList.add("panning");
@@ -888,8 +893,8 @@
           outroStage.classList.remove("active");
           video.classList.remove("blurred");
         }
-        // 09.5s - 15.0s: The Twist & Dwell Grid
-        else if (time >= 9.5 && time < 15.0) {
+        // 08.0s - 15.0s: The Twist & Dwell Grid (Darkened)
+        else if (time >= 8.0 && time < 15.0) {
           scene1.classList.remove("active");
           heatBadge.classList.remove("visible");
           vignette.classList.remove("dimmed");
@@ -903,12 +908,14 @@
         else if (time >= 15.0 && time < 22.0) {
           scene2.classList.remove("active");
           video.classList.add("blurred");
+          vignette.classList.add("darker");
           sheetReport.classList.add("active");
           outroStage.classList.remove("active");
         }
         // 22.0s - 28.0s: Outro & Logo
         else {
           sheetReport.classList.remove("active");
+          vignette.classList.add("darker");
           outroStage.classList.add("active");
         }
       }
@@ -925,10 +932,13 @@
             if (video.duration) video.currentTime = 0;
           }
 
-          if (video.duration) {
+          if (video && video.duration) {
             const expectedVideoTime = currentTime % video.duration;
-            if (Math.abs(video.currentTime - expectedVideoTime) > 0.5) {
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.4) {
               video.currentTime = expectedVideoTime;
+            }
+            if (isPlaying && video.paused) {
+              video.play().catch(() => {});
             }
           }
 
@@ -941,7 +951,13 @@
       }
 
       window.addEventListener("DOMContentLoaded", () => {
-        video.play().catch(() => {});
+        if (video) {
+          video.addEventListener("ended", () => {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          });
+          video.play().catch(() => {});
+        }
         requestAnimationFrame(loop);
       });
     </script>

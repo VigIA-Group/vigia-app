@@ -64,7 +64,12 @@ export function ProductionQualityControlCard() {
           borderWidth={1}
           borderColor="rgba(52, 211, 153, 0.25)"
         >
-          <Text fontSize={11} fontWeight="700" color={VIGIA_COLORS.emeraldSuccess} fontFamily="$body">
+          <Text
+            fontSize={11}
+            fontWeight="700"
+            color={VIGIA_COLORS.emeraldSuccess}
+            fontFamily="$body"
+          >
             96.8% Aptas para Empaque
           </Text>
         </View>
@@ -74,7 +79,8 @@ export function ProductionQualityControlCard() {
       <YStack gap={6}>
         <XStack justifyContent="space-between" alignItems="center">
           <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-            Distribución del Lote ({m.totalProduced.toLocaleString("es-BO")} unidades inspeccionadas)
+            Distribución del Lote ({m.totalProduced.toLocaleString("es-BO")} unidades
+            inspeccionadas)
           </Text>
           <Text fontSize={11} fontWeight="700" color={colors.text} fontFamily="$mono">
             {optimalCount.toLocaleString("es-BO")} óptimas · {m.defectiveTotal} descartadas
@@ -90,7 +96,12 @@ export function ProductionQualityControlCard() {
 
         <XStack justifyContent="space-between" flexWrap="wrap" gap={8} marginTop={2}>
           <XStack alignItems="center" gap={4}>
-            <View width={8} height={8} borderRadius={2} backgroundColor={VIGIA_COLORS.emeraldSuccess} />
+            <View
+              width={8}
+              height={8}
+              borderRadius={2}
+              backgroundColor={VIGIA_COLORS.emeraldSuccess}
+            />
             <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
               Óptimas ({optimalCount})
             </Text>
@@ -102,13 +113,23 @@ export function ProductionQualityControlCard() {
             </Text>
           </XStack>
           <XStack alignItems="center" gap={4}>
-            <View width={8} height={8} borderRadius={2} backgroundColor={VIGIA_COLORS.orangeAlert} />
+            <View
+              width={8}
+              height={8}
+              borderRadius={2}
+              backgroundColor={VIGIA_COLORS.orangeAlert}
+            />
             <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
               Repulgue Roto (48)
             </Text>
           </XStack>
           <XStack alignItems="center" gap={4}>
-            <View width={8} height={8} borderRadius={2} backgroundColor={VIGIA_COLORS.amberWarning} />
+            <View
+              width={8}
+              height={8}
+              borderRadius={2}
+              backgroundColor={VIGIA_COLORS.amberWarning}
+            />
             <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
               Deformes (24)
             </Text>
@@ -165,7 +186,13 @@ export function ProductionQualityControlCard() {
                   </View>
                 </XStack>
 
-                <Text fontSize={11} fontWeight="700" color={colors.text} fontFamily="$body" numberOfLines={1}>
+                <Text
+                  fontSize={11}
+                  fontWeight="700"
+                  color={colors.text}
+                  fontFamily="$body"
+                  numberOfLines={1}
+                >
                   {d.label.split("/")[0].trim()}
                 </Text>
 
@@ -252,8 +279,8 @@ export function ProductionQualityControlCard() {
           <Text fontWeight="700" color={colors.text} fontFamily="$body">
             Impacto Económico:
           </Text>{" "}
-          Las {m.burnedTotal} empanadas quemadas representaron {Math.round(m.burnedTotal * 7.5)} Bs de merma
-          crítica. Corrigiendo el Horno 2, la conformidad estimada ascenderá al 98.6%.
+          Las {m.burnedTotal} empanadas quemadas representaron {Math.round(m.burnedTotal * 7.5)} Bs
+          de merma crítica. Corrigiendo el Horno 2, la conformidad estimada ascenderá al 98.6%.
         </Text>
       </XStack>
     </YStack>

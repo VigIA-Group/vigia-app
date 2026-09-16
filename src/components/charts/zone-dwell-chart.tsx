@@ -19,7 +19,7 @@ export function ZoneDwellChart() {
 
   // Paleta de acentos coordinada para las 4 zonas
   const ZONE_COLORS: Record<string, string> = {
-    "Entrada": VIGIA_COLORS.blueCyan,
+    Entrada: VIGIA_COLORS.blueCyan,
     "Área de Cajas": VIGIA_COLORS.blueVibrant,
     "Pasillos Centro (Góndolas)": VIGIA_COLORS.bluePrimary,
     "Sector Bebidas y Snacks": VIGIA_COLORS.purpleMetric,
@@ -94,12 +94,7 @@ export function ZoneDwellChart() {
                 </XStack>
 
                 <XStack alignItems="center" gap={4}>
-                  <Text
-                    fontSize={13}
-                    fontWeight="800"
-                    color={zoneColor}
-                    fontFamily="$mono"
-                  >
+                  <Text fontSize={13} fontWeight="800" color={zoneColor} fontFamily="$mono">
                     {item.avgMinutes.toFixed(1)}
                   </Text>
                   <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
@@ -109,12 +104,7 @@ export function ZoneDwellChart() {
               </XStack>
 
               {/* Progress bar with rounded corners */}
-              <View
-                height={8}
-                borderRadius={4}
-                backgroundColor={colors.cardAlt}
-                overflow="hidden"
-              >
+              <View height={8} borderRadius={4} backgroundColor={colors.cardAlt} overflow="hidden">
                 <View
                   height={8}
                   borderRadius={4}
@@ -127,10 +117,13 @@ export function ZoneDwellChart() {
               {isSelected && (
                 <XStack justifyContent="space-between" alignItems="center" marginTop={2}>
                   <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
-                    Representa el {((item.avgMinutes / totalDwell) * 100).toFixed(0)}% del tiempo total de compra
+                    Representa el {((item.avgMinutes / totalDwell) * 100).toFixed(0)}% del tiempo
+                    total de compra
                   </Text>
                   <Text fontSize={10} color={zoneColor} fontFamily="$body" fontWeight="600">
-                    {item.zone.includes("Góndolas") ? "Zona de mayor retención" : "Zona de tránsito"}
+                    {item.zone.includes("Góndolas")
+                      ? "Zona de mayor retención"
+                      : "Zona de tránsito"}
                   </Text>
                 </XStack>
               )}

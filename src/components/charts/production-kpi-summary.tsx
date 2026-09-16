@@ -3,12 +3,7 @@
  */
 import { PRODUCTION_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  AlertTriangle,
-  Boxes,
-  CheckCircle2,
-  Clock,
-} from "lucide-react-native";
+import { AlertTriangle, Boxes, CheckCircle2, Clock } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
 

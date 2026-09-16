@@ -2,13 +2,13 @@ import BottomSheet, { BottomSheetScrollView } from "@/src/components/bottom-shee
 import type { Module, ModuleId } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import {
-    Camera,
-    ChevronRight,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    ShieldAlert,
-    Users,
+  Camera,
+  ChevronRight,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { useCallback, useRef } from "react";
 import { Text, View, XStack, YStack } from "tamagui";

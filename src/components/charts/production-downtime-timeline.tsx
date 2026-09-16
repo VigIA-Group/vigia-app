@@ -66,7 +66,8 @@ export function ProductionDowntimeTimeline() {
             </Text>
           </XStack>
           <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-            Eventos donde la cinta transportadora no registró flujo de empanadas por más de 3 minutos
+            Eventos donde la cinta transportadora no registró flujo de empanadas por más de 3
+            minutos
           </Text>
         </YStack>
 
@@ -150,13 +151,20 @@ export function ProductionDowntimeTimeline() {
               padding={14}
               gap={10}
             >
-              <XStack justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={8}>
+              <XStack
+                justifyContent="space-between"
+                alignItems="flex-start"
+                flexWrap="wrap"
+                gap={8}
+              >
                 <XStack alignItems="center" gap={8}>
                   <View
                     width={28}
                     height={28}
                     borderRadius={7}
-                    backgroundColor={isMechanical ? "rgba(248, 113, 113, 0.15)" : "rgba(251, 191, 36, 0.15)"}
+                    backgroundColor={
+                      isMechanical ? "rgba(248, 113, 113, 0.15)" : "rgba(251, 191, 36, 0.15)"
+                    }
                     alignItems="center"
                     justifyContent="center"
                   >
@@ -173,7 +181,9 @@ export function ProductionDowntimeTimeline() {
                         {item.startTime} – {item.endTime}
                       </Text>
                       <View
-                        backgroundColor={isMechanical ? "rgba(248, 113, 113, 0.14)" : "rgba(251, 191, 36, 0.14)"}
+                        backgroundColor={
+                          isMechanical ? "rgba(248, 113, 113, 0.14)" : "rgba(251, 191, 36, 0.14)"
+                        }
                         paddingHorizontal={6}
                         paddingVertical={1.5}
                         borderRadius={4}
@@ -199,7 +209,9 @@ export function ProductionDowntimeTimeline() {
                   flexDirection="row"
                   alignItems="center"
                   gap={5}
-                  backgroundColor={item.resolved ? "rgba(52, 211, 153, 0.12)" : "rgba(248, 113, 113, 0.12)"}
+                  backgroundColor={
+                    item.resolved ? "rgba(52, 211, 153, 0.12)" : "rgba(248, 113, 113, 0.12)"
+                  }
                   paddingHorizontal={9}
                   paddingVertical={4}
                   borderRadius={7}
@@ -236,7 +248,12 @@ export function ProductionDowntimeTimeline() {
                   </Text>
                 </XStack>
 
-                <Text fontSize={11} color={VIGIA_COLORS.redDanger} fontFamily="$mono" fontWeight="700">
+                <Text
+                  fontSize={11}
+                  color={VIGIA_COLORS.redDanger}
+                  fontFamily="$mono"
+                  fontWeight="700"
+                >
                   ~{item.impactUnitsLost} empanadas no producidas
                 </Text>
               </XStack>
@@ -268,7 +285,8 @@ export function ProductionDowntimeTimeline() {
         </XStack>
 
         <Text fontSize={11} color={colors.text} fontFamily="$mono" fontWeight="700">
-          Oportunidad de producción perdida: ~{totalLostUnits} pzas (~{Math.round(totalLostUnits * 7.5)} Bs)
+          Oportunidad de producción perdida: ~{totalLostUnits} pzas (~
+          {Math.round(totalLostUnits * 7.5)} Bs)
         </Text>
       </XStack>
     </YStack>

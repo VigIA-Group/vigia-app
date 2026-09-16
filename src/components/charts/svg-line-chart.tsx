@@ -132,7 +132,7 @@ export function SvgLineChart<T extends Record<string, unknown>>({
         ? {
             onPointerMove: (e: any) => {
               const rect = e.currentTarget?.getBoundingClientRect?.();
-              const x = rect ? e.clientX - rect.left : e.nativeEvent?.offsetX ?? 0;
+              const x = rect ? e.clientX - rect.left : (e.nativeEvent?.offsetX ?? 0);
               handlePointer(x);
             },
             onPointerLeave: () => {
@@ -145,11 +145,7 @@ export function SvgLineChart<T extends Record<string, unknown>>({
             },
           })}
     >
-      <Svg
-        viewBox={`0 0 ${viewBoxW} ${height}`}
-        width="100%"
-        height={height}
-      >
+      <Svg viewBox={`0 0 ${viewBoxW} ${height}`} width="100%" height={height}>
         <Defs>
           {/* Subtle area gradient under curve */}
           <LinearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -240,14 +236,7 @@ export function SvgLineChart<T extends Record<string, unknown>>({
         {/* Comparison dots */}
         {compareData &&
           cmpPts.map(([cx, cy], i) => (
-            <Circle
-              key={`cmp-${i}`}
-              cx={cx}
-              cy={cy}
-              r={2}
-              fill={compareColor}
-              fillOpacity={0.7}
-            />
+            <Circle key={`cmp-${i}`} cx={cx} cy={cy} r={2} fill={compareColor} fillOpacity={0.7} />
           ))}
 
         {/* Interactive Crosshair, Dots & Floating Tooltip */}

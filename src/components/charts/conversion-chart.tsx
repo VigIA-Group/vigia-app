@@ -4,19 +4,9 @@
  * Destaca el insight crítico del retail: mayor afluencia de fin de semana no implica ventas proporcionales.
  */
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  CONVERSION_7D,
-  getAverageConversionRate,
-} from "@/src/data/mock";
-import {
-  Platform,
-} from "react-native";
-import {
-  Coins,
-  ShoppingCart,
-  TrendingDown,
-  Users,
-} from "lucide-react-native";
+import { CONVERSION_7D, getAverageConversionRate } from "@/src/data/mock";
+import { Platform } from "react-native";
+import { Coins, ShoppingCart, TrendingDown, Users } from "lucide-react-native";
 import { useId, useState } from "react";
 import Svg, {
   Circle,
@@ -249,7 +239,10 @@ export function ConversionChart() {
             Pico de Eficiencia
           </Text>
           <Text fontSize={16} fontWeight="800" color={VIGIA_COLORS.blueVibrant} fontFamily="$mono">
-            86.4% <Text fontSize={10} color={colors.textLabel}>Lun</Text>
+            86.4%{" "}
+            <Text fontSize={10} color={colors.textLabel}>
+              Lun
+            </Text>
           </Text>
         </View>
 
@@ -278,7 +271,7 @@ export function ConversionChart() {
           ? {
               onPointerMove: (e: any) => {
                 const rect = e.currentTarget?.getBoundingClientRect?.();
-                const x = rect ? e.clientX - rect.left : e.nativeEvent?.offsetX ?? 0;
+                const x = rect ? e.clientX - rect.left : (e.nativeEvent?.offsetX ?? 0);
                 handlePointer(x);
               },
             }
@@ -288,11 +281,7 @@ export function ConversionChart() {
               },
             })}
       >
-        <Svg
-          viewBox={`0 0 ${viewBoxW} ${height}`}
-          width="100%"
-          height={height}
-        >
+        <Svg viewBox={`0 0 ${viewBoxW} ${height}`} width="100%" height={height}>
           <Defs>
             {/* Blue Gradient for Rate */}
             <LinearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -463,12 +452,38 @@ export function ConversionChart() {
 
               {/* Legend Strip */}
               <G>
-                <Rect x={viewBoxW - 190} y={PAD_TOP - 18} width={8} height={8} rx={2} fill={VIGIA_COLORS.blueVibrant} />
-                <SvgText x={viewBoxW - 176} y={PAD_TOP - 11} fontSize={9.5} fontFamily={CHART_FONTS.regular} fill={VIGIA_COLORS.textLabelDark}>
+                <Rect
+                  x={viewBoxW - 190}
+                  y={PAD_TOP - 18}
+                  width={8}
+                  height={8}
+                  rx={2}
+                  fill={VIGIA_COLORS.blueVibrant}
+                />
+                <SvgText
+                  x={viewBoxW - 176}
+                  y={PAD_TOP - 11}
+                  fontSize={9.5}
+                  fontFamily={CHART_FONTS.regular}
+                  fill={VIGIA_COLORS.textLabelDark}
+                >
                   Visitantes
                 </SvgText>
-                <Rect x={viewBoxW - 110} y={PAD_TOP - 18} width={8} height={8} rx={2} fill={VIGIA_COLORS.emeraldSuccess} />
-                <SvgText x={viewBoxW - 96} y={PAD_TOP - 11} fontSize={9.5} fontFamily={CHART_FONTS.regular} fill={VIGIA_COLORS.textLabelDark}>
+                <Rect
+                  x={viewBoxW - 110}
+                  y={PAD_TOP - 18}
+                  width={8}
+                  height={8}
+                  rx={2}
+                  fill={VIGIA_COLORS.emeraldSuccess}
+                />
+                <SvgText
+                  x={viewBoxW - 96}
+                  y={PAD_TOP - 11}
+                  fontSize={9.5}
+                  fontFamily={CHART_FONTS.regular}
+                  fill={VIGIA_COLORS.textLabelDark}
+                >
                   Tickets
                 </SvgText>
               </G>
@@ -666,7 +681,14 @@ export function ConversionChart() {
 
                     {/* Glowing Point */}
                     <Circle cx={activeX} cy={activeY} r={8} fill={crossColor} fillOpacity={0.25} />
-                    <Circle cx={activeX} cy={activeY} r={4.5} fill={crossColor} stroke="#ffffff" strokeWidth={1.5} />
+                    <Circle
+                      cx={activeX}
+                      cy={activeY}
+                      r={4.5}
+                      fill={crossColor}
+                      stroke="#ffffff"
+                      strokeWidth={1.5}
+                    />
                   </>
                 );
               })()}
@@ -690,7 +712,10 @@ export function ConversionChart() {
         >
           <YStack gap={2}>
             <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-              Desglose Operativo: <Text fontWeight="700" color={colors.text}>{selectedPoint.day} {selectedPoint.date}</Text>
+              Desglose Operativo:{" "}
+              <Text fontWeight="700" color={colors.text}>
+                {selectedPoint.day} {selectedPoint.date}
+              </Text>
             </Text>
             <XStack gap={14} marginTop={4} flexWrap="wrap">
               <XStack alignItems="center" gap={4}>
@@ -698,21 +723,32 @@ export function ConversionChart() {
                 <Text fontSize={13} fontWeight="700" color={colors.text} fontFamily="$mono">
                   {selectedPoint.visitors.toLocaleString("es-BO")}
                 </Text>
-                <Text fontSize={10} color={colors.textLabel}>visitas</Text>
+                <Text fontSize={10} color={colors.textLabel}>
+                  visitas
+                </Text>
               </XStack>
               <XStack alignItems="center" gap={4}>
                 <ShoppingCart size={13} color={VIGIA_COLORS.emeraldSuccess} />
                 <Text fontSize={13} fontWeight="700" color={colors.text} fontFamily="$mono">
                   {selectedPoint.transactions.toLocaleString("es-BO")}
                 </Text>
-                <Text fontSize={10} color={colors.textLabel}>ventas</Text>
+                <Text fontSize={10} color={colors.textLabel}>
+                  ventas
+                </Text>
               </XStack>
               <XStack alignItems="center" gap={4}>
                 <Coins size={13} color={VIGIA_COLORS.redDanger} />
-                <Text fontSize={13} fontWeight="700" color={VIGIA_COLORS.redDanger} fontFamily="$mono">
+                <Text
+                  fontSize={13}
+                  fontWeight="700"
+                  color={VIGIA_COLORS.redDanger}
+                  fontFamily="$mono"
+                >
                   -{formatCurrency(selectedPoint.lostRevenueUsd)}
                 </Text>
-                <Text fontSize={10} color={colors.textLabel}>pérdida est.</Text>
+                <Text fontSize={10} color={colors.textLabel}>
+                  pérdida est.
+                </Text>
               </XStack>
             </XStack>
           </YStack>
@@ -752,16 +788,12 @@ export function ConversionChart() {
       {/* Actionable AI Retail Recommendation Box */}
       <XStack
         backgroundColor={
-          viewMode === "financial"
-            ? "rgba(248, 113, 113, 0.08)"
-            : "rgba(10, 76, 232, 0.08)"
+          viewMode === "financial" ? "rgba(248, 113, 113, 0.08)" : "rgba(10, 76, 232, 0.08)"
         }
         borderRadius={12}
         borderWidth={1}
         borderColor={
-          viewMode === "financial"
-            ? "rgba(248, 113, 113, 0.25)"
-            : "rgba(10, 76, 232, 0.25)"
+          viewMode === "financial" ? "rgba(248, 113, 113, 0.25)" : "rgba(10, 76, 232, 0.25)"
         }
         padding={14}
         alignItems="flex-start"

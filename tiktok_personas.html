@@ -7,19 +7,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg-petroleo: #050e1d;
-        --bg-card: #0a1628;
+        --bg-petroleo: #040914;
+        --bg-surface: #071326;
+        --bg-card: rgba(7, 19, 38, 0.94);
         --blue-vigia: #056efa;
         --blue-glow: rgba(5, 110, 250, 0.45);
+        --cyan-neon: #00f0ff;
+        --cyan-glow: rgba(0, 240, 255, 0.45);
         --danger: #ef4444;
-        --danger-glow: rgba(239, 68, 68, 0.4);
+        --danger-glow: rgba(239, 68, 68, 0.5);
+        --success: #10b981;
         --text-white: #ffffff;
         --text-muted: #94a3b8;
+        --text-dim: #64748b;
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-tech: rgba(5, 110, 250, 0.35);
       }
 
       * {
@@ -29,7 +36,7 @@
       }
 
       body {
-        background: #02060d;
+        background: #02050b;
         font-family:
           "Plus Jakarta Sans",
           -apple-system,
@@ -53,7 +60,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 0 100px rgba(5, 110, 250, 0.2);
+        box-shadow: 0 0 100px rgba(5, 110, 250, 0.25);
         cursor: pointer;
       }
 
@@ -75,6 +82,7 @@
         object-fit: cover;
         object-position: center 35%;
         transform: scale(1);
+        filter: contrast(1.08) brightness(0.92);
         transition:
           transform 9s cubic-bezier(0.16, 1, 0.3, 1),
           filter 1.2s ease;
@@ -85,210 +93,230 @@
       }
 
       .video-element.blurred {
-        filter: blur(24px) brightness(0.28) saturate(1.3);
+        filter: blur(24px) brightness(0.25) saturate(1.2);
       }
 
-      /* Cinematic Vignette Overlay (Smooth dimming for high contrast) */
-      .cinematic-vignette {
+      /* Tactical Camera HUD Overlay (Clean, professional, not generic) */
+      .cctv-hud-overlay {
         position: absolute;
         inset: 0;
         z-index: 2;
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.4) 0%,
-          transparent 30%,
-          transparent 65%,
-          rgba(5, 14, 29, 0.85) 100%
-        );
         pointer-events: none;
-        transition:
-          background 0.8s ease,
-          backdrop-filter 0.8s ease;
       }
 
-      .cinematic-vignette.dimmed {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.8) 0%,
-          rgba(5, 14, 29, 0.65) 40%,
-          rgba(5, 14, 29, 0.95) 100%
-        );
-        backdrop-filter: brightness(0.65);
-      }
-
-      .cinematic-vignette.darker {
-        background: linear-gradient(
-          180deg,
-          rgba(5, 14, 29, 0.9) 0%,
-          rgba(5, 14, 29, 0.75) 45%,
-          rgba(5, 14, 29, 0.98) 100%
-        );
-        backdrop-filter: brightness(0.5);
-      }
-
-      /* Minimal Top Watermark */
-      .top-watermark {
+      /* Corner Reticle Brackets */
+      .corner-reticle {
         position: absolute;
-        top: 40px;
-        left: 32px;
-        right: 32px;
+        width: 18px;
+        height: 18px;
+        border-color: rgba(0, 240, 255, 0.45);
+        border-style: solid;
+        pointer-events: none;
+      }
+      .corner-reticle.tl {
+        top: 22px;
+        left: 22px;
+        border-width: 2px 0 0 2px;
+      }
+      .corner-reticle.tr {
+        top: 22px;
+        right: 22px;
+        border-width: 2px 2px 0 0;
+      }
+      .corner-reticle.bl {
+        bottom: 22px;
+        left: 22px;
+        border-width: 0 0 2px 2px;
+      }
+      .corner-reticle.br {
+        bottom: 22px;
+        right: 22px;
+        border-width: 0 2px 2px 0;
+      }
+
+      /* Telemetry Info Bar (Top) */
+      .telemetry-bar {
+        position: absolute;
+        top: 36px;
+        left: 28px;
+        right: 28px;
         z-index: 10;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        opacity: 0;
-        transform: translateY(-12px);
-        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
+        transition: opacity 0.6s ease;
       }
 
-      .top-watermark.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .live-chip {
-        display: inline-flex;
+      .cctv-meta-left {
+        display: flex;
         align-items: center;
-        gap: 8px;
-        background: rgba(5, 14, 29, 0.75);
+        gap: 10px;
+        background: rgba(4, 9, 20, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(14px);
-        padding: 7px 14px;
-        border-radius: 30px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        color: #e2e8f0;
+        backdrop-filter: blur(16px);
+        padding: 6px 14px;
+        border-radius: 20px;
       }
 
-      .live-dot {
+      .rec-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .rec-dot {
         width: 8px;
         height: 8px;
-        background: var(--blue-vigia);
+        background: var(--danger);
         border-radius: 50%;
-        box-shadow: 0 0 10px var(--blue-vigia);
-        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 10px var(--danger);
+        animation: recPulse 1.2s infinite;
       }
 
-      @keyframes pulse {
+      @keyframes recPulse {
         0%,
         100% {
           opacity: 1;
           transform: scale(1);
         }
         50% {
-          opacity: 0.35;
-          transform: scale(0.8);
+          opacity: 0.3;
+          transform: scale(1.3);
         }
       }
 
+      .rec-text {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        color: #fff;
+      }
+
+      .cctv-cam-id {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--cyan-neon);
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        padding-left: 8px;
+      }
+
+      .cctv-meta-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(4, 9, 20, 0.85);
+        border: 1px solid rgba(5, 110, 250, 0.35);
+        backdrop-filter: blur(16px);
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+
       .logo-img-mini {
-        height: 24px;
+        height: 22px;
         width: auto;
         object-fit: contain;
-        filter: drop-shadow(0 0 12px rgba(5, 110, 250, 0.5));
+        filter: drop-shadow(0 0 12px rgba(5, 110, 250, 0.6));
       }
 
-      /* Subtle Bounding Boxes Overlay */
-      .ai-boxes-overlay {
+      /* Cinematic Vignette Overlay (High contrast for text readability) */
+      .cinematic-vignette {
         position: absolute;
         inset: 0;
-        z-index: 3;
+        z-index: 4;
+        background: linear-gradient(
+          180deg,
+          rgba(4, 9, 20, 0.35) 0%,
+          transparent 20%,
+          transparent 75%,
+          rgba(4, 9, 20, 0.7) 100%
+        );
         pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.8s ease;
+        transition:
+          background 0.6s ease,
+          backdrop-filter 0.6s ease;
       }
 
-      .ai-boxes-overlay.visible {
-        opacity: 1;
+      .cinematic-vignette.dimmed {
+        background: rgba(4, 9, 20, 0.78);
+        backdrop-filter: brightness(0.42);
       }
 
-      .bounding-box {
-        position: absolute;
-        border: 2px solid var(--blue-vigia);
-        border-radius: 10px;
-        background: rgba(5, 110, 250, 0.08);
-        box-shadow: 0 0 25px var(--blue-glow);
+      .cinematic-vignette.darker {
+        background: rgba(4, 9, 20, 0.88);
+        backdrop-filter: brightness(0.35);
       }
 
-      .box-tag {
-        position: absolute;
-        top: -26px;
-        left: 0;
-        background: var(--blue-vigia);
-        color: #fff;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.5px;
-        padding: 3px 9px;
-        border-radius: 6px;
-        white-space: nowrap;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      }
-
-      /* Giant Clean Typography Stage */
+      /* Kinetic Typography Stage (Centered in the middle of screen) */
       .text-stage {
         position: absolute;
         inset: 0;
-        z-index: 5;
+        z-index: 6;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0 40px;
+        align-items: center;
+        padding: 0 28px;
         pointer-events: none;
       }
 
       .scene-text {
         position: absolute;
-        left: 40px;
-        right: 40px;
+        left: 28px;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%) translateY(28px);
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
         opacity: 0;
-        transform: translateY(30px);
-        filter: blur(8px);
-        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        filter: blur(6px);
+        transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .scene-text.active {
         opacity: 1;
-        transform: translateY(0);
-        filter: blur(0px);
+        transform: translateY(-50%);
+        filter: blur(0);
       }
 
-      .tag-chip {
+      .tech-badge-chip {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        align-self: flex-start;
-        font-size: 13px;
+        gap: 8px;
+        align-self: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: var(--blue-vigia);
-        background: rgba(5, 110, 250, 0.15);
-        border: 1px solid rgba(5, 110, 250, 0.35);
-        padding: 8px 18px;
-        border-radius: 30px;
-        backdrop-filter: blur(12px);
+        letter-spacing: 1px;
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid rgba(0, 240, 255, 0.35);
+        padding: 6px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
       }
 
-      .tag-chip.danger {
-        color: #ff5a5a;
+      .tech-badge-chip.danger {
+        color: #ffa3a3;
         background: rgba(239, 68, 68, 0.15);
-        border-color: rgba(239, 68, 68, 0.4);
+        border-color: rgba(239, 68, 68, 0.45);
       }
 
       .headline-big {
-        font-size: 48px;
+        font-size: 44px;
         font-weight: 900;
-        line-height: 1.1;
+        line-height: 1.05;
         letter-spacing: -1.2px;
         color: #ffffff;
-        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95);
+        text-transform: uppercase;
+        text-align: center;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.95);
       }
 
       .headline-big span.highlight-blue {
@@ -302,45 +330,50 @@
       }
 
       .sub-headline-text {
-        font-size: 21px;
+        font-size: 18px;
         font-weight: 600;
         line-height: 1.45;
         color: #e2e8f0;
-        max-width: 340px;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        max-width: 360px;
+        text-align: center;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
       }
 
-      /* Floating Metric Pill */
+      /* Sleek Metric Pill (Centered Twist Card) */
       .metric-pill-large {
         display: inline-flex;
         align-items: center;
-        gap: 18px;
-        background: rgba(10, 22, 40, 0.92);
-        border: 1.5px solid rgba(239, 68, 68, 0.45);
-        padding: 16px 24px;
-        border-radius: 22px;
+        gap: 16px;
+        background: rgba(8, 19, 38, 0.94);
+        border: 1.5px solid rgba(239, 68, 68, 0.5);
+        padding: 16px 22px;
+        border-radius: 20px;
         backdrop-filter: blur(25px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-        align-self: flex-start;
-        margin-top: 10px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+        align-self: center;
+        margin-top: 6px;
       }
 
       .metric-pill-value {
-        font-size: 36px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 38px;
         font-weight: 900;
         color: #ff4444;
-        font-variant-numeric: tabular-nums;
         line-height: 1;
+        letter-spacing: -1px;
       }
 
       .metric-pill-details {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
         gap: 3px;
       }
 
       .metric-pill-title {
-        font-size: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.6px;
@@ -348,37 +381,40 @@
       }
 
       .metric-pill-sub {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 800;
         color: #ff8b8b;
       }
 
-      /* Clean Animated VigIA Report Card */
+      /* Clean Animated VigIA Report Card (Centered in Middle) */
       .report-overlay-stage {
         position: absolute;
         inset: 0;
-        z-index: 6;
+        z-index: 7;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0 28px;
+        align-items: center;
+        padding: 0 24px;
         pointer-events: none;
       }
 
       .report-card {
-        background: rgba(8, 18, 34, 0.92);
-        border: 1.5px solid rgba(5, 110, 250, 0.4);
-        border-radius: 30px;
-        padding: 26px 22px;
+        width: 100%;
+        max-width: 430px;
+        background: rgba(7, 19, 38, 0.96);
+        border: 1.5px solid rgba(5, 110, 250, 0.45);
+        border-radius: 26px;
+        padding: 22px 18px;
         backdrop-filter: blur(35px);
         box-shadow:
-          0 30px 60px -15px rgba(0, 0, 0, 0.85),
-          0 0 50px rgba(5, 110, 250, 0.2);
+          0 30px 60px -15px rgba(0, 0, 0, 0.9),
+          0 0 50px rgba(5, 110, 250, 0.25);
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 14px;
         opacity: 0;
-        transform: translateY(50px) scale(0.95);
+        transform: translateY(30px) scale(0.96);
         transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
@@ -391,73 +427,78 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 12px;
       }
 
       .report-header-left {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
 
       .report-icon-box {
-        width: 40px;
-        height: 40px;
-        border-radius: 14px;
-        background: rgba(5, 110, 250, 0.15);
-        border: 1px solid rgba(5, 110, 250, 0.35);
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(5, 110, 250, 0.18);
+        border: 1px solid rgba(5, 110, 250, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--blue-vigia);
+        color: var(--cyan-neon);
       }
 
       .report-title-text {
-        font-size: 17px;
-        font-weight: 800;
+        font-size: 19px;
+        font-weight: 900;
         color: #fff;
-        letter-spacing: -0.2px;
+        letter-spacing: -0.3px;
       }
 
       .report-sub-text {
-        font-size: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         color: var(--text-muted);
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .report-badge-date {
-        font-size: 11px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         font-weight: 800;
-        color: var(--blue-vigia);
-        background: rgba(5, 110, 250, 0.12);
+        color: var(--cyan-neon);
+        background: rgba(0, 240, 255, 0.1);
         padding: 5px 12px;
         border-radius: 20px;
-        border: 1px solid rgba(5, 110, 250, 0.3);
+        border: 1px solid rgba(0, 240, 255, 0.3);
       }
 
-      /* Two Big Metric Columns */
+      /* Dual KPI Columns with JetBrains Mono numbers */
       .kpi-dual-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        gap: 10px;
       }
 
       .kpi-column {
-        background: rgba(5, 14, 29, 0.8);
+        background: rgba(12, 26, 52, 0.65);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        padding: 16px 14px;
+        border-radius: 16px;
+        padding: 12px 14px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
       }
 
       .kpi-column.danger {
-        border-color: rgba(239, 68, 68, 0.4);
-        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.45);
+        background: rgba(239, 68, 68, 0.1);
       }
 
       .kpi-caption {
-        font-size: 11px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.6px;
@@ -465,10 +506,10 @@
       }
 
       .kpi-number {
-        font-size: 30px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 32px;
         font-weight: 900;
         color: #fff;
-        font-variant-numeric: tabular-nums;
         line-height: 1.1;
       }
 
@@ -477,9 +518,9 @@
       }
 
       .kpi-status-foot {
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 700;
-        color: #94a3b8;
+        color: var(--success);
       }
 
       .kpi-status-foot.danger {
@@ -489,20 +530,20 @@
       /* Clean SVG Smooth Area Chart */
       .chart-box {
         width: 100%;
-        height: 95px;
-        background: rgba(5, 14, 29, 0.6);
-        border-radius: 18px;
-        padding: 12px 14px;
+        background: rgba(12, 26, 52, 0.5);
+        border-radius: 16px;
+        padding: 10px 12px;
         border: 1px solid rgba(255, 255, 255, 0.06);
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        gap: 6px;
       }
 
       .chart-tags-row {
         display: flex;
         justify-content: space-between;
-        font-size: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
         font-weight: 700;
       }
 
@@ -520,22 +561,32 @@
 
       .svg-canvas {
         width: 100%;
-        height: 55px;
+        height: 52px;
         overflow: visible;
       }
 
-      /* Diagnostic Strip */
+      /* Technical Diagnostic Strip */
       .diagnostic-strip {
-        background: rgba(239, 68, 68, 0.12);
-        border: 1px solid rgba(239, 68, 68, 0.35);
-        border-radius: 16px;
-        padding: 14px 18px;
+        background: rgba(239, 68, 68, 0.14);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-radius: 14px;
+        padding: 12px 14px;
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 13px;
-        line-height: 1.35;
+        font-size: 14px;
+        line-height: 1.4;
         color: #ffe4e4;
+      }
+
+      .diag-pulse-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--danger);
+        box-shadow: 0 0 10px var(--danger);
+        flex-shrink: 0;
+        animation: recPulse 1s infinite;
       }
 
       .diagnostic-strip strong {
@@ -546,71 +597,103 @@
       .outro-stage {
         position: absolute;
         inset: 0;
-        z-index: 7;
+        z-index: 8;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding: 0 40px 70px 40px;
+        padding: 0 32px 75px 32px;
+        background: radial-gradient(
+          circle at 50% 45%,
+          rgba(5, 110, 250, 0.18) 0%,
+          rgba(4, 9, 20, 0.96) 65%,
+          #02050b 100%
+        );
         opacity: 0;
-        transform: scale(0.92);
-        transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: scale(0.95);
+        transition: all 0.85s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
       }
 
       .outro-stage.active {
         opacity: 1;
         transform: scale(1);
+        pointer-events: auto;
       }
 
       .outro-logo-wrap {
-        margin-bottom: 24px;
+        margin-bottom: 22px;
         filter: drop-shadow(0 0 35px rgba(5, 110, 250, 0.6));
       }
 
       .outro-logo-img {
-        height: 56px;
+        height: 52px;
         width: auto;
         object-fit: contain;
       }
 
-      .outro-main-text {
-        font-size: 40px;
-        font-weight: 900;
-        line-height: 1.15;
-        letter-spacing: -0.5px;
-        color: #fff;
+      .outro-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(5, 110, 250, 0.15);
+        border: 1px solid rgba(5, 110, 250, 0.4);
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--cyan-neon);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
         margin-bottom: 14px;
+      }
+
+      .outro-main-text {
+        font-size: 36px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.8px;
+        color: #fff;
+        margin-bottom: 12px;
       }
 
       .outro-main-text span {
         color: var(--blue-vigia);
+        text-shadow: 0 0 25px var(--blue-glow);
       }
 
       .outro-sub-desc {
-        font-size: 16px;
+        font-size: 15px;
         color: #94a3b8;
-        line-height: 1.5;
+        line-height: 1.45;
         max-width: 320px;
-        margin-bottom: 32px;
+        margin-bottom: 28px;
       }
 
       .cta-pill-button {
-        background: var(--blue-vigia);
+        background: linear-gradient(135deg, var(--blue-vigia) 0%, #0052cc 100%);
         color: #fff;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 900;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        padding: 18px 40px;
+        padding: 16px 36px;
         border-radius: 40px;
-        box-shadow: 0 10px 35px var(--blue-glow);
+        box-shadow:
+          0 10px 30px var(--blue-glow),
+          0 0 40px rgba(5, 110, 250, 0.35);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 10px;
         border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.2s ease;
+      }
+
+      .cta-pill-button:active {
+        transform: scale(0.96);
       }
 
       /* Bottom Timeline Indicator */
@@ -620,15 +703,15 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.1);
         z-index: 20;
       }
 
       .timeline-strip-fill {
         height: 100%;
         width: 0%;
-        background: var(--blue-vigia);
-        box-shadow: 0 0 10px var(--blue-vigia);
+        background: linear-gradient(90deg, var(--blue-vigia), var(--cyan-neon));
+        box-shadow: 0 0 10px var(--cyan-neon);
         transition: width 0.1s linear;
       }
     </style>
@@ -639,45 +722,71 @@
       <!-- Video Background (Web-ready H.264) -->
       <div class="video-layer">
         <video id="videoElement" class="video-element" autoplay muted loop playsinline>
+          <source
+            src="https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2FPersonas1_web.mp4?alt=media&token=2e741c4c-0b78-4fed-a3c8-e27e6af2330b"
+            type="video/mp4"
+          />
           <source src="assets/videos/Personas1_web.mp4" type="video/mp4" />
           <source src="assets/videos/Personas1.mp4" type="video/mp4" />
         </video>
         <div class="cinematic-vignette" id="vignette"></div>
       </div>
 
-      <!-- Top Watermark (VigIA Logo + Status) -->
-      <div class="top-watermark" id="topWatermark">
-        <div class="live-chip">
-          <div class="live-dot"></div>
-          <span>Cámara 01 • Acceso</span>
-        </div>
-        <img src="assets/images/logotipo-dark.png" alt="VigIA" class="logo-img-mini" />
+      <!-- Tactical CCTV HUD Elements -->
+      <div class="cctv-hud-overlay">
+        <div class="corner-reticle tl"></div>
+        <div class="corner-reticle tr"></div>
+        <div class="corner-reticle bl"></div>
+        <div class="corner-reticle br"></div>
       </div>
 
-      <!-- Big Kinetic Typography Stage -->
+      <!-- Top Telemetry Bar (Live CCTV Specs) -->
+      <div class="telemetry-bar" id="telemetryBar">
+        <div class="cctv-meta-left">
+          <div class="rec-indicator">
+            <div class="rec-dot"></div>
+            <span class="rec-text" id="liveTimestamp">REC • 18:32:04</span>
+          </div>
+          <span class="cctv-cam-id">CAM-01 [ACCESO]</span>
+        </div>
+        <div class="cctv-meta-right">
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Flogotipo-dark.png?alt=media&token=08ca481a-ee08-4873-ac93-1688660252e4"
+            alt="VigIA"
+            class="logo-img-mini"
+            onerror="this.style.display = 'none'"
+          />
+        </div>
+      </div>
+
+      <!-- Big Kinetic Typography Stage (Centered) -->
       <div class="text-stage">
         <!-- Scene 1: Hook (04.8s - 09.5s) -->
         <div class="scene-text" id="scene1">
-          <div class="tag-chip">Sábado 18:30 hrs</div>
+          <div class="tech-badge-chip">
+            <span>⚡ SÁBADO 18:30 HRS • TRÁFICO PEAK</span>
+          </div>
           <h1 class="headline-big">
-            Tu local está <br />
-            <span class="highlight-blue">a reventar.</span>
+            TU LOCAL ESTÁ <br />
+            <span class="highlight-blue">A REVENTAR.</span>
           </h1>
           <p class="sub-headline-text">1,820 personas cruzaron la puerta este fin de semana.</p>
         </div>
 
         <!-- Scene 2: The Twist (09.5s - 15.0s) -->
         <div class="scene-text" id="scene2">
-          <div class="tag-chip danger">Punto Ciego</div>
+          <div class="tech-badge-chip danger">
+            <span>🚨 PUNTO CIEGO FINANCIERO</span>
+          </div>
           <h1 class="headline-big">
-            Crees que rompiste <br />
-            <span class="highlight-danger">récord de ventas...</span>
+            CREES QUE ROMPISTE <br />
+            <span class="highlight-danger">RÉCORD DE VENTAS...</span>
           </h1>
           <div class="metric-pill-large">
             <div class="metric-pill-value">11.2%</div>
             <div class="metric-pill-details">
               <span class="metric-pill-title">Tasa de Conversión</span>
-              <span class="metric-pill-sub">▼ -54% caída crítica</span>
+              <span class="metric-pill-sub">▼ -54.8% Caída Crítica</span>
             </div>
           </div>
         </div>
@@ -690,12 +799,12 @@
             <div class="report-header-left">
               <div class="report-icon-box">
                 <svg
-                  width="22"
-                  height="22"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2.3"
+                  stroke-width="2.5"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -705,18 +814,18 @@
                 </svg>
               </div>
               <div>
-                <div class="report-title-text">Conversión vs Tráfico</div>
-                <div class="report-sub-text">Auditoría con Visión Computacional</div>
+                <div class="report-title-text">Auditoría: Tráfico vs Conversión</div>
+                <div class="report-sub-text">MODELO: VISIÓN COMPUTACIONAL 4K</div>
               </div>
             </div>
-            <div class="report-badge-date">Fin de Semana</div>
+            <div class="report-badge-date">SÁBADO PEAK</div>
           </div>
 
           <div class="kpi-dual-row">
             <div class="kpi-column">
               <span class="kpi-caption">Personas Ingresadas</span>
               <span class="kpi-number">1,820</span>
-              <span class="kpi-status-foot">✓ Récord absoluto</span>
+              <span class="kpi-status-foot">▲ +48% vs Promedio</span>
             </div>
             <div class="kpi-column danger">
               <span class="kpi-caption">Tasa de Conversión</span>
@@ -725,44 +834,54 @@
             </div>
           </div>
 
-          <!-- Clean Chart -->
+          <!-- Clean Tech SVG Chart -->
           <div class="chart-box">
             <div class="chart-tags-row">
               <div class="chart-tag-item">
                 <div class="chart-tag-dot" style="background: rgba(255, 255, 255, 0.4)"></div>
-                <span style="color: var(--text-muted)">Tráfico (Personas)</span>
+                <span style="color: var(--text-muted)">Tráfico Entrada (1,820)</span>
               </div>
               <div class="chart-tag-item">
                 <div class="chart-tag-dot" style="background: var(--blue-vigia)"></div>
-                <span style="color: var(--blue-vigia)">Tasa Conversión %</span>
+                <span style="color: var(--cyan-neon)">Conversión Real %</span>
               </div>
             </div>
             <svg class="svg-canvas" viewBox="0 0 280 50">
-              <!-- Traffic curve -->
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#056EFA" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#056EFA" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <!-- Traffic dashed trend -->
               <path
                 d="M 10 42 C 70 40, 140 24, 270 6"
                 fill="none"
-                stroke="rgba(255,255,255,0.25)"
-                stroke-width="2.5"
+                stroke="rgba(255,255,255,0.2)"
+                stroke-width="2"
                 stroke-dasharray="3 3"
               />
-              <!-- Conversion curve -->
+              <!-- Conversion Area Fill -->
+              <path d="M 10 10 C 70 12, 140 18, 270 44 L 270 50 L 10 50 Z" fill="url(#areaGrad)" />
+              <!-- Conversion line -->
               <path
                 d="M 10 10 C 70 12, 140 18, 270 44"
                 fill="none"
-                stroke="#056EFA"
-                stroke-width="3.8"
+                stroke="#00F0FF"
+                stroke-width="3"
                 stroke-linecap="round"
               />
-              <circle cx="270" cy="44" r="5" fill="#EF4444" stroke="#FFF" stroke-width="1.8" />
+              <!-- Point Markers -->
+              <circle cx="10" cy="10" r="4" fill="#00F0FF" stroke="#040914" stroke-width="2" />
+              <circle cx="270" cy="44" r="5" fill="#EF4444" stroke="#FFF" stroke-width="2" />
             </svg>
           </div>
 
           <div class="diagnostic-strip">
-            <span style="font-size: 20px">⏱️</span>
+            <div class="diag-pulse-dot"></div>
             <div>
-              Causa: <strong>Fila de 9.4 min</strong> en cajas. Los clientes se marcharon sin pagar.
-              <strong>Pérdida: -$6,875 USD</strong>.
+              <strong>Cuello de botella en cajas:</strong> Fila promedio de
+              <strong>9.4 minutos</strong>. Pérdida estimada: <strong>-$6,875 USD</strong>.
             </div>
           </div>
         </div>
@@ -771,17 +890,22 @@
       <!-- Scene 4: Punchline & Outro (22.0s - 28.0s) -->
       <div class="outro-stage" id="outroStage">
         <div class="outro-logo-wrap">
-          <img src="assets/images/logotipo-dark.png" alt="VigIA" class="outro-logo-img" />
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/desarrollo-en-la-nube-7e9ff.firebasestorage.app/o/vigia%2Flogotipo-dark.png?alt=media&token=08ca481a-ee08-4873-ac93-1688660252e4"
+            alt="VigIA"
+            class="outro-logo-img"
+          />
         </div>
+        <div class="outro-badge">Visión Computacional & Analytics</div>
         <h2 class="outro-main-text">
           Más personas <br />
           <span>≠ Más ventas.</span>
         </h2>
         <p class="outro-sub-desc">
-          Convierte tus cámaras de seguridad en métricas reales de tu negocio.
+          Convierte tus cámaras de seguridad en auditorías de rentabilidad en tiempo real.
         </p>
-        <a href="https://vigia.lat" class="cta-pill-button">
-          Solicita el Sistema Ahora
+        <a href="https://vigia.lat" target="_blank" class="cta-pill-button">
+          <span>Solicita el Sistema Ahora</span>
           <svg
             width="18"
             height="18"
@@ -789,6 +913,8 @@
             fill="none"
             stroke="currentColor"
             stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
@@ -811,7 +937,8 @@
 
       const video = document.getElementById("videoElement");
       const vignette = document.getElementById("vignette");
-      const topWatermark = document.getElementById("topWatermark");
+      const telemetryBar = document.getElementById("telemetryBar");
+      const liveTimestamp = document.getElementById("liveTimestamp");
       const scene1 = document.getElementById("scene1");
       const scene2 = document.getElementById("scene2");
       const reportCard = document.getElementById("reportCard");
@@ -820,59 +947,71 @@
       const canvas = document.getElementById("canvas");
 
       // Click canvas to toggle play/pause or replay
-      canvas.addEventListener("click", () => {
+      canvas.addEventListener("click", (e) => {
+        if (e.target.closest(".cta-pill-button")) return;
         if (currentTime >= DURATION - 1) {
           currentTime = 0;
-          if (video.duration) video.currentTime = 0;
+          if (video && video.duration) video.currentTime = 0;
         }
         isPlaying = !isPlaying;
-        if (isPlaying) video.play();
-        else video.pause();
+        if (video) {
+          if (isPlaying) video.play().catch(() => {});
+          else video.pause();
+        }
       });
 
       function updateChoreography(time) {
-        // 0.0s - 04.8s: Raw CCTV Video Alone (4.8 seconds to hook the viewer)
-        if (time < 4.8) {
-          video.classList.remove("blurred");
-          video.classList.remove("panning");
-          vignette.classList.remove("dimmed");
-          vignette.classList.remove("darker");
-          topWatermark.classList.remove("visible");
+        // Update live CCTV timestamp clock (simulated realistic seconds)
+        const sec = Math.floor(time * 2);
+        const secPad = (sec % 60).toString().padStart(2, "0");
+        liveTimestamp.innerText = `REC • 18:32:${secPad}`;
+
+        // 0.0s - 03.5s: RAW VIDEO ALONE (Space for native TikTok SEO text)
+        if (time < 3.5) {
+          if (video) {
+            video.classList.remove("blurred");
+            video.classList.remove("panning");
+          }
+          vignette.classList.remove("dimmed", "darker");
+          if (telemetryBar) telemetryBar.style.opacity = "0";
           scene1.classList.remove("active");
           scene2.classList.remove("active");
           reportCard.classList.remove("active");
           outroStage.classList.remove("active");
         }
-        // 04.8s - 09.5s: First Big Text & Background Dimming (High contrast)
-        else if (time >= 4.8 && time < 9.5) {
-          topWatermark.classList.add("visible");
-          video.classList.add("panning");
+        // 03.5s - 08.5s: First Big Text & Background Dimming (Darkened for Contrast)
+        else if (time >= 3.5 && time < 8.5) {
+          if (video) {
+            video.classList.add("panning");
+            video.classList.remove("blurred");
+          }
+          if (telemetryBar) telemetryBar.style.opacity = "1";
           vignette.classList.add("dimmed");
           vignette.classList.remove("darker");
           scene1.classList.add("active");
           scene2.classList.remove("active");
           reportCard.classList.remove("active");
           outroStage.classList.remove("active");
-          video.classList.remove("blurred");
         }
-        // 09.5s - 15.0s: The Plot Twist (Conversion Drop)
-        else if (time >= 9.5 && time < 15.0) {
+        // 08.5s - 14.5s: The Plot Twist (Conversion Drop, Darker Background)
+        else if (time >= 8.5 && time < 14.5) {
+          if (video) video.classList.remove("blurred");
           scene1.classList.remove("active");
           vignette.classList.remove("dimmed");
           vignette.classList.add("darker");
           scene2.classList.add("active");
           reportCard.classList.remove("active");
           outroStage.classList.remove("active");
-          video.classList.remove("blurred");
         }
-        // 15.0s - 22.0s: The Animated Report Card (Glassmorphism & Chart)
-        else if (time >= 15.0 && time < 22.0) {
+        // 14.5s - 21.5s: The Animated Report Card (Centered & Darkened)
+        else if (time >= 14.5 && time < 21.5) {
+          if (video) video.classList.add("blurred");
+          vignette.classList.add("darker");
           scene2.classList.remove("active");
-          video.classList.add("blurred");
           reportCard.classList.add("active");
           outroStage.classList.remove("active");
         }
-        // 22.0s - 28.0s: Clean Outro & Real VigIA Logo
+        // 21.5s - 28.0s: Clean Outro & Real VigIA Logo
         else {
           reportCard.classList.remove("active");
           outroStage.classList.add("active");
@@ -888,13 +1027,16 @@
           currentTime += delta;
           if (currentTime >= DURATION) {
             currentTime = 0;
-            if (video.duration) video.currentTime = 0;
+            if (video && video.duration) video.currentTime = 0;
           }
 
-          if (video.duration) {
+          if (video && video.duration) {
             const expectedVideoTime = currentTime % video.duration;
-            if (Math.abs(video.currentTime - expectedVideoTime) > 0.5) {
+            if (Math.abs(video.currentTime - expectedVideoTime) > 0.4) {
               video.currentTime = expectedVideoTime;
+            }
+            if (isPlaying && video.paused) {
+              video.play().catch(() => {});
             }
           }
 
@@ -907,9 +1049,15 @@
       }
 
       window.addEventListener("DOMContentLoaded", () => {
-        video.play().catch(() => {
-          console.log("Autoplay paused. Click canvas to start.");
-        });
+        if (video) {
+          video.addEventListener("ended", () => {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          });
+          video.play().catch(() => {
+            console.log("Autoplay paused. Click canvas to start.");
+          });
+        }
         requestAnimationFrame(loop);
       });
     </script>

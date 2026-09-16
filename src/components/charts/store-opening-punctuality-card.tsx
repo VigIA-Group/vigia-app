@@ -3,11 +3,7 @@
  */
 import { OPERATIONS_METRICS } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
-import {
-  Camera,
-  Clock,
-  DoorOpen,
-} from "lucide-react-native";
+import { Camera, Clock, DoorOpen } from "lucide-react-native";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
 
@@ -54,7 +50,12 @@ export function StoreOpeningPunctualityCard() {
           paddingVertical={5}
           borderRadius={8}
         >
-          <Text fontSize={12} fontWeight="800" color={VIGIA_COLORS.emeraldSuccess} fontFamily="$mono">
+          <Text
+            fontSize={12}
+            fontWeight="800"
+            color={VIGIA_COLORS.emeraldSuccess}
+            fontFamily="$mono"
+          >
             {punctualityScore}% Puntualidad 7D
           </Text>
         </View>
@@ -75,7 +76,10 @@ export function StoreOpeningPunctualityCard() {
         <YStack gap={2}>
           <XStack alignItems="center" gap={6}>
             <Text fontSize={11} color={colors.textLabel} fontFamily="$body">
-              Apertura Hoy: <Text fontWeight="700" color={colors.text}>{today.day} {today.date}</Text>
+              Apertura Hoy:{" "}
+              <Text fontWeight="700" color={colors.text}>
+                {today.day} {today.date}
+              </Text>
             </Text>
             <XStack
               backgroundColor="rgba(255, 255, 255, 0.06)"
@@ -171,7 +175,13 @@ export function StoreOpeningPunctualityCard() {
                   {p.date}
                 </Text>
 
-                <Text fontSize={12} fontWeight="800" color={colors.text} fontFamily="$mono" marginTop={2}>
+                <Text
+                  fontSize={12}
+                  fontWeight="800"
+                  color={colors.text}
+                  fontFamily="$mono"
+                  marginTop={2}
+                >
                   {p.actualOpenTime}
                 </Text>
 
@@ -213,7 +223,9 @@ export function StoreOpeningPunctualityCard() {
             Impacto en Experiencia de Cliente y Ventas Matutinas
           </Text>
           <Text fontSize={10.5} color={colors.textSec} fontFamily="$body" lineHeight={15}>
-            Los retrasos de apertura (sábado +15 min y martes +12 min) generaron colas externas de hasta 8 personas. La apertura puntual a las 08:30 permite capturar compras de desayuno y tránsito laboral temprano.
+            Los retrasos de apertura (sábado +15 min y martes +12 min) generaron colas externas de
+            hasta 8 personas. La apertura puntual a las 08:30 permite capturar compras de desayuno y
+            tránsito laboral temprano.
           </Text>
         </YStack>
       </XStack>

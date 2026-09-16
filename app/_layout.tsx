@@ -1,13 +1,13 @@
 import { ThemeContext, useThemeState } from "@/src/hooks/use-app-theme";
 import config from "@/tamagui.config";
 import {
-    PlusJakartaSans_300Light,
-    PlusJakartaSans_400Regular,
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_600SemiBold,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
-    useFonts,
+  PlusJakartaSans_300Light,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+  useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
@@ -106,6 +106,8 @@ export default function RootLayout() {
                 <Stack.Screen name="auth/login" />
                 <Stack.Screen name="auth/signup" />
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="desposte" options={{ animation: "slide_from_right" }} />
+                <Stack.Screen name="deposte" options={{ animation: "slide_from_right" }} />
                 <Stack.Screen
                   name="settings"
                   options={{ presentation: "modal", animation: "slide_from_bottom" }}

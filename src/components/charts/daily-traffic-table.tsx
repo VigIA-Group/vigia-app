@@ -6,14 +6,7 @@
 import { useColors } from "@/src/hooks/use-colors";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { getDailyTrafficBreakdown } from "@/src/data/mock";
-import {
-  ArrowDownUp,
-  Calendar,
-  Clock,
-  ShoppingCart,
-  TrendingUp,
-  Users,
-} from "lucide-react-native";
+import { ArrowDownUp, Calendar, Clock, ShoppingCart, TrendingUp, Users } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View, XStack, YStack } from "tamagui";
 import { VIGIA_COLORS } from "./chart-theme";
@@ -165,22 +158,59 @@ export function DailyTrafficTable() {
             borderBottomWidth={1}
             borderBottomColor={colors.borderSoft}
           >
-            <Text flex={2} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading">
+            <Text
+              flex={2}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+            >
               DÍA / FECHA
             </Text>
-            <Text flex={2} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading">
+            <Text
+              flex={2}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+            >
               VISITANTES (AFORO)
             </Text>
-            <Text flex={1.8} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading">
+            <Text
+              flex={1.8}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+            >
               HORA PICO
             </Text>
-            <Text flex={1.5} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading">
+            <Text
+              flex={1.5}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+            >
               PERMANENCIA
             </Text>
-            <Text flex={2.2} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading">
+            <Text
+              flex={2.2}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+            >
               CONVERSIÓN (VENTAS)
             </Text>
-            <Text flex={1.8} fontSize={11} fontWeight="700" color={colors.textLabel} fontFamily="$heading" textAlign="right">
+            <Text
+              flex={1.8}
+              fontSize={11}
+              fontWeight="700"
+              color={colors.textLabel}
+              fontFamily="$heading"
+              textAlign="right"
+            >
               ESTADO RETAIL
             </Text>
           </XStack>
@@ -209,7 +239,9 @@ export function DailyTrafficTable() {
                     width={34}
                     height={34}
                     borderRadius={8}
-                    backgroundColor={isWeekend ? "rgba(251, 191, 36, 0.15)" : "rgba(5, 110, 250, 0.12)"}
+                    backgroundColor={
+                      isWeekend ? "rgba(251, 191, 36, 0.15)" : "rgba(5, 110, 250, 0.12)"
+                    }
                     alignItems="center"
                     justifyContent="center"
                   >
@@ -256,15 +288,23 @@ export function DailyTrafficTable() {
                       color={isPositiveDiff ? VIGIA_COLORS.emeraldSuccess : VIGIA_COLORS.redDanger}
                       fontFamily="$mono"
                     >
-                      {isPositiveDiff ? "+" : ""}{row.vsAvgPercent}%
+                      {isPositiveDiff ? "+" : ""}
+                      {row.vsAvgPercent}%
                     </Text>
                   </XStack>
-                  <View width={90} height={4} borderRadius={2} backgroundColor="rgba(255, 255, 255, 0.08)">
+                  <View
+                    width={90}
+                    height={4}
+                    borderRadius={2}
+                    backgroundColor="rgba(255, 255, 255, 0.08)"
+                  >
                     <View
                       height={4}
                       borderRadius={2}
                       backgroundColor={VIGIA_COLORS.blueVibrant}
-                      width={`${Math.round((row.visitors / maxDailyVisitors) * 100)}%` as `${number}%`}
+                      width={
+                        `${Math.round((row.visitors / maxDailyVisitors) * 100)}%` as `${number}%`
+                      }
                     />
                   </View>
                 </YStack>
@@ -293,7 +333,10 @@ export function DailyTrafficTable() {
                 {/* Conversión & Tickets */}
                 <YStack flex={2.2} gap={3}>
                   <XStack alignItems="center" gap={6}>
-                    <ShoppingCart size={12} color={isCritical ? VIGIA_COLORS.amberWarning : VIGIA_COLORS.emeraldSuccess} />
+                    <ShoppingCart
+                      size={12}
+                      color={isCritical ? VIGIA_COLORS.amberWarning : VIGIA_COLORS.emeraldSuccess}
+                    />
                     <Text
                       fontSize={13}
                       fontWeight="800"
@@ -306,11 +349,18 @@ export function DailyTrafficTable() {
                       ({row.transactions.toLocaleString("es-BO")} tickets)
                     </Text>
                   </XStack>
-                  <View width={100} height={4} borderRadius={2} backgroundColor="rgba(255, 255, 255, 0.08)">
+                  <View
+                    width={100}
+                    height={4}
+                    borderRadius={2}
+                    backgroundColor="rgba(255, 255, 255, 0.08)"
+                  >
                     <View
                       height={4}
                       borderRadius={2}
-                      backgroundColor={isCritical ? VIGIA_COLORS.amberWarning : VIGIA_COLORS.emeraldSuccess}
+                      backgroundColor={
+                        isCritical ? VIGIA_COLORS.amberWarning : VIGIA_COLORS.emeraldSuccess
+                      }
                       width={`${row.conversionRate}%` as `${number}%`}
                     />
                   </View>
@@ -374,7 +424,9 @@ export function DailyTrafficTable() {
                     width={40}
                     height={40}
                     borderRadius={10}
-                    backgroundColor={row.isWeekend ? "rgba(251, 191, 36, 0.15)" : "rgba(5, 110, 250, 0.12)"}
+                    backgroundColor={
+                      row.isWeekend ? "rgba(251, 191, 36, 0.15)" : "rgba(5, 110, 250, 0.12)"
+                    }
                     alignItems="center"
                     justifyContent="center"
                   >
@@ -435,7 +487,9 @@ export function DailyTrafficTable() {
                       fontSize={13}
                       fontWeight="800"
                       color={
-                        row.conversionRate >= 80 ? VIGIA_COLORS.emeraldSuccess : VIGIA_COLORS.amberWarning
+                        row.conversionRate >= 80
+                          ? VIGIA_COLORS.emeraldSuccess
+                          : VIGIA_COLORS.amberWarning
                       }
                       fontFamily="$mono"
                     >

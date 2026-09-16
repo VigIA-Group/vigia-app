@@ -42,10 +42,13 @@ import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import {
   BarChart2,
+  Beef,
   Bell,
   Briefcase,
+  ChevronRight,
   Factory,
   Filter,
   GitCompareArrows,
@@ -55,7 +58,7 @@ import {
   Users,
 } from "lucide-react-native";
 import { useRef, useState } from "react";
-import { Platform, ScrollView, Switch } from "react-native";
+import { Platform, ScrollView, Switch, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, XStack, YStack } from "tamagui";
 
@@ -759,7 +762,11 @@ export default function ReportsScreen() {
           {activeTab === "traffic" && (
             <YStack gap={14}>
               {/* Traffic sub-tabs */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ marginHorizontal: -4 }}
+              >
                 <XStack gap={8} paddingVertical={2}>
                   {TRAFFIC_SUB_TABS.map((subTab) => {
                     const active = trafficSubTab === subTab.id;
@@ -854,7 +861,11 @@ export default function ReportsScreen() {
                   )}
 
                   {/* Desktop: chart left, side panel right */}
-                  <XStack gap={14} alignItems="flex-start" flexDirection={isDesktop ? "row" : "column"}>
+                  <XStack
+                    gap={14}
+                    alignItems="flex-start"
+                    flexDirection={isDesktop ? "row" : "column"}
+                  >
                     <View
                       flex={isDesktop ? 3 : undefined}
                       backgroundColor={colors.card}
@@ -906,7 +917,8 @@ export default function ReportsScreen() {
                         >
                           <View width={6} height={6} borderRadius={3} backgroundColor="#056EFA" />
                           <Text fontSize={11} fontWeight="700" color="#056EFA" fontFamily="$body">
-                            Hora pico: {getPeakHourToday().hour}:00 – {getPeakHourToday().count} personas
+                            Hora pico: {getPeakHourToday().hour}:00 – {getPeakHourToday().count}{" "}
+                            personas
                           </Text>
                         </XStack>
                       )}
@@ -940,23 +952,43 @@ export default function ReportsScreen() {
                       )}
 
                       {comparePeriod && period === "7d" && (
-                        <XStack justifyContent="space-between" alignItems="center" marginTop={12} flexWrap="wrap" gap={8}>
+                        <XStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          marginTop={12}
+                          flexWrap="wrap"
+                          gap={8}
+                        >
                           <XStack gap={16}>
                             <XStack gap={5} alignItems="center">
-                              <View width={12} height={3} borderRadius={2} backgroundColor="#056EFA" />
+                              <View
+                                width={12}
+                                height={3}
+                                borderRadius={2}
+                                backgroundColor="#056EFA"
+                              />
                               <Text fontSize={11} color={colors.textTer} fontFamily="$body">
                                 Actual
                               </Text>
                             </XStack>
                             <XStack gap={5} alignItems="center">
-                              <View width={12} height={3} borderRadius={2} backgroundColor="#475569" />
+                              <View
+                                width={12}
+                                height={3}
+                                borderRadius={2}
+                                backgroundColor="#475569"
+                              />
                               <Text fontSize={11} color={colors.textTer} fontFamily="$body">
                                 Período anterior
                               </Text>
                             </XStack>
                           </XStack>
                           <View
-                            backgroundColor={getWeeklyChangePercent() >= 0 ? "rgba(52, 211, 153, 0.15)" : "rgba(248, 113, 113, 0.15)"}
+                            backgroundColor={
+                              getWeeklyChangePercent() >= 0
+                                ? "rgba(52, 211, 153, 0.15)"
+                                : "rgba(248, 113, 113, 0.15)"
+                            }
                             paddingHorizontal={8}
                             paddingVertical={3}
                             borderRadius={6}
@@ -967,7 +999,8 @@ export default function ReportsScreen() {
                               fontFamily="$mono"
                               color={getWeeklyChangePercent() >= 0 ? "#34d399" : "#f87171"}
                             >
-                              {getWeeklyChangePercent() >= 0 ? "+" : ""}{getWeeklyChangePercent()}% vs. semana anterior
+                              {getWeeklyChangePercent() >= 0 ? "+" : ""}
+                              {getWeeklyChangePercent()}% vs. semana anterior
                             </Text>
                           </View>
                         </XStack>
@@ -1012,7 +1045,11 @@ export default function ReportsScreen() {
                                       >
                                         {cam.name}
                                       </Text>
-                                      <Text fontSize={10} color={colors.textLabel} fontFamily="$body">
+                                      <Text
+                                        fontSize={10}
+                                        color={colors.textLabel}
+                                        fontFamily="$body"
+                                      >
                                         {cam.room}
                                       </Text>
                                     </YStack>
@@ -1080,6 +1117,66 @@ export default function ReportsScreen() {
           {/* ══ PRODUCCIÓN & MANUFACTURA DE ALIMENTOS ══ */}
           {activeTab === "production" && (
             <YStack gap={14}>
+              {/* Acceso Directo: Vertical Especializada Frigorífico Desposte de Cerdos */}
+              <TouchableOpacity
+                onPress={() => router.push("/desposte" as any)}
+                style={{
+                  backgroundColor: "rgba(10, 76, 232, 0.12)",
+                  borderWidth: 1.2,
+                  borderColor: "rgba(33, 152, 244, 0.4)",
+                  borderRadius: 14,
+                  padding: 14,
+                }}
+              >
+                <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={12}>
+                  <XStack gap={12} alignItems="center" flex={1} minWidth={220}>
+                    <View
+                      width={38}
+                      height={38}
+                      borderRadius={10}
+                      backgroundColor="rgba(33, 152, 244, 0.2)"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Beef size={20} color="#38bdf8" />
+                    </View>
+                    <YStack flex={1} gap={2}>
+                      <XStack alignItems="center" gap={8}>
+                        <Text fontSize={13} fontWeight="800" color={colors.text} fontFamily="$body">
+                          Planta Frigorífica · Desposte de Cerdos
+                        </Text>
+                        <View
+                          backgroundColor="rgba(16, 185, 129, 0.2)"
+                          paddingHorizontal={6}
+                          paddingVertical={2}
+                          borderRadius={4}
+                        >
+                          <Text fontSize={9} fontWeight="700" color="#34d399" fontFamily="$mono">
+                            6 CÁMARAS CON IA
+                          </Text>
+                        </View>
+                      </XStack>
+                      <Text
+                        fontSize={11}
+                        color={colors.textSec}
+                        fontFamily="$body"
+                        numberOfLines={2}
+                      >
+                        Clasificación de cortes (muslos, cabeza, costillar), telemetría de cinta y
+                        auditoría EPP anticorte.
+                      </Text>
+                    </YStack>
+                  </XStack>
+
+                  <XStack alignItems="center" gap={4}>
+                    <Text fontSize={12} fontWeight="700" color="#38bdf8" fontFamily="$body">
+                      Ver Dashboard Desposte
+                    </Text>
+                    <ChevronRight size={16} color="#38bdf8" />
+                  </XStack>
+                </XStack>
+              </TouchableOpacity>
+
               {/* Tarjetas KPI Ejecutivas de Producción */}
               <ProductionKpiSummary />
 

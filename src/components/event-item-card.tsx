@@ -1,12 +1,12 @@
 import type { EventItem } from "@/src/data/mock";
 import { getRelativeTime } from "@/src/data/mock";
 import {
-    Camera,
-    PackageX,
-    PersonStanding,
-    ScanLine,
-    ShieldAlert,
-    Users,
+  Camera,
+  PackageX,
+  PersonStanding,
+  ScanLine,
+  ShieldAlert,
+  Users,
 } from "lucide-react-native";
 import { MotiView } from "moti";
 import { Text, View, XStack, YStack } from "tamagui";
