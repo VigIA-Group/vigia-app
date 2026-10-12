@@ -27,7 +27,7 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const { theme: appTheme, setTheme: setAppTheme } = useThemeState("dark");
+  const { theme: appTheme, setTheme: setAppTheme } = useThemeState("light");
 
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_300Light,
@@ -98,14 +98,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <TamaguiProvider config={config} defaultTheme="dark">
+        <TamaguiProvider config={config} defaultTheme="light">
           <Theme name={appTheme}>
             <ThemeContext.Provider value={{ theme: appTheme, setTheme: setAppTheme }}>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
-                <Stack.Screen name="auth/login" />
-                <Stack.Screen name="auth/signup" />
+                <Stack.Screen name="menu" options={{ animation: "fade" }} />
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="[industry]" options={{ animation: "slide_from_right" }} />
                 <Stack.Screen name="desposte" options={{ animation: "slide_from_right" }} />
                 <Stack.Screen name="deposte" options={{ animation: "slide_from_right" }} />
                 <Stack.Screen

@@ -20,7 +20,8 @@ import { useColors } from "@/src/hooks/use-colors";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { BarChart2, Bell } from "lucide-react-native";
+import { BarChart2, Bell, ChevronRight, Layers, Sparkles } from "lucide-react-native";
+import { TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, Text, View, XStack, YStack } from "tamagui";
 
@@ -78,6 +79,63 @@ export default function HomeScreen() {
         {TODAY.getFullYear()}
       </Text>
     </YStack>
+  );
+
+  const industryBanner = (
+    <View paddingHorizontal={20} marginBottom={20}>
+      <TouchableOpacity
+        onPress={() => router.push("/menu" as any)}
+        style={{
+          borderRadius: 14,
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: "rgba(33, 152, 244, 0.35)",
+        }}
+      >
+        <LinearGradient
+          colors={["#050E1D", "#02209A", "#0A4CE8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{ padding: 14 }}
+        >
+          <XStack justifyContent="space-between" alignItems="center">
+            <XStack alignItems="center" gap={10} flex={1}>
+              <View
+                width={36}
+                height={36}
+                borderRadius={10}
+                backgroundColor="rgba(33, 152, 244, 0.2)"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Layers size={18} color="#38bdf8" />
+              </View>
+              <YStack flex={1} gap={2}>
+                <XStack alignItems="center" gap={6}>
+                  <Text fontSize={12} fontWeight="800" color="#ffffff" fontFamily="$body">
+                    Explorar Demos Multiindustria
+                  </Text>
+                  <View
+                    backgroundColor="rgba(56, 189, 248, 0.2)"
+                    paddingHorizontal={6}
+                    paddingVertical={2}
+                    borderRadius={4}
+                  >
+                    <Text fontSize={9} fontWeight="700" color="#38bdf8" fontFamily="$mono">
+                      18 SECTORES
+                    </Text>
+                  </View>
+                </XStack>
+                <Text fontSize={10.5} color="rgba(255, 255, 255, 0.75)" fontFamily="$body">
+                  Restaurantes, Cocinas, Malls, Hoteles, Obras, Seguridad EHS, Gyms, Clínicas, etc.
+                </Text>
+              </YStack>
+            </XStack>
+            <ChevronRight size={16} color="#38bdf8" />
+          </XStack>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
   );
 
   const kpiCards = (
@@ -361,28 +419,45 @@ export default function HomeScreen() {
           backgroundColor={colors.bg}
         >
           <VigIALogoText height={30} />
-          <View pressStyle={{ opacity: 0.7 }} onPress={() => router.push("/(tabs)/alerts")}>
-            <View>
-              <Bell size={22} color={colors.textTer} />
-              {unreviewedCount > 0 && (
-                <View
-                  position="absolute"
-                  top={-4}
-                  right={-4}
-                  width={16}
-                  height={16}
-                  borderRadius={8}
-                  backgroundColor="#f87171"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text fontSize={9} fontWeight="700" color="#ffffff" fontFamily="$body">
-                    {unreviewedCount > 9 ? "9+" : unreviewedCount}
-                  </Text>
-                </View>
-              )}
+          <XStack alignItems="center" gap={12}>
+            <TouchableOpacity
+              onPress={() => router.push("/menu" as any)}
+              style={{
+                backgroundColor: "rgba(33, 152, 244, 0.15)",
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "rgba(33, 152, 244, 0.3)",
+              }}
+            >
+              <Text fontSize={12} fontWeight="700" color="#38bdf8" fontFamily="$body">
+                Sectores
+              </Text>
+            </TouchableOpacity>
+            <View pressStyle={{ opacity: 0.7 }} onPress={() => router.push("/(tabs)/alerts")}>
+              <View>
+                <Bell size={22} color={colors.textTer} />
+                {unreviewedCount > 0 && (
+                  <View
+                    position="absolute"
+                    top={-4}
+                    right={-4}
+                    width={16}
+                    height={16}
+                    borderRadius={8}
+                    backgroundColor="#f87171"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text fontSize={9} fontWeight="700" color="#ffffff" fontFamily="$body">
+                      {unreviewedCount > 9 ? "9+" : unreviewedCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
+          </XStack>
         </XStack>
 
         <ScrollView
@@ -396,6 +471,7 @@ export default function HomeScreen() {
                 {/* Left column — main content */}
                 <YStack flex={3} minWidth={0}>
                   {greeting}
+                  {industryBanner}
                   {kpiCards}
                   {recentActivity}
                   {heatmap}
@@ -414,6 +490,7 @@ export default function HomeScreen() {
             /* ── Mobile: single column ── */
             <>
               {greeting}
+              {industryBanner}
               {kpiCards}
               {recentActivity}
               {activeModulesSection}

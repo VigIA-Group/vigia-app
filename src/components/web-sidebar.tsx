@@ -2,8 +2,15 @@ import { getUnreviewedCount } from "@/src/data/mock";
 import { useColors } from "@/src/hooks/use-colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { usePathname, useRouter } from "expo-router";
-import { BarChart2, BellRing, Cctv, CircleUser, LayoutDashboard } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import {
+    BarChart2,
+    BellRing,
+    Cctv,
+    CircleUser,
+    Layers,
+    LayoutDashboard,
+} from "lucide-react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text, YStack } from "tamagui";
 import { VigIALogoText } from "./vigia-logo-text";
 
@@ -15,7 +22,7 @@ const NAV_ITEMS = [
   { name: "cameras", label: "Cámaras", href: "/(tabs)/cameras", Icon: Cctv },
   { name: "reports", label: "Reportes", href: "/(tabs)/reports", Icon: BarChart2 },
   { name: "alerts", label: "Alertas", href: "/(tabs)/alerts", Icon: BellRing },
-  { name: "profile", label: "Perfil", href: "/(tabs)/profile", Icon: CircleUser },
+  { name: "profile", label: "Demo & Ajustes", href: "/(tabs)/profile", Icon: CircleUser },
 ] as const;
 
 export function WebSidebar() {
@@ -37,8 +44,43 @@ export function WebSidebar() {
         flexShrink: 0,
       }}
     >
-      <View style={{ paddingHorizontal: 8, marginBottom: 32 }}>
+      <View style={{ paddingHorizontal: 8, marginBottom: 20 }}>
         <VigIALogoText height={24} />
+      </View>
+
+      {/* Button to Industry Demos Selector */}
+      <View style={{ marginBottom: 18 }}>
+        <TouchableOpacity
+          onPress={() => router.push("/menu" as any)}
+          style={{
+            backgroundColor: "rgba(10, 76, 232, 0.14)",
+            borderWidth: 1,
+            borderColor: "rgba(33, 152, 244, 0.35)",
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            borderRadius: 10,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <Layers size={18} color="#38bdf8" />
+          <YStack flex={1}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "700",
+                color: "#38bdf8",
+                fontFamily: "DMSans_400Regular",
+              }}
+            >
+              Demos Sectoriales
+            </Text>
+            <Text style={{ fontSize: 10, color: "#94a3b8", fontFamily: "DMSans_400Regular" }}>
+              18 Industrias
+            </Text>
+          </YStack>
+        </TouchableOpacity>
       </View>
 
       <YStack gap={4}>

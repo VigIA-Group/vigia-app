@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -9,14 +8,9 @@ import { View } from "tamagui";
 
 export default function SplashScreen() {
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      const session = await AsyncStorage.getItem("vigia_session");
-      if (session) {
-        router.replace("/(tabs)/home");
-      } else {
-        router.replace("/auth/login");
-      }
-    }, 2200);
+    const timer = setTimeout(() => {
+      router.replace("/menu" as any);
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 

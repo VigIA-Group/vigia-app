@@ -2,10 +2,19 @@ import { PageContainer } from "@/src/components/page-container";
 import { LICENSE, USER } from "@/src/data/mock";
 import { useAppTheme } from "@/src/hooks/use-app-theme";
 import { useColors } from "@/src/hooks/use-colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, ChevronRight, LogOut, Monitor, Moon, Settings, Sun, Zap } from "lucide-react-native";
+import {
+  Bell,
+  ChevronRight,
+  Layers,
+  Monitor,
+  Moon,
+  Settings,
+  Sparkles,
+  Sun,
+  Zap,
+} from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -31,13 +40,12 @@ export default function ProfileScreen() {
 
   const handleThemeChange = async (option: ThemeOption) => {
     setSelectedTheme(option);
-    const resolved = option === "system" ? "dark" : option;
+    const resolved = option === "system" ? "light" : option;
     await setAppTheme(resolved);
   };
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("vigia_session");
-    router.replace("/auth/login");
+  const goToMenu = () => {
+    router.push("/menu" as any);
   };
 
   const licenseExpiry = new Date(LICENSE.expiresAt);
@@ -66,29 +74,34 @@ export default function ProfileScreen() {
             alignItems="center"
             gap={10}
           >
-            {/* Avatar */}
+            {/* Avatar / Logo */}
             <View width={72} height={72} borderRadius={36} overflow="hidden">
               <LinearGradient
-                colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
+                colors={["#02209A", "#0A4CE8", "#2198F4"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
               />
               <View flex={1} alignItems="center" justifyContent="center">
-                <Text fontSize={24} fontWeight="700" color="#ffffff" fontFamily="$mono">
-                  {USER.initials}
-                </Text>
+                <Sparkles size={30} color="#ffffff" />
               </View>
             </View>
 
-            <Text fontSize={18} fontWeight="700" color={colors.text} fontFamily="$body">
-              {USER.name}
+            <Text fontSize={20} fontWeight="800" color={colors.text} fontFamily="$body">
+              VigIA · Demo Comercial
             </Text>
-            <Text fontSize={13} color={colors.textTer} fontFamily="$body">
-              {USER.role}
-            </Text>
-            <Text fontSize={12} color={colors.textLabel} fontFamily="$body">
-              {USER.email}
+            <XStack
+              backgroundColor="rgba(33, 152, 244, 0.12)"
+              paddingHorizontal={10}
+              paddingVertical={4}
+              borderRadius={6}
+            >
+              <Text fontSize={11} fontWeight="700" color="#38bdf8" fontFamily="$mono">
+                ACCESO PÚBLICO MULTIINDUSTRIA
+              </Text>
+            </XStack>
+            <Text fontSize={12} color={colors.textLabel} fontFamily="$body" textAlign="center">
+              Exploración abierta de videoanalítica con IA para 18 sectores productivos
             </Text>
           </YStack>
 
@@ -304,23 +317,23 @@ export default function ProfileScreen() {
             </XStack>
           </SectionCard>
 
-          {/* Logout */}
+          {/* Industry Hub Navigation */}
           <View marginHorizontal={16} marginTop={4} marginBottom={20}>
             <XStack
               height={50}
               borderRadius={12}
-              backgroundColor="rgba(248,113,113,0.1)"
+              backgroundColor="rgba(10, 76, 232, 0.15)"
               borderWidth={1}
-              borderColor="rgba(248,113,113,0.2)"
+              borderColor="rgba(33, 152, 244, 0.35)"
               alignItems="center"
               justifyContent="center"
               gap={10}
               pressStyle={{ opacity: 0.7 }}
-              onPress={handleLogout}
+              onPress={goToMenu}
             >
-              <LogOut size={16} color="#f87171" />
-              <Text fontSize={14} fontWeight="600" color="#f87171" fontFamily="$body">
-                Cerrar sesión
+              <Layers size={18} color="#38bdf8" />
+              <Text fontSize={14} fontWeight="700" color="#38bdf8" fontFamily="$body">
+                Explorar Todas las Demos por Industria
               </Text>
             </XStack>
           </View>

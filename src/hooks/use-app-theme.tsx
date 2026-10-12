@@ -9,7 +9,7 @@ interface ThemeContextValue {
 }
 
 export const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
+  theme: "light",
   setTheme: async () => {},
 });
 
@@ -17,7 +17,7 @@ export function useAppTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeState(initial: AppTheme = "dark") {
+export function useThemeState(initial: AppTheme = "light") {
   const [theme, setThemeState] = useState<AppTheme>(initial);
 
   const setTheme = async (newTheme: AppTheme) => {

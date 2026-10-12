@@ -45,7 +45,6 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import {
   BarChart2,
-  Beef,
   Bell,
   Briefcase,
   ChevronRight,
@@ -1117,66 +1116,6 @@ export default function ReportsScreen() {
           {/* ══ PRODUCCIÓN & MANUFACTURA DE ALIMENTOS ══ */}
           {activeTab === "production" && (
             <YStack gap={14}>
-              {/* Acceso Directo: Vertical Especializada Frigorífico Desposte de Cerdos */}
-              <TouchableOpacity
-                onPress={() => router.push("/desposte" as any)}
-                style={{
-                  backgroundColor: "rgba(10, 76, 232, 0.12)",
-                  borderWidth: 1.2,
-                  borderColor: "rgba(33, 152, 244, 0.4)",
-                  borderRadius: 14,
-                  padding: 14,
-                }}
-              >
-                <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={12}>
-                  <XStack gap={12} alignItems="center" flex={1} minWidth={220}>
-                    <View
-                      width={38}
-                      height={38}
-                      borderRadius={10}
-                      backgroundColor="rgba(33, 152, 244, 0.2)"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <Beef size={20} color="#38bdf8" />
-                    </View>
-                    <YStack flex={1} gap={2}>
-                      <XStack alignItems="center" gap={8}>
-                        <Text fontSize={13} fontWeight="800" color={colors.text} fontFamily="$body">
-                          Planta Frigorífica · Desposte de Cerdos
-                        </Text>
-                        <View
-                          backgroundColor="rgba(16, 185, 129, 0.2)"
-                          paddingHorizontal={6}
-                          paddingVertical={2}
-                          borderRadius={4}
-                        >
-                          <Text fontSize={9} fontWeight="700" color="#34d399" fontFamily="$mono">
-                            6 CÁMARAS CON IA
-                          </Text>
-                        </View>
-                      </XStack>
-                      <Text
-                        fontSize={11}
-                        color={colors.textSec}
-                        fontFamily="$body"
-                        numberOfLines={2}
-                      >
-                        Clasificación de cortes (muslos, cabeza, costillar), telemetría de cinta y
-                        auditoría EPP anticorte.
-                      </Text>
-                    </YStack>
-                  </XStack>
-
-                  <XStack alignItems="center" gap={4}>
-                    <Text fontSize={12} fontWeight="700" color="#38bdf8" fontFamily="$body">
-                      Ver Dashboard Desposte
-                    </Text>
-                    <ChevronRight size={16} color="#38bdf8" />
-                  </XStack>
-                </XStack>
-              </TouchableOpacity>
-
               {/* Tarjetas KPI Ejecutivas de Producción */}
               <ProductionKpiSummary />
 
