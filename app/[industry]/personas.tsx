@@ -4,7 +4,7 @@ import { getIndustryById } from "@/src/data/industries";
 import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { useLocalSearchParams } from "expo-router";
-import { Clock, Flame, Layers, TrendingUp, UserCheck, Users } from "lucide-react-native";
+import { Clock, Flame, Users } from "lucide-react-native";
 import React, { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";

@@ -12,6 +12,7 @@ import {
   TrendingUp,
   UserCheck,
 } from "lucide-react-native";
+import { RestaurantTableServiceCard } from "@/src/components/charts/restaurant-table-service-card";
 import React from "react";
 import { ScrollView } from "react-native";
 import { Text, View, XStack, YStack } from "tamagui";
@@ -49,6 +50,11 @@ export default function IndustryOperationsScreen() {
           configuradas según los estándares de cada estación.
         </Text>
       </YStack>
+
+      {/* SECTOR SPECIFIC AUDIT CARD */}
+      {(ind.id === "restaurantes" || ind.id === "cocinas-profesionales") && (
+        <RestaurantTableServiceCard />
+      )}
 
       {/* DWELL TIMES & BOTTLENECK CARDS */}
       <XStack gap={16} flexDirection={isDesktop ? "row" : "column"} alignItems="stretch">

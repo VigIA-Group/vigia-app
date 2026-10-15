@@ -5,13 +5,7 @@ import { useBreakpoint } from "@/src/hooks/use-breakpoint";
 import { useColors } from "@/src/hooks/use-colors";
 import { useLocalSearchParams } from "expo-router";
 import {
-  AlertTriangle,
-  Boxes,
-  CheckCircle2,
-  Clock,
-  Layers,
-  ShieldCheck,
-  TrendingUp,
+    TrendingUp
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";

@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VigIA · Cotización y Propuesta Técnica · Videoanalítica para Restaurantes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      :root {
+        --navy: #0f172a;
+        --navy-light: #1e293b;
+        --blue: #0a4ce8;
+        --blue-dark: #02209a;
+        --blue-soft: #eff6ff;
+        --border: #cbd5e1;
+        --border-light: #e2e8f0;
+        --text: #334155;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --white: #ffffff;
+        --bg-page: #f8fafc;
+        --green-dark: #065f46;
+        --green-bg: #ecfdf5;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "Plus Jakarta Sans",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        color: var(--text);
+        background: #e2e8f0;
+        font-size: 10.5pt;
+        line-height: 1.48;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Screen Action Bar */
+      .action-bar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--navy);
+        border-bottom: 2px solid var(--blue);
+        padding: 10px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3);
+        color: var(--white);
+      }
+      .action-bar-title {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .btn-print {
+        background: var(--blue);
+        color: var(--white);
+        padding: 7px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        transition: background 0.2s;
+      }
+      .btn-print:hover {
+        background: #056efa;
+      }
+
+      /* Exact A4 Page Containers - Calibrated padding to guarantee zero cutoff */
+      .a4-page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        max-height: 297mm;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        page-break-after: always;
+        break-after: page;
+        background: var(--white);
+        margin: 20px auto;
+        padding: 22mm 22mm 18mm 22mm;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      @media print {
+        body {
+          background: none;
+        }
+        .action-bar {
+          display: none !important;
+        }
+        .a4-page {
+          margin: 0 !important;
+          box-shadow: none !important;
+          page-break-after: always !important;
+          break-after: page !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+
+      /* Headers and Footers */
+      .page-header {
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 5px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 8.5pt;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .page-header strong {
+        color: var(--blue-dark);
+      }
+
+      .page-footer {
+        border-top: 1px solid var(--border-light);
+        padding-top: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 8.5pt;
+        color: var(--text-muted);
+      }
+
+      .page-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+
+      /* Typography */
+      h1.doc-title {
+        font-size: 22pt;
+        line-height: 1.25;
+        font-weight: 800;
+        color: var(--navy);
+        margin-bottom: 8px;
+        letter-spacing: -0.4px;
+      }
+      h2.section-title {
+        font-size: 13.5pt;
+        line-height: 1.3;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 7px;
+        padding-bottom: 3px;
+        border-bottom: 1.5px solid var(--blue);
+      }
+      h3.subsection-title {
+        font-size: 10.5pt;
+        font-weight: 700;
+        color: var(--blue-dark);
+        margin-top: 8px;
+        margin-bottom: 4px;
+      }
+      p {
+        font-size: 9.3pt;
+        line-height: 1.45;
+        color: var(--text);
+        margin-bottom: 7px;
+        text-align: justify;
+      }
+
+      /* Cover Page */
+      .cover-page {
+        padding: 38mm 26mm 28mm 26mm;
+        justify-content: space-between;
+      }
+      .cover-top-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 26px;
+      }
+      .cover-logo-text {
+        font-size: 26pt;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--navy);
+      }
+      .cover-logo-text span {
+        color: var(--blue);
+      }
+      .cover-divider {
+        width: 60px;
+        height: 4px;
+        background: var(--blue);
+        margin-bottom: 22px;
+      }
+      .cover-subtitle {
+        font-size: 11.5pt;
+        font-weight: 400;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 30px;
+        text-align: left;
+      }
+
+      .cover-meta-box {
+        border-left: 3px solid var(--blue);
+        padding-left: 16px;
+        margin-top: 20px;
+        margin-bottom: 26px;
+      }
+      .cover-meta-row {
+        margin-bottom: 6px;
+        font-size: 9.8pt;
+      }
+      .cover-meta-row strong {
+        color: var(--navy);
+        display: inline-block;
+        width: 150px;
+      }
+      .cover-meta-row span {
+        color: var(--text);
+      }
+
+      .cover-intro-text {
+        font-size: 9.3pt;
+        line-height: 1.55;
+        color: var(--text);
+        text-align: justify;
+        border-top: 1px solid var(--border-light);
+        padding-top: 14px;
+      }
+
+      /* Modules and Images */
+      .module-block {
+        margin-bottom: 8px;
+      }
+      .module-desc {
+        font-size: 9pt;
+        line-height: 1.4;
+        text-align: justify;
+        margin-bottom: 5px;
+      }
+
+      .images-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 4px;
+        margin-bottom: 6px;
+      }
+      .images-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 4px;
+        margin-bottom: 6px;
+      }
+
+      .image-card {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f8fafc;
+      }
+      .image-card img {
+        width: 100%;
+        height: 88px;
+        object-fit: cover;
+        display: block;
+        background: #0f172a;
+      }
+      .image-card-caption {
+        padding: 4px 6px;
+        font-size: 7.8pt;
+        font-weight: 700;
+        color: var(--navy);
+        background: #ffffff;
+        border-top: 1px solid var(--border-light);
+        line-height: 1.25;
+      }
+      .image-card-sub {
+        font-size: 7pt;
+        font-weight: 400;
+        color: var(--text-muted);
+        display: block;
+        margin-top: 1px;
+      }
+
+      /* Tables */
+      table.doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8.8pt;
+        margin: 6px 0 8px 0;
+      }
+      table.doc-table th {
+        background: var(--navy);
+        color: var(--white);
+        padding: 5px 8px;
+        text-align: left;
+        font-weight: 700;
+        border: 1px solid var(--navy);
+        font-size: 8.5pt;
+      }
+      table.doc-table td {
+        padding: 4px 8px;
+        border: 1px solid var(--border);
+        color: var(--text-dark);
+        vertical-align: middle;
+      }
+      table.doc-table tr:nth-child(even) td {
+        background: #f8fafc;
+      }
+      table.doc-table tr.highlight td {
+        background: var(--blue-soft);
+        font-weight: 700;
+        color: var(--blue-dark);
+      }
+
+      /* Callouts & Examples */
+      .note-box {
+        background: #f8fafc;
+        border-left: 3px solid var(--blue);
+        padding: 7px 10px;
+        margin: 6px 0;
+        font-size: 8.6pt;
+        line-height: 1.4;
+        text-align: justify;
+        color: var(--text);
+      }
+      .note-box strong {
+        color: var(--navy);
+      }
+
+      .example-box {
+        background: #ffffff;
+        border: 1.2px solid var(--border);
+        border-radius: 5px;
+        padding: 9px 12px;
+        margin: 7px 0;
+      }
+      .example-box-title {
+        font-size: 9.3pt;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 3px;
+      }
+
+      /* Lists */
+      ul.doc-list {
+        margin: 3px 0 6px 16px;
+        font-size: 9pt;
+        line-height: 1.38;
+      }
+      ul.doc-list li {
+        margin-bottom: 3px;
+        text-align: justify;
+      }
+      ul.doc-list li strong {
+        color: var(--navy);
+      }
+
+      .recommendation-badge {
+        display: inline-block;
+        background: var(--green-bg);
+        color: var(--green-dark);
+        font-weight: 700;
+        font-size: 7.5pt;
+        padding: 1px 5px;
+        border-radius: 3px;
+        margin-left: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Action Bar (Screen Only) -->
+    <div class="action-bar">
+      <div class="action-bar-title">VigIA · Cotización y Propuesta Técnica para Restaurantes</div>
+      <button onclick="window.print()" class="btn-print">Imprimir / Guardar en PDF</button>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 1: PORTADA EJECUTIVA SIMPLE Y LIMPIA
+     ======================================================== -->
+    <div class="a4-page cover-page">
+      <div>
+        <div class="cover-top-logo">
+          <div class="cover-logo-text">Vig<span>IA</span></div>
+        </div>
+        <div class="cover-divider"></div>
+
+        <h1 class="doc-title">Cotización y Propuesta Técnica</h1>
+        <div class="cover-subtitle">
+          Sistema de Videoanalítica y Detección Automática sobre Cámaras para Restaurantes y Cadenas
+          Gastronómicas
+        </div>
+
+        <div class="cover-meta-box">
+          <div class="cover-meta-row">
+            <strong>Preparado para:</strong>
+            <span>Cadena de Restaurantes y Gastronomía</span>
+          </div>
+          <div class="cover-meta-row">
+            <strong>Cámaras disponibles:</strong>
+            <span>120 cámaras de seguridad instaladas en 10 sucursales</span>
+          </div>
+          <div class="cover-meta-row">
+            <strong>Enfoque analítico:</strong>
+            <span>Selección estratégica de cámaras clave (estimado de ~5 cámaras a procesar)</span>
+          </div>
+          <div class="cover-meta-row">
+            <strong>Modalidades:</strong>
+            <span>Plan Local (On-Premise) y Plan Nube (SaaS)</span>
+          </div>
+          <div class="cover-meta-row">
+            <strong>Fecha:</strong>
+            <span>15 de Octubre 2026</span>
+          </div>
+          <div class="cover-meta-row">
+            <strong>Elaborado por:</strong>
+            <span>VigIa Vision - Plataforma de Videoanalítica</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cover-intro-text">
+        La presente propuesta describe las capacidades de videoanalítica y visión por computadora de
+        la plataforma VigIA orientadas al sector gastronómico. El sistema aprovecha las cámaras de
+        seguridad existentes para transformar el video en información operativa en tiempo real,
+        permitiendo supervisar la afluencia de clientes, los tiempos de atención, el ritmo de
+        preparación en cocina, el cumplimiento de protocolos de higiene y la seguridad de las
+        instalaciones. De las 120 cámaras existentes en la cadena, el análisis se concentra
+        únicamente en los puntos estratégicos donde se toman decisiones operativas, estimando que
+        solo se requerirá procesar alrededor de 5 cámaras clave.
+      </div>
+
+      <div class="page-footer">
+        <span>VigIa Vision - Plataforma de Videoanalítica</span>
+        <span>vigia.world</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 2: ALCANCE OPERATIVO · PERSONAS Y OPERACIONES
+     ======================================================== -->
+    <div class="a4-page">
+      <div class="page-header">
+        <span>VigIA · Propuesta Técnica para Restaurantes</span>
+        <strong>Alcance Operativo (Parte 1)</strong>
+      </div>
+
+      <div class="page-body">
+        <h2 class="section-title">Alcance Operativo: Módulos de Personas y Operaciones</h2>
+        <p>
+          VigIA estructura sus funciones analíticas en cuatro módulos independientes:
+          <strong>Personas</strong>, <strong>Operaciones</strong>, <strong>Producción</strong> y
+          <strong>Seguridad</strong>. Cada cliente puede contratar los módulos que se ajusten a sus
+          prioridades de gestión. A continuación se detalla el alcance de los módulos orientados a
+          la experiencia del comensal y la supervisión del salón y personal.
+        </p>
+
+        <!-- Módulo 1: Personas -->
+        <div class="module-block">
+          <h3 class="subsection-title">1. Módulo de Personas</h3>
+          <p class="module-desc">
+            Analiza el flujo, tránsito y permanencia de comensales en el restaurante para apoyar la
+            toma de decisiones sobre turnos y servicio:
+          </p>
+          <ul class="doc-list">
+            <li>
+              <strong>Conteo y afluencia:</strong> Conteo continuo de entradas y salidas en accesos
+              principales y medición de aforo en sala.
+            </li>
+            <li>
+              <strong>Tiempos de espera y filas:</strong> Detección de filas en recepción y cajas,
+              midiendo el tiempo de espera por cliente.
+            </li>
+            <li>
+              <strong>Mapas de calor y permanencia:</strong> Mapeo de densidad de tránsito y
+              permanencia promedio en mesas, barra y pasillos.
+            </li>
+          </ul>
+
+          <div class="images-grid-3">
+            <div class="image-card">
+              <img src="restaurante/conteopersonas.png" alt="Conteo de personas" />
+              <div class="image-card-caption">
+                Conteo de personas y aforo
+                <span class="image-card-sub">Control de ingresos y salidas en accesos</span>
+              </div>
+            </div>
+            <div class="image-card">
+              <img src="restaurante/tiempodeespera.jpeg" alt="Tiempos de espera" />
+              <div class="image-card-caption">
+                Filas y tiempos de espera
+                <span class="image-card-sub">Monitoreo de colas en cajas y entrada</span>
+              </div>
+            </div>
+            <div class="image-card">
+              <img src="restaurante/mapadecalor.png" alt="Mapas de calor" />
+              <div class="image-card-caption">
+                Mapas de calor en salón
+                <span class="image-card-sub">Densidad de circulación y permanencia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo 2: Operaciones -->
+        <div class="module-block">
+          <h3 class="subsection-title">2. Módulo de Operaciones</h3>
+          <p class="module-desc">
+            Supervisa los estándares de servicio en mesas y las normas higiénicas del personal en
+            cocina y sala de atención:
+          </p>
+          <ul class="doc-list">
+            <li>
+              <strong>Atención y limpieza de mesas:</strong> Alertas cuando una mesa ocupada pasa
+              varios minutos sin recibir atención, o cuando una mesa desocupada permanece sin
+              limpiar ni acondicionar para el siguiente cliente.
+            </li>
+            <li>
+              <strong>Uso reglamentario de uniforme:</strong> Detección del uso adecuado de gorro,
+              cofia, guantes y mandil en zonas de manipulación de alimentos.
+            </li>
+            <li>
+              <strong>Conducta operativa:</strong> Notificación ante el uso indebido de teléfonos
+              móviles en áreas de preparación.
+            </li>
+          </ul>
+
+          <div class="images-grid-2">
+            <div class="image-card">
+              <img src="restaurante/mesas.png" alt="Control de mesas" />
+              <div class="image-card-caption">
+                Estado de mesas en salón
+                <span class="image-card-sub"
+                  >Detección de mesas desatendidas y mesas sin limpiar</span
+                >
+              </div>
+            </div>
+            <div class="image-card">
+              <img src="restaurante/usodeuniformerestaurante.jpeg" alt="Uso de uniforme" />
+              <div class="image-card-caption">
+                Uso de uniforme e inocuidad
+                <span class="image-card-sub">Control de gorro, guantes y mandil en cocina</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>VigIA Vision - Plataforma de Videoanalítica</span>
+        <span>Página 2 de 6</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 3: ALCANCE OPERATIVO · PRODUCCIÓN Y SEGURIDAD
+     ======================================================== -->
+    <div class="a4-page">
+      <div class="page-header">
+        <span>VigIA · Propuesta Técnica para Restaurantes</span>
+        <strong>Alcance Operativo (Parte 2)</strong>
+      </div>
+
+      <div class="page-body">
+        <h2 class="section-title">Alcance Operativo: Módulos de Producción y Seguridad</h2>
+        <p>
+          La eficiencia interna de la cocina y el resguardo de los locales en horarios no laborales
+          completan la supervisión integral de la cadena mediante análisis visual continuo:
+        </p>
+
+        <!-- Módulo 3: Producción -->
+        <div class="module-block">
+          <h3 class="subsection-title">3. Módulo de Producción</h3>
+          <p class="module-desc">
+            Diseñado para monitorear el flujo de preparación y salida de alimentos en la ventanilla
+            de despacho (pase de cocina):
+          </p>
+          <ul class="doc-list">
+            <li>
+              <strong>Conteo de platos despachados:</strong> Registro visual de cada plato o bandeja
+              que sale de cocina hacia el salón o delivery, contabilizado por tipo y turno de
+              trabajo.
+            </li>
+            <li>
+              <strong>Ritmo de cocina y tiempos de entrega:</strong> Medición del tiempo
+              transcurrido entre la comanda y la entrega efectiva del pedido en el mostrador.
+            </li>
+            <li>
+              <strong>Comparación de producción versus ventas:</strong> Conciliación de platos
+              producidos físicamente frente a los tickets registrados en el sistema de facturación,
+              reduciendo mermas y despachos no registrados.
+            </li>
+          </ul>
+
+          <div class="image-card" style="margin-top: 6px; margin-bottom: 10px">
+            <img
+              src="restaurante/produccion.png"
+              alt="Control de producción"
+              style="height: 105px"
+            />
+            <div class="image-card-caption">
+              Control de producción en pase de cocina
+              <span class="image-card-sub"
+                >Conteo automático de platos despachados y medición del ritmo de preparación</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo 4: Seguridad -->
+        <div class="module-block">
+          <h3 class="subsection-title">4. Módulo de Seguridad</h3>
+          <p class="module-desc">
+            Protege las instalaciones fuera del horario comercial aprovechando las cámaras
+            instaladas en accesos, bodegas y salón:
+          </p>
+          <ul class="doc-list">
+            <li>
+              <strong>Intrusión perimetral nocturna:</strong> Activación de perímetros virtuales que
+              detectan la presencia de personas no autorizadas durante la noche o fuera de los
+              horarios de atención.
+            </li>
+            <li>
+              <strong>Alertas con evidencia en video:</strong> Generación inmediata de
+              notificaciones con clip de video hacia el personal de seguridad o supervisores ante
+              cualquier ingreso no programado.
+            </li>
+            <li>
+              <strong>Control de accesos a áreas restringidas:</strong> Supervisión de bodegas de
+              insumos de alto valor y oficinas administrativas.
+            </li>
+          </ul>
+
+          <div class="image-card" style="margin-top: 6px; margin-bottom: 4px">
+            <img src="restaurante/intrusion.png" alt="Seguridad perimetral" style="height: 105px" />
+            <div class="image-card-caption">
+              Seguridad perimetral nocturna
+              <span class="image-card-sub"
+                >Detección de intrusiones con perímetros virtuales activos fuera del horario
+                comercial</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>VigIa Vision - Plataforma de Videoanalítica</span>
+        <span>Página 3 de 6</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 4: DIMENSIONAMIENTO Y VALIDACIÓN DE HARDWARE
+     ======================================================== -->
+    <div class="a4-page">
+      <div class="page-header">
+        <span>VigIA · Propuesta Técnica para Restaurantes</span>
+        <strong>Dimensionamiento y Hardware</strong>
+      </div>
+
+      <div class="page-body">
+        <h2 class="section-title">Dimensionamiento de Servidores y Selección de Cámaras</h2>
+
+        <div class="note-box" style="margin-top: 2px; margin-bottom: 8px">
+          <strong>¿Por qué no es necesario procesar las 120 cámaras de la cadena?</strong><br />
+          La videovigilancia convencional instala decenas de cámaras fijas para registrar pasillos
+          secundarios, ángulos muertos, cajas y perímetros desde múltiples perspectivas pasivas. En
+          cambio,
+          <strong
+            >la videoanalítica operativa de VigIA no requiere procesar todos los flujos
+            existentes</strong
+          >, sino únicamente las cámaras orientadas a los puntos neurálgicos donde ocurren los
+          eventos de negocio: acceso/aforo, salón de mesas, pase de cocina e higiene. Conectar las
+          120 cámaras saturaría el cómputo sin aportar valor. Por ello, la propuesta está
+          dimensionada para procesar únicamente los flujos necesarios, siendo
+          <strong
+            >lo más probable que solo se requiera procesar alrededor de 5 cámaras clave</strong
+          >
+          por establecimiento.
+        </div>
+
+        <p style="font-size: 9.1pt; margin-bottom: 5px">
+          Para el dimensionamiento de hardware, es indispensable distinguir tres conceptos no
+          equivalentes: <strong>Sucursales</strong> (10 locales),
+          <strong>Cámaras instaladas</strong> (120 disponibles) y
+          <strong>Dispositivos de procesamiento</strong>. Un mismo equipo local con capacidad
+          suficiente puede procesar cámaras de varias sucursales si la conectividad y el ancho de
+          banda lo permiten.
+        </p>
+
+        <h3 class="subsection-title">Escenarios de Dimensionamiento Ilustrativos</h3>
+        <ul class="doc-list">
+          <li>
+            <strong>Escenario A (Distribuido):</strong> Un dispositivo por sucursal (10 equipos en
+            total). Prioriza la autonomía operativa total de cada local ante cortes de red externa.
+          </li>
+          <li>
+            <strong>Escenario B (Parcialmente Centralizado):</strong> Varios dispositivos atienden
+            grupos de sucursales según cercanía geográfica y estabilidad de enlaces privados.
+          </li>
+          <li>
+            <strong>Escenario C (Centralizado):</strong> Menos dispositivos de alta capacidad
+            atienden cámaras de varias sucursales en un punto central.
+          </li>
+        </ul>
+
+        <h3 class="subsection-title">Validación con Datos Reales de Laboratorio</h3>
+        <p style="font-size: 9pt; margin-bottom: 4px">
+          Medición sobre equipo del cliente con procesador <strong>Intel Core i7-10700</strong> (8
+          núcleos, 16 hilos) y <strong>16 GB de RAM</strong> en Windows 11 para análisis de personas
+          en cajas:
+        </p>
+
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Prueba de Carga</th>
+              <th>Velocidad de Muestreo</th>
+              <th>Carga de CPU Estimada</th>
+              <th>Evaluación Operativa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>4 cámaras simultáneas</td>
+              <td>3 imágenes por segundo (fps)</td>
+              <td>8 % – 11 %</td>
+              <td>Muy cómodo (consumo marginal)</td>
+            </tr>
+            <tr>
+              <td>10 cámaras simultáneas</td>
+              <td>3 imágenes por segundo (fps)</td>
+              <td>19 % – 27 %</td>
+              <td>Cómodo para operación continua</td>
+            </tr>
+            <tr>
+              <td>10 cámaras simultáneas</td>
+              <td>5 imágenes por segundo (fps)</td>
+              <td>30 % – 43 %</td>
+              <td>Cómodo, con amplio margen libre</td>
+            </tr>
+            <tr>
+              <td>10 cámaras simultáneas</td>
+              <td>10 imágenes por segundo (fps)</td>
+              <td>58 % – 83 %</td>
+              <td>Al límite (no recomendado para 24/7)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note-box" style="margin-top: 4px">
+          <strong>Compatibilidad con el alcance real:</strong> Al procesar únicamente las
+          <strong>alrededor de 5 cámaras clave</strong> por establecimiento a 2–5 fps, el procesador
+          Intel Core i7 opera en una franja sumamente holgada (inferior al 25% de uso), garantizando
+          estabilidad térmica y continuidad 24/7.
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>VigIa Vision - Plataforma de Videoanalítica</span>
+        <span>Página 4 de 6</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 5: COTIZACIÓN · PLAN LOCAL
+     ======================================================== -->
+    <div class="a4-page">
+      <div class="page-header">
+        <span>VigIA · Propuesta Técnica para Restaurantes</span>
+        <strong>Cotización Oficial · Plan Local</strong>
+      </div>
+
+      <div class="page-body">
+        <h2 class="section-title">Cotización: Plan Local (On-Premise)</h2>
+        <p>
+          El Plan Local contempla la instalación de licencias en servidores o computadores situados
+          en las instalaciones del cliente. Los cuatro módulos disponibles son: <em>Personas</em>,
+          <em>Operaciones</em>, <em>Producción</em> y <em>Seguridad</em>. Se recomienda contratar el
+          paquete de <strong>3 módulos</strong> para cubrir las necesidades clave del negocio
+          gastronómico.
+        </p>
+
+        <h3 class="subsection-title">1. Precio Base por Instalación Inicial</h3>
+        <p>
+          El precio de instalación inicial en el primer dispositivo varía en función de la cantidad
+          de módulos contratados. Incluye la puesta en marcha, calibración y
+          <strong>6 meses de soporte técnico gratuito</strong>:
+        </p>
+
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Cantidad de Módulos Contratados</th>
+              <th style="text-align: right">Precio de Instalación Inicial</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 módulo estándar</td>
+              <td style="text-align: right">Bs 9.000</td>
+            </tr>
+            <tr>
+              <td>2 módulos estándar</td>
+              <td style="text-align: right">Bs 10.400</td>
+            </tr>
+            <tr class="highlight">
+              <td>3 módulos estándar <span class="recommendation-badge">Recomendado</span></td>
+              <td style="text-align: right">Bs 11.900</td>
+            </tr>
+            <tr>
+              <td>4 módulos estándar</td>
+              <td style="text-align: right">Bs 13.100</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="subsection-title">2. Instalaciones en Dispositivos o Sucursales Adicionales</h3>
+        <p>
+          Para expandir el sistema a nuevas sucursales o dispositivos adicionales, se aplica una
+          tarifa fija preferencial de
+          <strong>directo solo Bs 1.100 por cada instalación en dispositivo extra</strong>.
+        </p>
+
+        <div class="example-box">
+          <div class="example-box-title">Ejemplo Ilustrativo de Inversión Inicial (Plan Local)</div>
+          <p style="font-size: 9.3pt; margin-bottom: 6px">
+            Para una cadena que contrata la instalación inicial con los 3 módulos recomendados más 5
+            sucursales adicionales:
+          </p>
+          <ul class="doc-list" style="margin-top: 2px; margin-bottom: 6px; font-size: 9.3pt">
+            <li>
+              Instalación inicial en dispositivo principal (3 módulos recomendados):
+              <strong>Bs 11.900</strong>
+            </li>
+            <li>
+              5 instalaciones en dispositivos adicionales (5 × Bs 1.100): <strong>Bs 5.500</strong>
+            </li>
+            <li>
+              <strong>Total de inversión inicial: Bs 17.400</strong> (o Bs 18.600 en caso de optar
+              por los 4 módulos completos).
+            </li>
+          </ul>
+          <p style="font-size: 8.8pt; color: var(--text-muted); margin-bottom: 0">
+            La condición se aplica a la cantidad de instalaciones contratadas y no condiciona la
+            arquitectura técnica si se centraliza el procesamiento en menos servidores.
+          </p>
+        </div>
+
+        <h3 class="subsection-title">3. Soporte y Mantenimiento Posterior</h3>
+        <p>
+          Finalizado el período de 6 meses de garantía gratuita, el servicio de soporte estándar
+          tiene un costo de <strong>Bs 250 al mes</strong> para ajustes menores, monitoreo
+          preventivo y correcciones. Nuevos modelos o desarrollos a medida se cotizan por separado.
+        </p>
+      </div>
+
+      <div class="page-footer">
+        <span>VigIa Vision - Plataforma de Videoanalítica</span>
+        <span>Página 5 de 6</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+     PÁGINA 6: COTIZACIÓN · PLAN NUBE Y SIGUIENTES PASOS
+     ======================================================== -->
+    <div class="a4-page">
+      <div class="page-header">
+        <span>VigIA · Propuesta Técnica para Restaurantes</span>
+        <strong>Cotización Oficial · Plan Nube</strong>
+      </div>
+
+      <div class="page-body">
+        <h2 class="section-title">Cotización: Plan Nube (Suscripción Mensual)</h2>
+        <p>
+          Bajo la modalidad Plan Nube, el análisis de video se ejecuta directamente en los
+          servidores cloud de VigIA. La cadena no requiere adquirir computadores dedicados ni
+          realizar mantenimiento de servidores locales, pagando únicamente por cámara activa al mes.
+        </p>
+
+        <h3 class="subsection-title">1. Estructura de Tarifas por Cámara al Mes</h3>
+        <p>
+          El precio base por cámara incluye hasta 3 módulos activos simultáneamente. A mayor
+          cantidad de cámaras y según el horario de detección requerido, se aplican descuentos
+          acumulables:
+        </p>
+
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Condición de Aplicación</th>
+              <th style="text-align: right">Tarifa Resultante</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Tarifa base por cámara</strong></td>
+              <td>Hasta 3 módulos estándar activos por cámara</td>
+              <td style="text-align: right">Bs 170 / mes</td>
+            </tr>
+            <tr>
+              <td>Descuento por volumen (5 a 15 cámaras)</td>
+              <td>10 % de descuento sobre tarifa base</td>
+              <td style="text-align: right">Bs 153,00 / mes</td>
+            </tr>
+            <tr>
+              <td>Descuento por volumen (16 a 31 cámaras)</td>
+              <td>15 % de descuento acumulado (+5 % adicional)</td>
+              <td style="text-align: right">Bs 144,50 / mes</td>
+            </tr>
+            <tr>
+              <td>Descuento por volumen (32 o más cámaras)</td>
+              <td>20 % de descuento acumulado (+5 % adicional)</td>
+              <td style="text-align: right">Bs 136,00 / mes</td>
+            </tr>
+            <tr>
+              <td>Descuento por horario (12 a 16 horas/día)</td>
+              <td>5 % de descuento adicional sobre la tarifa</td>
+              <td style="text-align: right">Aplica descuento</td>
+            </tr>
+            <tr>
+              <td>Descuento por horario (8 horas/día)</td>
+              <td>10 % de descuento adicional sobre la tarifa</td>
+              <td style="text-align: right">Aplica descuento</td>
+            </tr>
+            <tr class="highlight">
+              <td><strong>Detecciones especiales fuera de catálogo</strong></td>
+              <td>Modelos personalizados que no forman parte de lo descrito</td>
+              <td style="text-align: right">Bs 210 / mes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="example-box">
+          <div class="example-box-title">Ejemplo de Suscripción en Nube (5 Cámaras Clave)</div>
+          <p style="font-size: 9.1pt; margin-bottom: 4px">
+            Dado que solo se requiere procesar las cámaras estratégicas de la operación, al conectar
+            <strong>5 cámaras clave</strong> en un establecimiento con el 10 % de descuento por
+            volumen:
+          </p>
+          <ul class="doc-list" style="margin-top: 2px; margin-bottom: 4px; font-size: 9pt">
+            <li>
+              Tarifa unitaria con descuento por volumen (5 cámaras):
+              <strong>Bs 153,00 por cámara al mes</strong>.
+            </li>
+            <li>
+              Inversión mensual total para 5 cámaras: <strong>Bs 765 al mes</strong> (o Bs
+              726,75/mes si opera en horario de 12 a 16 horas al día con el 5 % adicional).
+            </li>
+          </ul>
+        </div>
+
+        <h3 class="subsection-title">2. Siguientes Pasos: Relevamiento Técnico Conjunto</h3>
+        <p style="font-size: 9.1pt; margin-bottom: 5px">
+          Para avanzar en la implementación sin costos innecesarios, se coordinará una sesión de
+          trabajo conjunto entre el equipo de VigIA y los responsables de operaciones y tecnología
+          del restaurante para:
+        </p>
+        <ul class="doc-list">
+          <li>
+            <strong>Auditoría de cámaras existentes:</strong> Revisar los planos y ángulos de visión
+            de las 120 cámaras para
+            <strong>definir con exactitud cuántas cámaras será realmente necesario procesar</strong>
+            (identificando las ~5 cámaras neurálgicas por local).
+          </li>
+          <li>
+            <strong>Verificación de red y streams RTSP:</strong> Comprobar la resolución,
+            iluminación y estabilidad de enlace de las cámaras seleccionadas.
+          </li>
+          <li>
+            <strong>Validez de la cotización:</strong> 30 días calendario a partir de su emisión.
+          </li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>VigIa Vision · Contacto: 62645594, info@vigia.world · Sitio Web: vigia.world</span>
+
+        <span>Página 6 de 6</span>
+      </div>
+    </div>
+  </body>
+</html>
